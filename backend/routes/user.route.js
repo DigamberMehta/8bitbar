@@ -1,0 +1,135 @@
+import express from "express";
+import bcrypt from "bcryptjs";
+import User from "../models/user.model.js";
+import { generateToken } from "../utils/generateToken.js";
+import authenticateUser from "../middlewares/authenticateUser.js";
+import rateLimit from "express-rate-limit";
+
+const router = express.Router();
+
+// Rate limiter for auth routes
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: {
+    success: false,
+    message: "Too many requests, please try again later.",
+  },
+});
+
+// --- Registration Route ---
+// Logic from the 'register' controller is now directly inside the route handler.
+router.post("/register", authLimiter, async (req, res) => {
+  const { name, email, password, dob } = req.body;
+  try {
+    // 1. Validate input
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill in all fields",
+      });
+    }
+
+    // 2. Check if user already exists
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    // 3. Hash password and create new user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      ...(dob && { dob }),
+    });
+
+    // 4. Send success response
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// --- Login Route ---
+// Logic from the 'login' controller is now directly inside the route handler.
+router.post("/login", authLimiter, async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // 1. Validate input
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill in all fields",
+      });
+    }
+
+    // 2. Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // 3. Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // 4. Generate token and send response
+    // Assumes generateToken handles the response sending (e.g., setting a cookie and sending JSON)
+    generateToken(res, user, `Welcome back ${user.name}`);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// --- Logout Route ---
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "strict",
+  });
+  res.status(200).json({ success: true, message: "Logged out successfully" });
+});
+
+// --- Profile Route (Protected) ---
+// This route was already structured this way and remains the same.
+// It uses the 'authenticateUser' middleware to protect the route.
+router.get("/profile", authenticateUser, async (req, res) => {
+  try {
+    // The user ID is attached to the request object by the authenticateUser middleware
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+export default router;
