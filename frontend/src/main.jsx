@@ -7,9 +7,9 @@ import Cart from "./components/cart";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+ 
     <AuthProvider>
       <App />
     </AuthProvider>
-  </StrictMode>
+ 
 );

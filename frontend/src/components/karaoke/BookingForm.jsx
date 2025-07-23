@@ -67,6 +67,47 @@ const BookingForm = ({ room }) => {
     });
   };
 
+  // Helper: get the Date object for a slot on a given date
+  const getSlotDate = (dateStr, slot) => {
+    const match = slot.match(/(\d+):(\d+) (AM|PM)/);
+    if (!match) return null;
+    const [_, slotHour, slotMinute, slotPeriod] = match;
+    let hour = parseInt(slotHour, 10);
+    if (slotPeriod === "PM" && hour !== 12) hour += 12;
+    if (slotPeriod === "AM" && hour === 12) hour = 0;
+    const slotDate = new Date(dateStr);
+    slotDate.setHours(hour, parseInt(slotMinute, 10), 0, 0);
+    return slotDate;
+  };
+
+  // Get all slots that would be blocked by the selected duration
+  const getBlockedSlots = (dateStr) => {
+    return timeSlots.filter((slot, idx) => {
+      const slotStart = getSlotDate(dateStr, slot);
+      if (!slotStart) return false;
+      // Calculate the end time for this booking if started at this slot
+      const slotEnd = new Date(slotStart);
+      slotEnd.setHours(slotEnd.getHours() + numberOfHours);
+      // For each hour in the duration, check if any hour overlaps with a booking
+      for (let d = 0; d < numberOfHours; d++) {
+        const checkStart = new Date(slotStart);
+        checkStart.setHours(checkStart.getHours() + d);
+        const checkEnd = new Date(checkStart);
+        checkEnd.setHours(checkEnd.getHours() + 1);
+        // Check for overlap with any booking
+        const overlap = bookings.some((b) => {
+          const bookingStart = new Date(b.startDateTime);
+          const bookingEnd = new Date(b.endDateTime);
+          // Overlap if checkStart < bookingEnd && checkEnd > bookingStart
+          return checkStart < bookingEnd && checkEnd > bookingStart;
+        });
+        if (overlap) return true;
+      }
+      return false;
+    });
+  };
+  const blockedSlots = selectedDate ? getBlockedSlots(selectedDate) : [];
+
   const bookedTimes = selectedDate ? getBookedTimesForDate(selectedDate) : [];
 
   const handleAddToCart = () => {
@@ -187,9 +228,9 @@ const BookingForm = ({ room }) => {
                 <button
                   key={time}
                   onClick={() => setSelectedTime(time)}
-                  disabled={bookedTimes.includes(time)}
+                  disabled={blockedSlots.includes(time)}
                   className={`p-3 border rounded-lg text-center transition-all duration-300 ${
-                    bookedTimes.includes(time)
+                    blockedSlots.includes(time)
                       ? "opacity-50 cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500"
                       : selectedTime === time
                       ? "border-pink-500 bg-pink-500/20 text-pink-400"

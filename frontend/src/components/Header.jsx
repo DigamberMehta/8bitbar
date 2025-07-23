@@ -4,12 +4,7 @@ import { Menu, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useModal } from "../contexts/ModalContext";
 
-// Add a simple cart icon component
-const CartIcon = () => (
-  <span role="img" aria-label="cart" className="text-2xl align-middle">
-    🛒
-  </span>
-);
+ 
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -63,7 +58,7 @@ const Header = () => {
               to="/cart"
               className="ml-2 px-3 py-2 hover:text-cyan-400 transition-colors relative"
             >
-              <CartIcon />
+              Cart
             </Link>
             {/* Auth Buttons (Desktop) */}
             {!user ? (

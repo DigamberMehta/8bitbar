@@ -25,8 +25,8 @@ const seedData = async () => {
       customerName: "Charlie Brown",
       customerEmail: "charlie@example.com",
       numberOfPeople: 5,
-      startDateTime: new Date("2025-08-01T14:00:00"), // 2:00 PM
-      endDateTime: new Date("2025-08-01T17:00:00"),   // 5:00 PM
+      startDateTime: new Date("2025-08-01T21:00:00"), // 2:00 PM
+      endDateTime: new Date("2025-08-01T22:00:00"),   // 5:00 PM
       durationHours: 3,
       totalPrice: 300,
       status: "confirmed",

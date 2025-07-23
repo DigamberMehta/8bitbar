@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useModal } from "../contexts/ModalContext";
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const { openLogin } = useModal();
 
+  // Helper to load cart from localStorage and update state
   const loadCart = () => {
     const stored = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(stored);
   };
 
+  // Consolidated Effect Hook: Loads cart and listens for changes
   useEffect(() => {
     loadCart();
     const onStorageChange = (e) => {
@@ -23,12 +29,23 @@ const Cart = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
+  // Function to remove a specific item from the cart
   const handleRemoveItem = (itemIndex) => {
     const updatedCart = cart.filter((_, index) => index !== itemIndex);
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
+  // Function to handle the checkout button click
+  const handleProceedToCheckout = () => {
+    if (user) {
+      navigate("/checkout"); // If user is logged in, go to checkout
+    } else {
+      openLogin(); // If not logged in, open the login modal
+    }
+  };
+
+  // Calculate the total cost
   const estimatedTotal = cart.reduce((total, item) => total + (item.totalCost || 0), 0);
 
   // --- Empty Cart View ---
@@ -62,12 +79,9 @@ const Cart = () => {
           🛒 Your Cart
         </h1>
         
-        {/* Main two-column layout */}
-        {/* 👇 CHANGE: Increased gap from gap-12 to gap-16 for more space */}
         <div className="flex flex-col lg:flex-row gap-16">
           
           {/* Left Column: Product List */}
-          {/* 👇 CHANGE: Changed from flex-grow to a specific width for better control */}
           <div className="lg:w-2/3">
             <div className="flex justify-between border-b border-pink-500/30 pb-3 mb-4">
               <h2 className="text-gray-400 font-semibold uppercase tracking-wider">Product</h2>
@@ -134,7 +148,7 @@ const Cart = () => {
                 </div>
               </div>
               <button
-                onClick={() => navigate("/checkout")}
+                onClick={handleProceedToCheckout}
                 className="w-full mt-8 py-3 bg-gradient-to-r from-pink-500 to-cyan-400 text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-all duration-300 text-lg"
               >
                 Proceed to Checkout

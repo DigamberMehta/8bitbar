@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import userRoutes from "./routes/user.route.js";
 import karaokeRoutes from "./routes/karaoke.route.js";
+import n64Routes from "./routes/n64.route.js";
 import cookieParser from "cookie-parser";
 dotenv.config({});
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 //apis
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/karaoke-rooms", karaokeRoutes);
+app.use("/api/v1/n64-rooms", n64Routes);
 
 // call the connectDB function
 connectDB();
