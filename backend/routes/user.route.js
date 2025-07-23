@@ -41,9 +41,11 @@ router.post("/register", authLimiter, async (req, res) => {
 
     // 3. Hash password and create new user
     const hashedPassword = await bcrypt.hash(password, 10);
+    // Normalize email (convert to lowercase)
+    const normalizedEmail = email.toLowerCase().trim();
     const newUser = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
       ...(dob && { dob }),
     });
@@ -75,8 +77,9 @@ router.post("/login", authLimiter, async (req, res) => {
       });
     }
 
-    // 2. Find user by email
-    const user = await User.findOne({ email });
+    // 2. Find user by email (normalize email first)
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(400).json({
         success: false,
