@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react"; // Modified: Imported useRef
 import {
   Stage,
   Layer,
@@ -8,186 +8,255 @@ import {
   Text,
 } from "react-konva";
 import useImage from "use-image";
+import "./BarMapEditor.css";
+import Toolbar from "./Toolbar";
+import StageArea from "./StageArea";
+import ShapeRenderer from "./ShapeRenderer";
 
 const MAP_URL =
   "https://8bitbar.com.au/wp-content/uploads/2025/06/map-layout-0-resturant-scaled.jpg";
-const CANVAS_WIDTH = 1400; // Increased width
-const CANVAS_HEIGHT = 1000; // Increased height
+const CANVAS_WIDTH = 1000;
+const CANVAS_HEIGHT = 2400;
 
-const initialTables = [
-  { id: "t1", x: 200, y: 200 },
-  { id: "t2", x: 400, y: 300 },
-  { id: "t3", x: 600, y: 500 },
+// --- Initial Data ---
+const initialShapes = [
+  // Round Tables
+  { id: "t1", type: "round-table", x: 200, y: 200, radius: 40 },
+  { id: "t2", type: "round-table", x: 400, y: 300, radius: 40 },
+  { id: "t3", type: "round-table", x: 600, y: 500, radius: 40 },
+  // Chairs
+  { id: "c1", type: "chair", x: 170, y: 170, width: 32, height: 32 },
+  { id: "c2", type: "chair", x: 230, y: 170, width: 32, height: 32 },
+  { id: "c3", type: "chair", x: 170, y: 230, width: 32, height: 32 },
+  { id: "c4", type: "chair", x: 230, y: 230, width: 32, height: 32 },
+  { id: "c5", type: "chair", x: 370, y: 270, width: 32, height: 32 },
+  { id: "c6", type: "chair", x: 430, y: 330, width: 32, height: 32 },
 ];
 
-const initialChairs = [
-  { id: "c1", x: 170, y: 170 },
-  { id: "c2", x: 230, y: 170 },
-  { id: "c3", x: 170, y: 230 },
-  { id: "c4", x: 230, y: 230 },
-  { id: "c5", x: 370, y: 270 },
-  { id: "c6", x: 430, y: 330 },
-];
-
-const TABLE_RADIUS = 30;
-const CHAIR_SIZE = 20;
+// --- Default Styles ---
+const DEFAULT_TABLE_COLOR = "#228B22"; // ForestGreen
+const DEFAULT_CHAIR_COLOR = "#A0522D"; // Sienna
+const DEFAULT_TEXT_COLOR = "#000000";
+const FONT_SIZE = 22;
 
 const BarMapEditor = () => {
-  const [tables, setTables] = useState(initialTables);
-  const [chairs, setChairs] = useState(initialChairs);
+  const [shapes, setShapes] = useState(initialShapes);
+  const [selectedId, setSelectedId] = useState(null);
   const [hoveredId, setHoveredId] = useState(null);
+  const [scale, setScale] = useState(1);
   const [mapImage] = useImage(MAP_URL);
 
-  // Helper to get next table id
-  const getNextTableId = () => {
-    const nums = tables
-      .map((t) => parseInt(t.id.replace("t", ""), 10))
+  const [tableColor, setTableColor] = useState(DEFAULT_TABLE_COLOR);
+  const [chairColor, setChairColor] = useState(DEFAULT_CHAIR_COLOR);
+  const [textColor, setTextColor] = useState(DEFAULT_TEXT_COLOR);
+
+  const stageContainerRef = useRef(null); // Added: Ref for the stage container
+
+  // --- Helper to get next ID for any shape ---
+  const getNextId = (prefix) => {
+    const nums = shapes
+      .map((s) => parseInt(s.id.replace(prefix, ""), 10))
       .filter((n) => !isNaN(n));
     const max = nums.length ? Math.max(...nums) : 0;
-    return `t${max + 1}`;
-  };
-  // Helper to get next chair id
-  const getNextChairId = () => {
-    const nums = chairs
-      .map((c) => parseInt(c.id.replace("c", ""), 10))
-      .filter((n) => !isNaN(n));
-    const max = nums.length ? Math.max(...nums) : 0;
-    return `c${max + 1}`;
+    return `${prefix}${max + 1}`;
   };
 
-  const handleAddTable = () => {
-    setTables([...tables, { id: getNextTableId(), x: 100, y: 100 }]);
-  };
+  // --- Handlers for adding new shapes ---
+  const handleAddShape = (type) => {
+    let newShape;
 
-  const handleAddChair = () => {
-    setChairs([...chairs, { id: getNextChairId(), x: 150, y: 100 }]);
-  };
-
-  const handleTableDrag = (idx, e) => {
-    const newTables = tables.slice();
-    newTables[idx] = {
-      ...newTables[idx],
-      x: e.target.x(),
-      y: e.target.y(),
+    // Modified: Calculate position based on the visible center of the stage
+    if (!stageContainerRef.current) return;
+    const container = stageContainerRef.current;
+    const position = {
+      x: (container.scrollLeft + container.clientWidth / 2) / scale,
+      y: (container.scrollTop + container.clientHeight / 2) / scale,
     };
-    setTables(newTables);
+
+    switch (type) {
+      case "round-table":
+        newShape = {
+          id: getNextId("t"),
+          type,
+          ...position,
+          radius: 40,
+        };
+        break;
+      case "corner-table":
+        newShape = {
+          id: getNextId("ct"),
+          type,
+          ...position,
+          width: 70,
+          height: 70,
+        };
+        break;
+      case "chair":
+        newShape = {
+          id: getNextId("c"),
+          type,
+          ...position,
+          width: 32,
+          height: 32,
+        };
+        break;
+      case "text":
+        newShape = {
+          id: getNextId("txt"),
+          type,
+          text: "New Text",
+          ...position,
+        };
+        break;
+      default:
+        return;
+    }
+    setShapes([...shapes, newShape]);
   };
 
-  const handleChairDrag = (idx, e) => {
-    const newChairs = chairs.slice();
-    newChairs[idx] = {
-      ...newChairs[idx],
-      x: e.target.x(),
-      y: e.target.y(),
+  const handleDeleteSelected = () => {
+    if (!selectedId) return;
+    setShapes(shapes.filter((shape) => shape.id !== selectedId));
+    setSelectedId(null);
+  };
+
+  const handleDragEnd = (id, e) => {
+    const newShapes = shapes.slice();
+    const shape = newShapes.find((s) => s.id === id);
+    if (shape) {
+      shape.x = e.target.x();
+      shape.y = e.target.y();
+      setShapes(newShapes);
+    }
+  };
+
+  const handleZoom = (direction) => {
+    const scaleBy = 1.1;
+    setScale(direction === "in" ? scale * scaleBy : scale / scaleBy);
+  };
+
+  const handleColorChange = (color, typesToUpdate) => {
+    if (typesToUpdate.includes("chair")) setChairColor(color);
+    if (typesToUpdate.some((t) => t.includes("table"))) setTableColor(color);
+  };
+
+  const getShapeFillColor = (shape) => {
+    switch (shape.type) {
+      case "round-table":
+      case "corner-table":
+        return tableColor;
+      case "chair":
+        return chairColor;
+      case "text":
+        return textColor;
+      default:
+        return "black";
+    }
+  };
+
+  const renderShape = (shape) => {
+    const commonProps = {
+      key: shape.id,
+      id: shape.id,
+      x: shape.x,
+      y: shape.y,
+      draggable: true,
+      onClick: () => setSelectedId(shape.id),
+      onTap: () => setSelectedId(shape.id),
+      onDragEnd: (e) => handleDragEnd(shape.id, e),
+      onMouseEnter: () => setHoveredId(shape.id),
+      onMouseLeave: () => setHoveredId(null),
+      stroke:
+        selectedId === shape.id
+          ? "red"
+          : hoveredId === shape.id
+          ? "yellow"
+          : "black",
+      strokeWidth: selectedId === shape.id ? 5 : hoveredId === shape.id ? 4 : 2,
     };
-    setChairs(newChairs);
-  };
 
-  const handleShapeClick = (id) => {
-    alert(id);
+    const textLabel = (
+      <Text
+        x={shape.x - (shape.width || shape.radius * 2) / 2}
+        y={shape.y - FONT_SIZE / 2}
+        width={shape.width || shape.radius * 2}
+        text={shape.id}
+        fontSize={FONT_SIZE}
+        fontStyle="bold"
+        fill="#fff"
+        align="center"
+        verticalAlign="middle"
+        listening={false}
+      />
+    );
+
+    switch (shape.type) {
+      case "round-table":
+        return (
+          <React.Fragment key={shape.id}>
+            <Circle
+              {...commonProps}
+              radius={shape.radius}
+              fill={getShapeFillColor(shape)}
+            />
+            {textLabel}
+          </React.Fragment>
+        );
+      case "corner-table":
+      case "chair":
+        return (
+          <React.Fragment key={shape.id}>
+            <Rect
+              {...commonProps}
+              width={shape.width}
+              height={shape.height}
+              fill={getShapeFillColor(shape)}
+              offsetX={shape.width / 2}
+              offsetY={shape.height / 2}
+            />
+            {textLabel}
+          </React.Fragment>
+        );
+      case "text":
+        return (
+          <Text
+            {...commonProps}
+            text={shape.text}
+            fontSize={FONT_SIZE}
+            fontStyle="bold"
+            fill={textColor}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <button
-          onClick={handleAddTable}
-          style={{ marginRight: 8, padding: "8px 16px" }}
-        >
-          Add Table
-        </button>
-        <button onClick={handleAddChair} style={{ padding: "8px 16px" }}>
-          Add Chair
-        </button>
-      </div>
-      <Stage
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
-        style={{ border: "1px solid #ccc" }}
-      >
-        <Layer>
-          {mapImage && (
-            <KonvaImage
-              image={mapImage}
-              width={CANVAS_WIDTH}
-              height={CANVAS_HEIGHT}
-            />
-          )}
-          {/* Tables */}
-          {tables.map((table, idx) => (
-            <React.Fragment key={table.id}>
-              <Circle
-                x={table.x}
-                y={table.y}
-                radius={TABLE_RADIUS}
-                fill="green"
-                stroke={hoveredId === table.id ? "yellow" : "black"}
-                strokeWidth={hoveredId === table.id ? 4 : 2}
-                draggable
-                onDragEnd={(e) => handleTableDrag(idx, e)}
-                onClick={() => handleShapeClick(table.id)}
-                onTap={() => handleShapeClick(table.id)}
-                onMouseEnter={() => setHoveredId(table.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                onTouchStart={() => setHoveredId(table.id)}
-                onTouchEnd={() => setHoveredId(null)}
-              />
-              <Text
-                x={table.x - TABLE_RADIUS}
-                y={table.y - 12}
-                width={TABLE_RADIUS * 2}
-                height={24}
-                text={table.id}
-                fontSize={18}
-                fontStyle="bold"
-                fill="#fff"
-                align="center"
-                verticalAlign="middle"
-                listening={false}
-              />
-            </React.Fragment>
-          ))}
-          {/* Chairs */}
-          {chairs.map((chair, idx) => (
-            <React.Fragment key={chair.id}>
-              <Rect
-                x={chair.x}
-                y={chair.y}
-                width={CHAIR_SIZE}
-                height={CHAIR_SIZE}
-                fill="#8B4513"
-                stroke={hoveredId === chair.id ? "yellow" : "black"}
-                strokeWidth={hoveredId === chair.id ? 4 : 2}
-                offsetX={CHAIR_SIZE / 2}
-                offsetY={CHAIR_SIZE / 2}
-                draggable
-                onDragEnd={(e) => handleChairDrag(idx, e)}
-                onClick={() => handleShapeClick(chair.id)}
-                onTap={() => handleShapeClick(chair.id)}
-                onMouseEnter={() => setHoveredId(chair.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                onTouchStart={() => setHoveredId(chair.id)}
-                onTouchEnd={() => setHoveredId(null)}
-              />
-              <Text
-                x={chair.x - CHAIR_SIZE / 2}
-                y={chair.y - 10}
-                width={CHAIR_SIZE}
-                height={20}
-                text={chair.id}
-                fontSize={12}
-                fontStyle="bold"
-                fill="#fff"
-                align="center"
-                verticalAlign="middle"
-                listening={false}
-              />
-            </React.Fragment>
-          ))}
-        </Layer>
-      </Stage>
+    <div className="bar-map-editor-root">
+      <Toolbar
+        onAddShape={handleAddShape}
+        onZoom={handleZoom}
+        onDeleteSelected={handleDeleteSelected}
+        selectedId={selectedId}
+        tableColor={tableColor}
+        chairColor={chairColor}
+        onColorChange={handleColorChange}
+      />
+      <StageArea
+        shapes={shapes}
+        renderShape={renderShape}
+        mapImage={mapImage}
+        scale={scale}
+        stageContainerRef={stageContainerRef}
+        CANVAS_WIDTH={CANVAS_WIDTH}
+        CANVAS_HEIGHT={CANVAS_HEIGHT}
+      />
     </div>
   );
 };
+
+// --- Styles ---
+// REMOVE the styles object entirely
 
 export default BarMapEditor;
