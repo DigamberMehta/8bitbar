@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import BoothInfo from "./BoothInfo";
 import BookingForm from "./BookingForm";
+import axios from "../../utils/axios";
 
 /**
  * N64Booking Component
@@ -18,11 +19,11 @@ const N64Booking = () => {
     const fetchData = async () => {
       try {
         const [boothRes, bookingRes] = await Promise.all([
-          fetch("http://localhost:3000/api/v1/n64-rooms"),
-          fetch("http://localhost:3000/api/v1/n64-rooms/bookings"),
+          axios.get("/n64-rooms"),
+          axios.get("/n64-rooms/bookings"),
         ]);
-        const boothData = await boothRes.json();
-        const bookingData = await bookingRes.json();
+        const boothData = boothRes.data;
+        const bookingData = bookingRes.data;
         if (boothData.success && bookingData.success) {
           setBooths(boothData.booths);
           setBookings(bookingData.bookings);

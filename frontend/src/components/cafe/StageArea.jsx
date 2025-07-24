@@ -9,8 +9,13 @@ const StageArea = ({
   stageContainerRef,
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
+  deviceType,
 }) => (
-  <div ref={stageContainerRef} className="bar-map-editor-stage-container">
+  <div
+    ref={stageContainerRef}
+    className="bar-map-editor-stage-container"
+    style={{ height: CANVAS_HEIGHT, width: "100%" }}
+  >
     <Stage
       width={CANVAS_WIDTH}
       height={CANVAS_HEIGHT}

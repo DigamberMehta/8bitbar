@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axios from "../../utils/axios";
 
 /**
  * BookingForm Component
@@ -22,10 +23,8 @@ const BookingForm = ({ room }) => {
     // Fetch all bookings
     const fetchBookings = async () => {
       try {
-        const res = await fetch(
-          "http://localhost:3000/api/v1/karaoke-rooms/bookings"
-        );
-        const data = await res.json();
+        const res = await axios.get("/karaoke-rooms/bookings");
+        const data = res.data;
         if (data.success) {
           setBookings(data.bookings);
         }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import RoomInfo from "./RoomInfo";
 import BookingForm from "./BookingForm";
+import axios from "../../utils/axios";
 
 /**
  * KaraokeBooking Component
@@ -16,8 +17,8 @@ const KaraokeBooking = () => {
   useEffect(() => {
     const fetchRoom = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/v1/karaoke-rooms");
-        const data = await res.json();
+        const res = await axios.get("/karaoke-rooms");
+        const data = res.data;
         if (data.success && data.rooms.length > 0) {
           setRoom(data.rooms[0]);
         } else {

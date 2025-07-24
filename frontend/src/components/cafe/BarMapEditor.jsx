@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"; // Modified: Imported useRef
+import React, { useState, useRef, useEffect } from "react"; // Modified: Imported useRef, useEffect
 import {
   Stage,
   Layer,
@@ -8,15 +8,16 @@ import {
   Text,
 } from "react-konva";
 import useImage from "use-image";
-import "./BarMapEditor.css";
 import Toolbar from "./Toolbar";
 import StageArea from "./StageArea";
 import ShapeRenderer from "./ShapeRenderer";
+import axios from "../../utils/axios";
+import EditorSettings from "./EditorSettings";
 
-const MAP_URL =
+const DEFAULT_MAP_URL =
   "https://8bitbar.com.au/wp-content/uploads/2025/06/map-layout-0-resturant-scaled.jpg";
-const CANVAS_WIDTH = 1000;
-const CANVAS_HEIGHT = 2400;
+const DEFAULT_CANVAS_WIDTH = 1000;
+const DEFAULT_CANVAS_HEIGHT = 2400;
 
 // --- Initial Data ---
 const initialShapes = [
@@ -39,18 +40,224 @@ const DEFAULT_CHAIR_COLOR = "#A0522D"; // Sienna
 const DEFAULT_TEXT_COLOR = "#000000";
 const FONT_SIZE = 22;
 
+const DEVICE_TYPES = [
+  { label: "Desktop", value: "desktop" },
+  { label: "Mobile", value: "mobile" },
+];
+
+const MOBILE_SCALE = 0.7; // scale down bg image for mobile
+const MOBILE_TABLE_RADIUS = 36;
+const MOBILE_TABLE_SIZE = 60;
+const MOBILE_CHAIR_SIZE = 28;
+
 const BarMapEditor = () => {
   const [shapes, setShapes] = useState(initialShapes);
   const [selectedId, setSelectedId] = useState(null);
   const [hoveredId, setHoveredId] = useState(null);
   const [scale, setScale] = useState(1);
-  const [mapImage] = useImage(MAP_URL);
+  const [mapUrl, setMapUrl] = useState(DEFAULT_MAP_URL);
+  const [canvasWidth, setCanvasWidth] = useState(DEFAULT_CANVAS_WIDTH);
+  const [canvasHeight, setCanvasHeight] = useState(DEFAULT_CANVAS_HEIGHT);
+  const [mapImage] = useImage(mapUrl);
 
   const [tableColor, setTableColor] = useState(DEFAULT_TABLE_COLOR);
   const [chairColor, setChairColor] = useState(DEFAULT_CHAIR_COLOR);
   const [textColor, setTextColor] = useState(DEFAULT_TEXT_COLOR);
+  const [deviceType, setDeviceType] = useState("desktop");
+
+  const [loading, setLoading] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("");
 
   const stageContainerRef = useRef(null); // Added: Ref for the stage container
+
+  // Helper to get initial shapes based on device type
+  const getInitialShapes = (type) => {
+    if (type === "mobile") {
+      return [
+        // Round Tables
+        {
+          id: "t1",
+          type: "round-table",
+          x: 120,
+          y: 120,
+          radius: MOBILE_TABLE_RADIUS,
+        },
+        {
+          id: "t2",
+          type: "round-table",
+          x: 220,
+          y: 180,
+          radius: MOBILE_TABLE_RADIUS,
+        },
+        {
+          id: "t3",
+          type: "round-table",
+          x: 320,
+          y: 300,
+          radius: MOBILE_TABLE_RADIUS,
+        },
+        // Chairs
+        {
+          id: "c1",
+          type: "chair",
+          x: 100,
+          y: 100,
+          width: MOBILE_CHAIR_SIZE,
+          height: MOBILE_CHAIR_SIZE,
+        },
+        {
+          id: "c2",
+          type: "chair",
+          x: 140,
+          y: 100,
+          width: MOBILE_CHAIR_SIZE,
+          height: MOBILE_CHAIR_SIZE,
+        },
+        {
+          id: "c3",
+          type: "chair",
+          x: 100,
+          y: 140,
+          width: MOBILE_CHAIR_SIZE,
+          height: MOBILE_CHAIR_SIZE,
+        },
+        {
+          id: "c4",
+          type: "chair",
+          x: 140,
+          y: 140,
+          width: MOBILE_CHAIR_SIZE,
+          height: MOBILE_CHAIR_SIZE,
+        },
+        {
+          id: "c5",
+          type: "chair",
+          x: 200,
+          y: 160,
+          width: MOBILE_CHAIR_SIZE,
+          height: MOBILE_CHAIR_SIZE,
+        },
+        {
+          id: "c6",
+          type: "chair",
+          x: 240,
+          y: 200,
+          width: MOBILE_CHAIR_SIZE,
+          height: MOBILE_CHAIR_SIZE,
+        },
+      ];
+    }
+    return initialShapes;
+  };
+
+  // Load layout from backend
+  useEffect(() => {
+    const fetchLayout = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(
+          `/admin/cafe-layout?deviceType=${deviceType}`
+        );
+        const layout = res.data.layout;
+        if (layout) {
+          // Convert backend format to shapes array
+          const loadedShapes = [
+            ...(layout.tables || []).map((table) => ({
+              ...table,
+              type: table.type,
+              id: table.id,
+              x: table.x,
+              y: table.y,
+              radius:
+                deviceType === "mobile" ? MOBILE_TABLE_RADIUS : table.radius,
+              width: deviceType === "mobile" ? MOBILE_TABLE_SIZE : table.width,
+              height:
+                deviceType === "mobile" ? MOBILE_TABLE_SIZE : table.height,
+              color: table.color,
+            })),
+            ...(layout.chairs || []).map((chair) => ({
+              ...chair,
+              type: "chair",
+              id: chair.id,
+              x: chair.x,
+              y: chair.y,
+              width: deviceType === "mobile" ? MOBILE_CHAIR_SIZE : chair.width,
+              height:
+                deviceType === "mobile" ? MOBILE_CHAIR_SIZE : chair.height,
+              color: chair.color,
+            })),
+          ];
+          setShapes(loadedShapes);
+          if (layout.tables && layout.tables[0])
+            setTableColor(layout.tables[0].color);
+          if (layout.chairs && layout.chairs[0])
+            setChairColor(layout.chairs[0].color);
+          if (layout.bgImageUrl) setMapUrl(layout.bgImageUrl);
+          if (layout.canvasWidth) setCanvasWidth(layout.canvasWidth);
+          if (layout.canvasHeight) setCanvasHeight(layout.canvasHeight);
+        } else {
+          // If no layout exists for this device type, set defaults
+          setShapes(getInitialShapes(deviceType));
+          setTableColor(DEFAULT_TABLE_COLOR);
+          setChairColor(DEFAULT_CHAIR_COLOR);
+          setMapUrl(DEFAULT_MAP_URL);
+          setCanvasWidth(deviceType === "mobile" ? 450 : DEFAULT_CANVAS_WIDTH);
+          setCanvasHeight(DEFAULT_CANVAS_HEIGHT);
+        }
+      } catch (err) {
+        setSaveStatus("Failed to load layout");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLayout();
+    // eslint-disable-next-line
+  }, [deviceType]);
+
+  // Save layout to backend
+  const handleSaveLayout = async (shapesToSave) => {
+    setLoading(true);
+    setSaveStatus("");
+    try {
+      const shapesData = shapesToSave || shapes;
+      const tables = shapesData
+        .filter((s) => s.type === "round-table" || s.type === "corner-table")
+        .map((s) => ({
+          id: s.id,
+          type: s.type,
+          x: s.x,
+          y: s.y,
+          radius: s.radius,
+          width: s.width,
+          height: s.height,
+          color: tableColor,
+        }));
+      const chairs = shapesData
+        .filter((s) => s.type === "chair")
+        .map((s) => ({
+          id: s.id,
+          x: s.x,
+          y: s.y,
+          width: s.width,
+          height: s.height,
+          color: chairColor,
+        }));
+      await axios.put("/admin/cafe-layout", {
+        tables,
+        chairs,
+        bgImageUrl: mapUrl,
+        canvasWidth,
+        canvasHeight,
+        deviceType,
+        changeType: "updated",
+      });
+      setSaveStatus("Layout saved successfully!");
+    } catch (err) {
+      setSaveStatus("Failed to save layout");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // --- Helper to get next ID for any shape ---
   const getNextId = (prefix) => {
@@ -154,9 +361,10 @@ const BarMapEditor = () => {
     }
   };
 
+  // In renderShape, scale down bg image for mobile
   const renderShape = (shape) => {
+    const { id, ...rest } = shape;
     const commonProps = {
-      key: shape.id,
       id: shape.id,
       x: shape.x,
       y: shape.y,
@@ -174,7 +382,6 @@ const BarMapEditor = () => {
           : "black",
       strokeWidth: selectedId === shape.id ? 5 : hoveredId === shape.id ? 4 : 2,
     };
-
     const textLabel = (
       <Text
         x={shape.x - (shape.width || shape.radius * 2) / 2}
@@ -189,12 +396,12 @@ const BarMapEditor = () => {
         listening={false}
       />
     );
-
     switch (shape.type) {
       case "round-table":
         return (
           <React.Fragment key={shape.id}>
             <Circle
+              key={shape.id}
               {...commonProps}
               radius={shape.radius}
               fill={getShapeFillColor(shape)}
@@ -207,6 +414,7 @@ const BarMapEditor = () => {
         return (
           <React.Fragment key={shape.id}>
             <Rect
+              key={shape.id}
               {...commonProps}
               width={shape.width}
               height={shape.height}
@@ -220,6 +428,7 @@ const BarMapEditor = () => {
       case "text":
         return (
           <Text
+            key={shape.id}
             {...commonProps}
             text={shape.text}
             fontSize={FONT_SIZE}
@@ -233,7 +442,34 @@ const BarMapEditor = () => {
   };
 
   return (
-    <div className="bar-map-editor-root">
+    <div className="bar-map-editor-root p-4">
+      <EditorSettings
+        deviceType={deviceType}
+        setDeviceType={setDeviceType}
+        mapUrl={mapUrl}
+        setMapUrl={setMapUrl}
+        canvasWidth={canvasWidth}
+        setCanvasWidth={setCanvasWidth}
+        canvasHeight={canvasHeight}
+        setCanvasHeight={setCanvasHeight}
+        DEVICE_TYPES={DEVICE_TYPES}
+      />
+      {loading && (
+        <div className="text-black bg-yellow-200 px-4 py-2 rounded mb-2 font-medium">
+          Loading...
+        </div>
+      )}
+      {saveStatus && (
+        <div
+          className={`px-4 py-2 rounded mb-2 font-medium ${
+            saveStatus.includes("success")
+              ? "text-green-700 bg-green-100"
+              : "text-red-700 bg-red-100"
+          }`}
+        >
+          {saveStatus}
+        </div>
+      )}
       <Toolbar
         onAddShape={handleAddShape}
         onZoom={handleZoom}
@@ -243,20 +479,25 @@ const BarMapEditor = () => {
         chairColor={chairColor}
         onColorChange={handleColorChange}
       />
+      <button
+        className="bar-map-editor-button mt-3 mb-3 ml-2 text-white bg-slate-500 p-1 rounded-md"
+        onClick={() => handleSaveLayout(shapes)}
+        disabled={loading}
+      >
+        Save Layout
+      </button>
       <StageArea
         shapes={shapes}
         renderShape={renderShape}
         mapImage={mapImage}
-        scale={scale}
+        scale={deviceType === "mobile" ? scale * MOBILE_SCALE : scale}
         stageContainerRef={stageContainerRef}
-        CANVAS_WIDTH={CANVAS_WIDTH}
-        CANVAS_HEIGHT={CANVAS_HEIGHT}
+        CANVAS_WIDTH={canvasWidth}
+        CANVAS_HEIGHT={canvasHeight}
+        deviceType={deviceType}
       />
     </div>
   );
 };
-
-// --- Styles ---
-// REMOVE the styles object entirely
 
 export default BarMapEditor;

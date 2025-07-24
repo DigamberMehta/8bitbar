@@ -8,6 +8,7 @@ import {
   MdSportsEsports,
   MdMenu,
   MdClose,
+  MdRestaurant,
 } from "react-icons/md";
 
 const AdminLayout = () => {
@@ -39,6 +40,11 @@ const AdminLayout = () => {
       path: "/admin/n64-rooms",
       label: "N64 Rooms",
       icon: <MdSportsEsports size={20} />,
+    },
+    {
+      path: "/admin/cafe-layout",
+      label: "Cafe Layout",
+      icon: <MdRestaurant size={20} />,
     },
   ];
 
