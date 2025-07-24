@@ -4,8 +4,6 @@ import { Menu, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useModal } from "../contexts/ModalContext";
 
- 
-
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -19,6 +17,12 @@ const Header = () => {
     { path: "/gallery", label: "Gallery" },
     { path: "/contact", label: "Contact" },
   ];
+
+  // Add admin panel to nav items if user is admin
+  const adminNavItems =
+    user?.role === "admin"
+      ? [...navItems, { path: "/admin", label: "Admin Panel" }]
+      : navItems;
 
   const isActive = (path) => location.pathname === path;
 
@@ -37,19 +41,29 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8 items-center">
-            {navItems.map((item) => (
+            {adminNavItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={`relative px-3 py-2 text-sm font-medium transition-all duration-300 ${
-                  isActive(item.path)
+                  item.label === "Admin Panel"
+                    ? isActive(item.path)
+                      ? "text-orange-400 neon-text-orange"
+                      : "text-orange-300 hover:text-orange-400"
+                    : isActive(item.path)
                     ? "text-cyan-400 neon-text-cyan"
                     : "text-gray-300 hover:text-white"
                 }`}
               >
                 {item.label}
                 {isActive(item.path) && (
-                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-pink-500 to-cyan-400 neon-glow-cyan"></div>
+                  <div
+                    className={`absolute bottom-0 left-0 w-full h-0.5 ${
+                      item.label === "Admin Panel"
+                        ? "bg-gradient-to-r from-orange-500 to-red-400 neon-glow-orange"
+                        : "bg-gradient-to-r from-pink-500 to-cyan-400 neon-glow-cyan"
+                    }`}
+                  ></div>
                 )}
               </Link>
             ))}
@@ -111,13 +125,17 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-700">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
+              {adminNavItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={`block px-3 py-2 text-base font-medium transition-colors ${
-                    isActive(item.path)
+                    item.label === "Admin Panel"
+                      ? isActive(item.path)
+                        ? "text-orange-400 bg-gray-800"
+                        : "text-orange-300 hover:text-orange-400 hover:bg-gray-800"
+                      : isActive(item.path)
                       ? "text-cyan-400 bg-gray-800"
                       : "text-gray-300 hover:text-white hover:bg-gray-800"
                   }`}
@@ -131,7 +149,7 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
                 className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-cyan-400 hover:bg-gray-800"
               >
-                <CartIcon /> Cart
+                 Cart
               </Link>
               {/* Auth Buttons (Mobile) */}
               {!user ? (
