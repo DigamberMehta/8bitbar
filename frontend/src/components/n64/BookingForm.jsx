@@ -21,8 +21,8 @@ const BookingForm = ({ booths, bookings }) => {
   const selectedBooth = booths.find((b) => b._id === selectedBoothId);
   const timeSlots = selectedBooth ? selectedBooth.timeSlots : [];
   const maxPeople = selectedBooth ? selectedBooth.maxPeople : 4;
-  const pricePerHour = selectedBooth ? selectedBooth.pricePerHour : 20;
-  const totalCost = pricePerHour * duration;
+  const pricePerHour = selectedBooth ? selectedBooth.pricePerHour : null;
+  const totalCost = selectedBooth ? pricePerHour * duration : null;
 
   // Helper: get the Date object for a slot on a given date
   const getSlotDate = (dateStr, slot) => {
@@ -76,7 +76,7 @@ const BookingForm = ({ booths, bookings }) => {
         title: "N64 Booth",
         boothName: selectedBooth.name,
         imageUrl:
-        "https://8bitbar.com.au/wp-content/uploads/2025/03/20250419_212301-scaled.jpg",
+          "https://8bitbar.com.au/wp-content/uploads/2025/03/20250419_212301-scaled.jpg",
         date: selectedDate,
         time: selectedTime,
         duration,
@@ -211,7 +211,9 @@ const BookingForm = ({ booths, bookings }) => {
         <div className="border-t border-gray-700 pt-6">
           <div className="flex justify-between items-center text-xl">
             <span className="text-gray-300 font-semibold">Total Cost:</span>
-            <span className="text-green-400 font-bold">${totalCost}</span>
+            <span className="text-green-400 font-bold">
+              {selectedBooth ? `$${totalCost}` : "--"}
+            </span>
           </div>
         </div>
 

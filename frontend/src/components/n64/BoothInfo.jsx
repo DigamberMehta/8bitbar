@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Gamepad2, Star, Users } from "lucide-react";
+import axios from "../../utils/axios";
 
 /**
  * BoothInfo Component
@@ -7,25 +8,63 @@ import { Gamepad2, Star, Users } from "lucide-react";
  * features, pricing, and images.
  */
 const BoothInfo = () => {
+  const [booth, setBooth] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function fetchBooth() {
+      try {
+        setLoading(true);
+        const res = await axios.get("/n64-rooms");
+        if (res.data && res.data.booths && res.data.booths.length > 0) {
+          setBooth(res.data.booths[0]);
+        } else {
+          setError("No booth info available.");
+        }
+      } catch (err) {
+        setError("Failed to load booth info.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBooth();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-pink-500"></div>
+      </div>
+    );
+  }
+  if (error) {
+    return <div className="text-center text-red-400 py-8">{error}</div>;
+  }
+  if (!booth) return null;
+
   return (
     <div className="space-y-8">
       {/* Main Image */}
       <div className="bg-black/50 border border-pink-500/30 rounded-lg overflow-hidden">
         <img
-          src="https://8bitbar.com.au/wp-content/uploads/2025/03/20250419_212301-scaled.jpg"
-          alt="N64 Gaming Booth"
+          src={
+            booth.imageUrl ||
+            "https://placehold.co/600x400/1a202c/9f7aea?text=N64+Booth"
+          }
+          alt={booth.name}
           className="w-full h-64 object-cover"
-          onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1a202c/9f7aea?text=N64+Booth'; }}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src =
+              "https://placehold.co/600x400/1a202c/9f7aea?text=N64+Booth";
+          }}
         />
         <div className="p-6">
           <h2 className="font-['Orbitron'] text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-            N64 Gaming Booths
+            {booth.name}
           </h2>
-          <p className="text-gray-300 mb-4">
-            Experience the golden age of gaming with our premium N64 booths.
-            Each booth comes with classic games and comfortable seating for up
-            to 4 people.
-          </p>
+          <p className="text-gray-300 mb-4">{booth.description}</p>
         </div>
       </div>
 
@@ -35,24 +74,15 @@ const BoothInfo = () => {
           ✨ What's Included
         </h3>
         <div className="space-y-4">
-          <div className="flex items-center space-x-3">
-            <Gamepad2 className="h-5 w-5 text-pink-400" />
-            <span className="text-gray-300">
-              Original N64 console with authentic controllers
-            </span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Star className="h-5 w-5 text-cyan-400" />
-            <span className="text-gray-300">
-              Selection of classic N64 games (Mario Kart, GoldenEye, etc.)
-            </span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Users className="h-5 w-5 text-yellow-400" />
-            <span className="text-gray-300">
-              Comfortable seating for up to 4 players
-            </span>
-          </div>
+          {booth.inclusions?.features?.map((feature, idx) => (
+            <div className="flex items-center space-x-3" key={idx}>
+              {idx === 0 && <Gamepad2 className="h-5 w-5 text-pink-400" />}
+              {idx === 1 && <Star className="h-5 w-5 text-cyan-400" />}
+              {idx === 2 && <Users className="h-5 w-5 text-yellow-400" />}
+              {idx > 2 && <Star className="h-5 w-5 text-cyan-400" />}
+              <span className="text-gray-300">{feature}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -69,7 +99,9 @@ const BoothInfo = () => {
                 Perfect for a retro gaming throwback
               </p>
             </div>
-            <span className="text-2xl font-bold text-green-400">$20</span>
+            <span className="text-2xl font-bold text-green-400">
+              ${booth.pricePerHour}
+            </span>
           </div>
         </div>
       </div>
