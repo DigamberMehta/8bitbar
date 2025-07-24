@@ -4,6 +4,7 @@ import KaraokeBooking from "../models/KaraokeBooking.js";
 import N64Booking from "../models/N64Booking.js";
 import KaraokeRoom from "../models/KaraokeRoom.js";
 import N64Room from "../models/N64Room.js";
+import CafeLayout from "../models/CafeLayout.js";
 
 const router = express.Router();
 
@@ -146,6 +147,93 @@ router.put("/n64-rooms/:id", async (req, res) => {
     res.json({ room });
   } catch (error) {
     res.status(500).json({ message: "Error updating N64 room" });
+  }
+});
+
+// --- Cafe Layout Management ---
+// Get current cafe layout
+router.get("/cafe-layout", async (req, res) => {
+  try {
+    const deviceType = req.query.deviceType || "desktop";
+    const layout = await CafeLayout.findOne({ deviceType }).sort({
+      updatedAt: -1,
+    });
+    res.json({ layout });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching cafe layout" });
+  }
+});
+
+// Update cafe layout (replace all)
+router.put("/cafe-layout", async (req, res) => {
+  try {
+    const {
+      chairs,
+      tables,
+      changeType,
+      bgImageUrl,
+      canvasWidth,
+      canvasHeight,
+      deviceType,
+    } = req.body;
+    const layout = await CafeLayout.create({
+      chairs,
+      tables,
+      bgImageUrl,
+      canvasWidth,
+      canvasHeight,
+      deviceType: deviceType || "desktop",
+      updatedBy: req.userId,
+      changeType: changeType || "updated",
+    });
+    res.json({ layout });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating cafe layout" });
+  }
+});
+
+// Add a chair or table
+router.post("/cafe-layout/item", async (req, res) => {
+  try {
+    const { item, itemType } = req.body; // itemType: 'chair' or 'table'
+    const lastLayout = await CafeLayout.findOne().sort({ updatedAt: -1 });
+    let newChairs = lastLayout ? [...lastLayout.chairs] : [];
+    let newTables = lastLayout ? [...lastLayout.tables] : [];
+    if (itemType === "chair") newChairs.push(item);
+    else if (itemType === "table") newTables.push(item);
+    const layout = await CafeLayout.create({
+      chairs: newChairs,
+      tables: newTables,
+      updatedBy: req.userId,
+      changeType: "added",
+    });
+    res.json({ layout });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding item to cafe layout" });
+  }
+});
+
+// Remove a chair or table
+router.delete("/cafe-layout/item/:itemId", async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { itemType } = req.query; // 'chair' or 'table'
+    const lastLayout = await CafeLayout.findOne().sort({ updatedAt: -1 });
+    let newChairs = lastLayout
+      ? lastLayout.chairs.filter((c) => c.id !== itemId)
+      : [];
+    let newTables = lastLayout
+      ? lastLayout.tables.filter((t) => t.id !== itemId)
+      : [];
+    const layout = await CafeLayout.create({
+      chairs: itemType === "chair" ? newChairs : lastLayout.chairs,
+      tables: itemType === "table" ? newTables : lastLayout.tables,
+      updatedBy: req.userId,
+      changeType: "removed",
+    });
+    res.json({ layout });
+  } catch (error) {
+    res.status(500).json({ message: "Error removing item from cafe layout" });
   }
 });
 

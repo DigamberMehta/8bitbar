@@ -92,11 +92,6 @@ const Header = () => {
               </>
             ) : (
               <div className="flex items-center ml-6 space-x-3">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="h-8 w-8 rounded-full border-2 border-cyan-400"
-                />
                 <span className="text-gray-200 font-medium">{user.name}</span>
                 <button
                   onClick={logout}
@@ -149,7 +144,7 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
                 className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-cyan-400 hover:bg-gray-800"
               >
-                 Cart
+                Cart
               </Link>
               {/* Auth Buttons (Mobile) */}
               {!user ? (
@@ -175,11 +170,6 @@ const Header = () => {
                 </div>
               ) : (
                 <div className="flex items-center gap-3 mt-4">
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="h-8 w-8 rounded-full border-2 border-cyan-400"
-                  />
                   <span className="text-gray-200 font-medium">{user.name}</span>
                   <button
                     onClick={() => {

@@ -86,6 +86,7 @@ function App() {
                   path="n64-rooms/:id/edit"
                   element={<N64RoomEditAdmin />}
                 />
+                <Route path="cafe-layout" element={<BarMapEditor />} />
               </Route>
             </Routes>
           </main>

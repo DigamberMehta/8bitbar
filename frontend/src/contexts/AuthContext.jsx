@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "../utils/axios";
 
 const AuthContext = createContext();
 
@@ -25,32 +26,14 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch("http://localhost:3000/api/v1/user/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-      let data = {};
-      try {
-        data = await response.json();
-      } catch (e) {
-        // If not JSON, fallback
-        data = {};
-      }
-      if (response.ok && data.success) {
+      const response = await axios.post("/user/login", { email, password });
+      const data = response.data || {};
+      if (response.status === 200 && data.success) {
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
         return { success: true };
       } else if (data.message) {
         return { success: false, error: data.message };
-      } else if (response.status === 429) {
-        return {
-          success: false,
-          error: "Too many requests, please try again later.",
-        };
       } else {
         return {
           success: false,
@@ -59,9 +42,17 @@ export const AuthProvider = ({ children }) => {
         };
       }
     } catch (error) {
+      if (error.response?.status === 429) {
+        return {
+          success: false,
+          error: "Too many requests, please try again later.",
+        };
+      }
       return {
         success: false,
-        error: "Network error. Please try again later.",
+        error:
+          error.response?.data?.message ||
+          "Network error. Please try again later.",
       };
     }
   };
@@ -71,24 +62,9 @@ export const AuthProvider = ({ children }) => {
       const body = dob
         ? { name, email, password, dob }
         : { name, email, password };
-      const response = await fetch(
-        "http://localhost:3000/api/v1/user/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(body),
-        }
-      );
-      let data = {};
-      try {
-        data = await response.json();
-      } catch (e) {
-        data = {};
-      }
-      if (response.ok && data.success) {
+      const response = await axios.post("/user/register", body);
+      const data = response.data || {};
+      if (response.status === 201 && data.success) {
         // Auto-login after successful signup
         const loginResult = await login(email, password);
         if (loginResult.success) {
@@ -101,11 +77,6 @@ export const AuthProvider = ({ children }) => {
         }
       } else if (data.message) {
         return { success: false, error: data.message };
-      } else if (response.status === 429) {
-        return {
-          success: false,
-          error: "Too many requests, please try again later.",
-        };
       } else {
         return {
           success: false,
@@ -114,19 +85,24 @@ export const AuthProvider = ({ children }) => {
         };
       }
     } catch (error) {
+      if (error.response?.status === 429) {
+        return {
+          success: false,
+          error: "Too many requests, please try again later.",
+        };
+      }
       return {
         success: false,
-        error: "Network error. Please try again later.",
+        error:
+          error.response?.data?.message ||
+          "Network error. Please try again later.",
       };
     }
   };
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:3000/api/v1/user/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await axios.post("/user/logout");
     } catch (e) {
       // Ignore network errors on logout
     }
