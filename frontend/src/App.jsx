@@ -25,6 +25,7 @@ import N64RoomsAdmin from "./pages/admin/n64admin/N64RoomsAdmin";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import N64RoomEditAdmin from "./pages/admin/n64admin/N64RoomEditAdmin";
 import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmin";
+import BarMapEditor from "./components/cafe/BarMapEditor";
 
 // Import Context Provider
 import { ModalProvider } from "./contexts/ModalContext";
@@ -57,6 +58,7 @@ function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/bar-map-editor" element={<BarMapEditor />} />
 
               {/* Admin Routes */}
               <Route

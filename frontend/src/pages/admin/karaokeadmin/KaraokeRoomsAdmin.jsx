@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../utils/axios";
 import { useNavigate } from "react-router-dom";
+import { Pencil } from 'lucide-react';
 
 const KaraokeRoomsAdmin = () => {
   const [rooms, setRooms] = useState([]);
@@ -57,7 +58,7 @@ const KaraokeRoomsAdmin = () => {
                             onClick={() => navigate(`/admin/karaoke-room/edit?id=${room._id}`)}
                             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md"
                         >
-                            ✏️ <span className="sr-only">Edit</span>
+                           <Pencil size={24} />  <span className="sr-only">Edit</span>
                         </button>
                     </div>
                   </div>
