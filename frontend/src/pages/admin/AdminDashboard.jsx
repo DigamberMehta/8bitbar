@@ -5,6 +5,7 @@ import {
   MdVideogameAsset,
   MdMeetingRoom,
   MdSportsEsports,
+  MdLocalCafe,
 } from "react-icons/md";
 
 const AdminDashboard = () => {
@@ -13,6 +14,7 @@ const AdminDashboard = () => {
     totalN64Bookings: 0,
     totalKaraokeRooms: 0,
     totalN64Rooms: 0,
+    totalCafeBookings: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -23,19 +25,26 @@ const AdminDashboard = () => {
   const fetchDashboardStats = async () => {
     try {
       // You'll need to create these endpoints in your backend
-      const [karaokeBookings, n64Bookings, karaokeRooms, n64Rooms] =
-        await Promise.all([
-          api.get("/admin/karaoke-bookings/count"),
-          api.get("/admin/n64-bookings/count"),
-          api.get("/admin/karaoke-rooms/count"),
-          api.get("/admin/n64-rooms/count"),
-        ]);
+      const [
+        karaokeBookings,
+        n64Bookings,
+        karaokeRooms,
+        n64Rooms,
+        cafeBookings,
+      ] = await Promise.all([
+        api.get("/admin/karaoke-bookings/count"),
+        api.get("/admin/n64-bookings/count"),
+        api.get("/admin/karaoke-rooms/count"),
+        api.get("/admin/n64-rooms/count"),
+        api.get("/admin/cafe-bookings/count"),
+      ]);
 
       setStats({
         totalKaraokeBookings: karaokeBookings.data.count || 0,
         totalN64Bookings: n64Bookings.data.count || 0,
         totalKaraokeRooms: karaokeRooms.data.count || 0,
         totalN64Rooms: n64Rooms.data.count || 0,
+        totalCafeBookings: cafeBookings.data.count || 0,
       });
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
@@ -68,7 +77,7 @@ const AdminDashboard = () => {
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <StatCard
           title="Karaoke Bookings"
           value={stats.totalKaraokeBookings}
@@ -80,6 +89,12 @@ const AdminDashboard = () => {
           value={stats.totalN64Bookings}
           icon={<MdVideogameAsset size={28} />}
           color="border-green-500"
+        />
+        <StatCard
+          title="Cafe Bookings"
+          value={stats.totalCafeBookings}
+          icon={<MdLocalCafe size={28} />}
+          color="border-yellow-500"
         />
         <StatCard
           title="Karaoke Rooms"

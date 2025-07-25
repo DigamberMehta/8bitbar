@@ -10,7 +10,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import HomePage from "./pages/HomePage";
 import KaraokeBookingPage from "./pages/KaraokeBookingPage";
 import N64BoothBookingPage from "./pages/N64BoothBookingPage";
-import GalleryPage from "./pages/GalleryPage";
+import CafeBookingPage from "./components/CafeBooking/CafeBookingPage";
+
 import ContactPage from "./pages/ContactPage";
 import Cart from "./components/cart"; // Assuming cart is in components
 import CheckoutPage from "./pages/CheckoutPage"; // Import the new checkout page
@@ -22,6 +23,8 @@ import KaraokeBookingsAdmin from "./pages/admin/karaokeadmin/KaraokeBookingsAdmi
 import N64BookingsAdmin from "./pages/admin/n64admin/N64BookingsAdmin";
 import KaraokeRoomsAdmin from "./pages/admin/karaokeadmin/KaraokeRoomsAdmin";
 import N64RoomsAdmin from "./pages/admin/n64admin/N64RoomsAdmin";
+import CafeBookingsAdmin from "./pages/admin/cafeadmin/CafeBookingsAdmin";
+import CafeSettingsAdmin from "./pages/admin/cafeadmin/CafeSettingsAdmin";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import N64RoomEditAdmin from "./pages/admin/n64admin/N64RoomEditAdmin";
 import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmin";
@@ -54,7 +57,7 @@ function App() {
                 path="/n64-booth-booking"
                 element={<N64BoothBookingPage />}
               />
-              <Route path="/gallery" element={<GalleryPage />} />
+              <Route path="/cafe-booking" element={<CafeBookingPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<CheckoutPage />} />
@@ -76,6 +79,8 @@ function App() {
                   element={<KaraokeBookingsAdmin />}
                 />
                 <Route path="n64-bookings" element={<N64BookingsAdmin />} />
+                <Route path="cafe-bookings" element={<CafeBookingsAdmin />} />
+                <Route path="cafe-settings" element={<CafeSettingsAdmin />} />
                 <Route path="karaoke-rooms" element={<KaraokeRoomsAdmin />} />
                 <Route
                   path="karaoke-room/edit"
