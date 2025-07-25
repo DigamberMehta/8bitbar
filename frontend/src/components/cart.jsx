@@ -10,9 +10,17 @@ const Cart = () => {
   const { user } = useAuth();
   const { openLogin } = useModal();
 
+  // Helper to get the user-specific cart key
+  const getCartKey = () => (user ? `cart_${user.id}` : null);
+
   // Helper to load cart from localStorage and update state
   const loadCart = () => {
-    const stored = JSON.parse(localStorage.getItem("cart") || "[]");
+    const cartKey = getCartKey();
+    if (!cartKey) {
+      setCart([]);
+      return;
+    }
+    const stored = JSON.parse(localStorage.getItem(cartKey) || "[]");
     setCart(stored);
   };
 
@@ -20,20 +28,24 @@ const Cart = () => {
   useEffect(() => {
     loadCart();
     const onStorageChange = (e) => {
-      if (e.key === "cart") {
+      const cartKey = getCartKey();
+      if (cartKey && e.key === cartKey) {
         loadCart();
       }
     };
     window.addEventListener("storage", onStorageChange);
     return () => window.removeEventListener("storage", onStorageChange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
+  }, [location.pathname, user]);
 
   // Function to remove a specific item from the cart
   const handleRemoveItem = (itemIndex) => {
     const updatedCart = cart.filter((_, index) => index !== itemIndex);
     setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const cartKey = getCartKey();
+    if (cartKey) {
+      localStorage.setItem(cartKey, JSON.stringify(updatedCart));
+    }
   };
 
   // Function to handle the checkout button click
@@ -50,6 +62,26 @@ const Cart = () => {
     (total, item) => total + (item.totalCost || 0),
     0
   );
+
+  // --- If not logged in, prompt login ---
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-black text-white p-4">
+        <div className="flex flex-col items-center text-center">
+          <span className="text-7xl mb-6">🛒</span>
+          <h1 className="font-['Orbitron'] text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
+            Please Log In to View Your Cart
+          </h1>
+          <button
+            onClick={openLogin}
+            className="px-8 py-3 bg-gradient-to-r from-cyan-400 to-pink-500 text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-all duration-300"
+          >
+            Log In
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // --- Empty Cart View ---
   if (cart.length === 0) {

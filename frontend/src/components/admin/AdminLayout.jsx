@@ -17,45 +17,52 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
+    // Dashboard
     {
       path: "/admin/dashboard",
       label: "Dashboard",
       icon: <MdDashboard size={20} />,
     },
+
+    // Karaoke Section
     {
       path: "/admin/karaoke-bookings",
       label: "Karaoke Bookings",
       icon: <MdMusicNote size={20} />,
     },
     {
-      path: "/admin/n64-bookings",
-      label: "N64 Bookings",
-      icon: <MdVideogameAsset size={20} />,
-    },
-    {
-      path: "/admin/cafe-bookings",
-      label: "Cafe Bookings",
-      icon: <MdLocalCafe size={20} />,
-    },
-    {
-      path: "/admin/cafe-settings",
-      label: "Cafe Settings",
-      icon: <MdLocalCafe size={20} />,
-    },
-    {
       path: "/admin/karaoke-rooms",
       label: "Karaoke Rooms",
       icon: <MdMeetingRoom size={20} />,
+    },
+
+    // N64 Section
+    {
+      path: "/admin/n64-bookings",
+      label: "N64 Bookings",
+      icon: <MdVideogameAsset size={20} />,
     },
     {
       path: "/admin/n64-rooms",
       label: "N64 Rooms",
       icon: <MdSportsEsports size={20} />,
     },
+
+    // Cafe Section
+    {
+      path: "/admin/cafe-bookings",
+      label: "Cafe Bookings",
+      icon: <MdLocalCafe size={20} />,
+    },
     {
       path: "/admin/cafe-layout",
       label: "Cafe Layout",
       icon: <MdRestaurant size={20} />,
+    },
+    {
+      path: "/admin/cafe-settings",
+      label: "Cafe Settings",
+      icon: <MdLocalCafe size={20} />,
     },
   ];
 

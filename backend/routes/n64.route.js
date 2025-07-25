@@ -1,6 +1,7 @@
 import express from "express";
 import N64Room from "../models/N64Room.js";
 import N64Booking from "../models/N64Booking.js";
+import authenticateUser from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
@@ -21,6 +22,20 @@ router.get("/bookings", async (req, res) => {
   try {
     // Populate booth info for each booking
     const bookings = await N64Booking.find().populate("roomId");
+    res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+// GET /api/v1/n64-rooms/my-bookings - fetch user's N64 bookings
+router.get("/my-bookings", authenticateUser, async (req, res) => {
+  try {
+    const bookings = await N64Booking.find({ userId: req.user.id })
+      .populate("roomId")
+      .sort({ createdAt: -1 });
     res.status(200).json({ success: true, bookings });
   } catch (error) {
     res

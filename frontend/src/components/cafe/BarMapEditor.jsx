@@ -63,12 +63,24 @@ const BarMapEditor = () => {
   const [tableColor, setTableColor] = useState(DEFAULT_TABLE_COLOR);
   const [chairColor, setChairColor] = useState(DEFAULT_CHAIR_COLOR);
   const [textColor, setTextColor] = useState(DEFAULT_TEXT_COLOR);
-  const [deviceType, setDeviceType] = useState("desktop");
+  const [deviceType, setDeviceType] = useState("desktop"); // Layout type being edited
+  const [actualDeviceType, setActualDeviceType] = useState("desktop"); // Actual device being used
 
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
 
   const stageContainerRef = useRef(null); // Added: Ref for the stage container
+
+  // Detect actual device type for responsive canvas (separate from layout being edited)
+  useEffect(() => {
+    const checkActualDevice = () => {
+      setActualDeviceType(window.innerWidth <= 768 ? "mobile" : "desktop");
+    };
+
+    checkActualDevice();
+    window.addEventListener("resize", checkActualDevice);
+    return () => window.removeEventListener("resize", checkActualDevice);
+  }, []);
 
   // Helper to get initial shapes based on device type
   const getInitialShapes = (type) => {
@@ -442,7 +454,7 @@ const BarMapEditor = () => {
   };
 
   return (
-    <div className="bar-map-editor-root p-4">
+    <div className="bar-map-editor-root p-2 md:p-4">
       <EditorSettings
         deviceType={deviceType}
         setDeviceType={setDeviceType}
@@ -479,8 +491,17 @@ const BarMapEditor = () => {
         chairColor={chairColor}
         onColorChange={handleColorChange}
       />
+      {/* Mobile editing desktop layout warning */}
+      {actualDeviceType === "mobile" && deviceType === "desktop" && (
+        <div className="mb-3 p-3 bg-blue-100 border border-blue-300 rounded-md text-blue-800 text-sm">
+          📱 You're editing the <strong>Desktop</strong> layout on a mobile
+          device. The canvas is scaled down for easier editing. The actual
+          desktop layout will be full-sized.
+        </div>
+      )}
+
       <button
-        className="bar-map-editor-button mt-3 mb-3 ml-2 text-white bg-slate-500 p-1 rounded-md"
+        className="bar-map-editor-button mt-3 mb-3 ml-0 md:ml-2 text-white bg-slate-500 p-2 md:p-1 rounded-md text-sm md:text-base"
         onClick={() => handleSaveLayout(shapes)}
         disabled={loading}
       >
@@ -490,11 +511,12 @@ const BarMapEditor = () => {
         shapes={shapes}
         renderShape={renderShape}
         mapImage={mapImage}
-        scale={deviceType === "mobile" ? scale * MOBILE_SCALE : scale}
+        scale={scale}
         stageContainerRef={stageContainerRef}
         CANVAS_WIDTH={canvasWidth}
         CANVAS_HEIGHT={canvasHeight}
         deviceType={deviceType}
+        actualDeviceType={actualDeviceType}
       />
     </div>
   );
