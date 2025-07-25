@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const n64BookingSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     customerName: {
       type: String,
       required: true,
@@ -9,6 +14,9 @@ const n64BookingSchema = new mongoose.Schema(
     customerEmail: {
       type: String,
       required: true,
+    },
+    customerPhone: {
+      type: String,
     },
     numberOfPeople: {
       type: Number,
@@ -47,7 +55,7 @@ const n64BookingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "cancelled"],
+      enum: ["pending", "confirmed", "cancelled", "completed"],
       default: "pending",
     },
   },

@@ -82,8 +82,10 @@ const ContactPage = () => {
                     <p className="text-white font-semibold">
                       8-Bit Bar Australia
                     </p>
-                    <p className="text-gray-300">123 Gaming Street</p>
-                    <p className="text-gray-300">Sydney, NSW 2000</p>
+                    <p className="text-gray-300">
+                      Shop 1/352 Esplanade, Scarness
+                    </p>
+                    <p className="text-gray-300">QLD 4655</p>
                     <p className="text-gray-300">Australia</p>
                   </div>
                 </div>
@@ -125,10 +127,10 @@ const ContactPage = () => {
                   <div>
                     <p className="text-white font-semibold">Phone</p>
                     <a
-                      href="tel:+61288888888"
+                      href="tel:+61493091188"
                       className="text-gray-300 hover:text-green-400 transition-colors"
                     >
-                      (02) 8888-8888
+                      +61 493 091 188
                     </a>
                   </div>
                 </div>
@@ -142,6 +144,36 @@ const ContactPage = () => {
                       className="text-gray-300 hover:text-cyan-400 transition-colors"
                     >
                       play@8bitbar.com.au
+                    </a>
+                  </div>
+                </div>
+
+                {/* Website */}
+                <div className="flex items-center space-x-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-purple-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"
+                    />
+                  </svg>
+                  <div>
+                    <p className="text-white font-semibold">Website</p>
+                    <a
+                      href="https://8bitbar.com.au"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-300 hover:text-purple-400 transition-colors"
+                    >
+                      8bitbar.com.au
                     </a>
                   </div>
                 </div>
@@ -188,7 +220,7 @@ const ContactPage = () => {
               </h3>
               <div className="relative w-full h-64 bg-gray-800 rounded-lg overflow-hidden">
                 <iframe
-                  src="https://maps.google.com/maps?q=123%20Gaming%20Street%2C%20Sydney%2C%20NSW%202000%2C%20Australia&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  src="https://www.google.com/maps?q=-25.2846586,152.8551759&z=17&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

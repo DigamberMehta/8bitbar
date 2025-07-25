@@ -10,43 +10,51 @@ const StageArea = ({
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
   deviceType,
-}) => (
-  <div
-    ref={stageContainerRef}
-    className="bar-map-editor-stage-container border border-gray-600 rounded overflow-auto"
-    style={{
-      maxHeight: "600px",
-      maxWidth: "100%",
-      width: "100%",
-    }}
-  >
+  actualDeviceType, // New prop for actual device being used
+}) => {
+  // Apply mobile scale based on actual device being used, not layout type being edited
+  const MOBILE_SCALE = 0.7;
+  const isOnMobileDevice = actualDeviceType === "mobile";
+  const responsiveScale = isOnMobileDevice ? scale * MOBILE_SCALE : scale;
+
+  return (
     <div
+      ref={stageContainerRef}
+      className="bar-map-editor-stage-container border border-gray-600 rounded overflow-auto"
       style={{
-        width: CANVAS_WIDTH * scale,
-        height: CANVAS_HEIGHT * scale,
-        minWidth: "100%",
-        minHeight: "400px",
+        maxHeight: "600px",
+        maxWidth: "100%",
+        width: "100%",
       }}
     >
-      <Stage
-        width={CANVAS_WIDTH * scale}
-        height={CANVAS_HEIGHT * scale}
-        scaleX={scale}
-        scaleY={scale}
+      <div
+        style={{
+          width: CANVAS_WIDTH * responsiveScale,
+          height: CANVAS_HEIGHT * responsiveScale,
+          minWidth: "100%",
+          minHeight: "400px",
+        }}
       >
-        <Layer>
-          {mapImage && (
-            <KonvaImage
-              image={mapImage}
-              width={CANVAS_WIDTH}
-              height={CANVAS_HEIGHT}
-            />
-          )}
-          {shapes.map((shape) => renderShape(shape))}
-        </Layer>
-      </Stage>
+        <Stage
+          width={CANVAS_WIDTH * responsiveScale}
+          height={CANVAS_HEIGHT * responsiveScale}
+          scaleX={responsiveScale}
+          scaleY={responsiveScale}
+        >
+          <Layer>
+            {mapImage && (
+              <KonvaImage
+                image={mapImage}
+                width={CANVAS_WIDTH}
+                height={CANVAS_HEIGHT}
+              />
+            )}
+            {shapes.map((shape) => renderShape(shape))}
+          </Layer>
+        </Stage>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default StageArea;

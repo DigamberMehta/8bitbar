@@ -32,7 +32,7 @@ const KaraokeBookingsAdmin = () => {
         status: newStatus,
       });
       fetchBookings(); // Refresh the list after updating
-    } catch (error)      {
+    } catch (error) {
       console.error("Error updating booking status:", error);
     }
   };
@@ -45,14 +45,14 @@ const KaraokeBookingsAdmin = () => {
       day: "numeric",
     });
   };
-  
+
   const formatTime = (dateString) => {
-      return new Date(dateString).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true
-      });
-  }
+    return new Date(dateString).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
   // Helper function to get status badge colors
   const getStatusColor = (status) => {
@@ -63,6 +63,8 @@ const KaraokeBookingsAdmin = () => {
         return "bg-yellow-100 text-yellow-800";
       case "cancelled":
         return "bg-red-100 text-red-800";
+      case "completed":
+        return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -73,7 +75,9 @@ const KaraokeBookingsAdmin = () => {
     return bookings
       .filter((booking) => {
         if (!dateFilter) return true;
-        const bookingDate = new Date(booking.startDateTime).toISOString().slice(0, 10);
+        const bookingDate = new Date(booking.startDateTime)
+          .toISOString()
+          .slice(0, 10);
         return bookingDate === dateFilter;
       })
       .sort((a, b) => {
@@ -90,37 +94,44 @@ const KaraokeBookingsAdmin = () => {
         }
       });
   }, [bookings, dateFilter, sortBy]);
-  
+
   // A reusable component for action buttons
   const ActionButtons = ({ booking }) => (
     <div className="flex items-center gap-4 mt-4 md:mt-0">
-        {booking.status === "pending" && (
-            <>
-                <button
-                    onClick={() => updateBookingStatus(booking._id, "confirmed")}
-                    className="text-sm font-medium text-green-600 hover:text-green-800"
-                >
-                    Confirm
-                </button>
-                <button
-                    onClick={() => updateBookingStatus(booking._id, "cancelled")}
-                    className="text-sm font-medium text-red-600 hover:text-red-800"
-                >
-                    Cancel
-                </button>
-            </>
-        )}
-        {booking.status === "confirmed" && (
-            <button
-                onClick={() => updateBookingStatus(booking._id, "cancelled")}
-                className="text-sm font-medium text-red-600 hover:text-red-800"
-            >
-                Cancel
-            </button>
-        )}
+      {booking.status === "pending" && (
+        <>
+          <button
+            onClick={() => updateBookingStatus(booking._id, "confirmed")}
+            className="text-sm font-medium text-green-600 hover:text-green-800"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => updateBookingStatus(booking._id, "cancelled")}
+            className="text-sm font-medium text-red-600 hover:text-red-800"
+          >
+            Cancel
+          </button>
+        </>
+      )}
+      {booking.status === "confirmed" && (
+        <>
+          <button
+            onClick={() => updateBookingStatus(booking._id, "completed")}
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            Complete
+          </button>
+          <button
+            onClick={() => updateBookingStatus(booking._id, "cancelled")}
+            className="text-sm font-medium text-red-600 hover:text-red-800"
+          >
+            Cancel
+          </button>
+        </>
+      )}
     </div>
   );
-
 
   if (loading) {
     return (
@@ -134,7 +145,9 @@ const KaraokeBookingsAdmin = () => {
     <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Karaoke Bookings</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Karaoke Bookings
+          </h1>
           <div className="flex flex-col sm:flex-row gap-2 flex-wrap">
             <select
               value={filter}
@@ -144,6 +157,7 @@ const KaraokeBookingsAdmin = () => {
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
             </select>
             <input
@@ -166,68 +180,130 @@ const KaraokeBookingsAdmin = () => {
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden md:block bg-white shadow-md rounded-lg overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking Details</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {processedBookings.map((booking) => (
-                <tr key={booking._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{booking.customerName || "N/A"}</div>
-                    <div className="text-sm text-gray-500">{booking.customerEmail || "N/A"}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">Room: {booking.roomId?.name || "Karaoke Room"}</div>
-                    <div className="text-sm text-gray-500">{formatDate(booking.startDateTime)} for {booking.durationHours}h</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
-                      {booking.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <ActionButtons booking={booking} />
-                  </td>
+        <div className="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Phone
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Booking Details
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {processedBookings.map((booking) => (
+                  <tr key={booking._id}>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {booking.customerName || "N/A"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {booking.customerEmail || "N/A"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {booking.customerPhone || "N/A"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        Room: {booking.roomId?.name || "Karaoke Room"}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {formatDate(booking.startDateTime)} for{" "}
+                        {booking.durationHours}h
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                          booking.status
+                        )}`}
+                      >
+                        {booking.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                      <ActionButtons booking={booking} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Mobile Card View */}
         <div className="md:hidden space-y-4">
           {processedBookings.map((booking) => (
-            <div key={booking._id} className="bg-white shadow-md rounded-lg p-4">
+            <div
+              key={booking._id}
+              className="bg-white shadow-md rounded-lg p-4"
+            >
               <div className="flex justify-between items-start">
-                <div>
-                  <div className="font-bold text-gray-800">{booking.customerName || "N/A"}</div>
-                  <div className="text-sm text-gray-500">{booking.customerEmail || "N/A"}</div>
+                <div className="flex-1">
+                  <div className="font-bold text-gray-800 mb-1">
+                    {booking.customerName || "N/A"}
+                  </div>
+                  <div className="text-sm text-gray-500 mb-1">
+                    📧 {booking.customerEmail || "N/A"}
+                  </div>
+                  {booking.customerPhone && (
+                    <div className="text-sm text-gray-500">
+                      📞 {booking.customerPhone}
+                    </div>
+                  )}
                 </div>
-                <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
+                <span
+                  className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                    booking.status
+                  )}`}
+                >
                   {booking.status}
                 </span>
               </div>
               <div className="mt-4 border-t border-gray-200 pt-4">
-                 <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
-                    <dt className="text-sm font-medium text-gray-500">Room</dt>
-                    <dd className="text-sm text-gray-900">{booking.roomId?.name || "Karaoke Room"}</dd>
-                    
-                    <dt className="text-sm font-medium text-gray-500">Date</dt>
-                    <dd className="text-sm text-gray-900">{formatDate(booking.startDateTime)}</dd>
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
+                  <dt className="text-sm font-medium text-gray-500">Room</dt>
+                  <dd className="text-sm text-gray-900">
+                    {booking.roomId?.name || "Karaoke Room"}
+                  </dd>
 
-                    <dt className="text-sm font-medium text-gray-500">Time</dt>
-                    <dd className="text-sm text-gray-900">{formatTime(booking.startDateTime)}</dd>
+                  <dt className="text-sm font-medium text-gray-500">Date</dt>
+                  <dd className="text-sm text-gray-900">
+                    {formatDate(booking.startDateTime)}
+                  </dd>
 
-                    <dt className="text-sm font-medium text-gray-500">Duration</dt>
-                    <dd className="text-sm text-gray-900">{booking.durationHours} hours</dd>
-                 </dl>
+                  <dt className="text-sm font-medium text-gray-500">Time</dt>
+                  <dd className="text-sm text-gray-900">
+                    {formatTime(booking.startDateTime)}
+                  </dd>
+
+                  <dt className="text-sm font-medium text-gray-500">
+                    Duration
+                  </dt>
+                  <dd className="text-sm text-gray-900">
+                    {booking.durationHours} hours
+                  </dd>
+                </dl>
               </div>
               <div className="mt-4 border-t border-gray-200 pt-4">
                 <ActionButtons booking={booking} />

@@ -1,6 +1,7 @@
 import express from "express";
 import KaraokeRoom from "../models/KaraokeRoom.js";
 import KaraokeBooking from "../models/KaraokeBooking.js";
+import authenticateUser from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
@@ -20,6 +21,20 @@ router.get("/", async (req, res) => {
 router.get("/bookings", async (req, res) => {
   try {
     const bookings = await KaraokeBooking.find();
+    res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+// GET /api/v1/karaoke-rooms/my-bookings - fetch user's karaoke bookings
+router.get("/my-bookings", authenticateUser, async (req, res) => {
+  try {
+    const bookings = await KaraokeBooking.find({ userId: req.user.id })
+      .populate("roomId")
+      .sort({ createdAt: -1 });
     res.status(200).json({ success: true, bookings });
   } catch (error) {
     res
