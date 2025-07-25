@@ -6,6 +6,7 @@ import userRoutes from "./routes/user.route.js";
 import karaokeRoutes from "./routes/karaoke.route.js";
 import n64Routes from "./routes/n64.route.js";
 import adminRoutes from "./routes/admin.route.js";
+import cafeRoutes from "./routes/cafe.route.js";
 import cookieParser from "cookie-parser";
 dotenv.config({});
 
@@ -27,6 +28,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/karaoke-rooms", karaokeRoutes);
 app.use("/api/v1/n64-rooms", n64Routes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/cafe", cafeRoutes);
 
 // call the connectDB function
 connectDB();

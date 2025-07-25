@@ -13,26 +13,39 @@ const StageArea = ({
 }) => (
   <div
     ref={stageContainerRef}
-    className="bar-map-editor-stage-container"
-    style={{ height: CANVAS_HEIGHT, width: "100%" }}
+    className="bar-map-editor-stage-container border border-gray-600 rounded overflow-auto"
+    style={{
+      maxHeight: "600px",
+      maxWidth: "100%",
+      width: "100%",
+    }}
   >
-    <Stage
-      width={CANVAS_WIDTH}
-      height={CANVAS_HEIGHT}
-      scaleX={scale}
-      scaleY={scale}
+    <div
+      style={{
+        width: CANVAS_WIDTH * scale,
+        height: CANVAS_HEIGHT * scale,
+        minWidth: "100%",
+        minHeight: "400px",
+      }}
     >
-      <Layer>
-        {mapImage && (
-          <KonvaImage
-            image={mapImage}
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-          />
-        )}
-        {shapes.map((shape) => renderShape(shape))}
-      </Layer>
-    </Stage>
+      <Stage
+        width={CANVAS_WIDTH * scale}
+        height={CANVAS_HEIGHT * scale}
+        scaleX={scale}
+        scaleY={scale}
+      >
+        <Layer>
+          {mapImage && (
+            <KonvaImage
+              image={mapImage}
+              width={CANVAS_WIDTH}
+              height={CANVAS_HEIGHT}
+            />
+          )}
+          {shapes.map((shape) => renderShape(shape))}
+        </Layer>
+      </Stage>
+    </div>
   </div>
 );
 

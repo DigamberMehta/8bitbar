@@ -46,7 +46,10 @@ const Cart = () => {
   };
 
   // Calculate the total cost
-  const estimatedTotal = cart.reduce((total, item) => total + (item.totalCost || 0), 0);
+  const estimatedTotal = cart.reduce(
+    (total, item) => total + (item.totalCost || 0),
+    0
+  );
 
   // --- Empty Cart View ---
   if (cart.length === 0) {
@@ -78,18 +81,24 @@ const Cart = () => {
         <h1 className="font-['Orbitron'] text-4xl font-bold mb-10 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400 text-center">
           🛒 Your Cart
         </h1>
-        
+
         <div className="flex flex-col lg:flex-row gap-16">
-          
           {/* Left Column: Product List */}
           <div className="lg:w-2/3">
             <div className="flex justify-between border-b border-pink-500/30 pb-3 mb-4">
-              <h2 className="text-gray-400 font-semibold uppercase tracking-wider">Product</h2>
-              <h2 className="text-gray-400 font-semibold uppercase tracking-wider">Total</h2>
+              <h2 className="text-gray-400 font-semibold uppercase tracking-wider">
+                Product
+              </h2>
+              <h2 className="text-gray-400 font-semibold uppercase tracking-wider">
+                Total
+              </h2>
             </div>
             <div className="space-y-6">
               {cart.map((item, idx) => (
-                <div key={idx} className="flex items-start justify-between gap-4 p-4 bg-black/60 border border-pink-500/30 rounded-lg shadow-lg">
+                <div
+                  key={idx}
+                  className="flex items-start justify-between gap-4 p-4 bg-black/60 border border-pink-500/30 rounded-lg shadow-lg"
+                >
                   <div className="flex items-start gap-6">
                     {item.imageUrl && (
                       <img
@@ -103,15 +112,48 @@ const Cart = () => {
                         {item.title || item.roomName}
                       </div>
                       <p className="text-gray-400 text-sm mb-3 max-w-md">
-                        {item.description || "Welcome! Host your next unforgettable event with us."}
+                        {item.description ||
+                          "Welcome! Host your next unforgettable event with us."}
                       </p>
                       <div className="text-gray-300 text-sm space-y-1">
-                        <p><span className="font-semibold">Start Date:</span> {item.date}</p>
-                        <p><span className="font-semibold">Booking Time:</span> {item.time}</p>
-                        <p><span className="font-semibold">Duration:</span> {item.duration} {item.duration > 1 ? "hours" : "hour"}</p>
-                        <p><span className="font-semibold">Person:</span> {item.people}</p>
+                        <p>
+                          <span className="font-semibold">Start Date:</span>{" "}
+                          {item.date}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Booking Time:</span>{" "}
+                          {item.time}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Duration:</span>{" "}
+                          {item.duration} {item.duration > 1 ? "hours" : "hour"}
+                        </p>
+                        {item.people && (
+                          <p>
+                            <span className="font-semibold">Person:</span>{" "}
+                            {item.people}
+                          </p>
+                        )}
+                        {item.chairIds && (
+                          <div>
+                            <span className="font-semibold">Chairs:</span>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {item.chairIds.map((chairId) => (
+                                <span
+                                  key={chairId}
+                                  className="px-2 py-1 bg-cyan-600 text-white text-xs rounded"
+                                >
+                                  {chairId}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <button onClick={() => handleRemoveItem(idx)} className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 mt-3 text-sm font-semibold">
+                      <button
+                        onClick={() => handleRemoveItem(idx)}
+                        className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 mt-3 text-sm font-semibold"
+                      >
                         Remove Item
                       </button>
                     </div>
@@ -135,7 +177,9 @@ const Cart = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-gray-300">
                   <span>Subtotal</span>
-                  <span className="font-medium">${estimatedTotal.toFixed(2)}</span>
+                  <span className="font-medium">
+                    ${estimatedTotal.toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center text-gray-300">
                   <span>Shipping</span>
@@ -144,7 +188,9 @@ const Cart = () => {
                 <div className="border-t border-pink-500/20 my-4"></div>
                 <div className="flex justify-between items-center text-white text-xl font-bold">
                   <span>Estimated total</span>
-                  <span className="text-green-400">${estimatedTotal.toFixed(2)}</span>
+                  <span className="text-green-400">
+                    ${estimatedTotal.toFixed(2)}
+                  </span>
                 </div>
               </div>
               <button

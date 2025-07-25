@@ -9,6 +9,7 @@ import {
   MdMenu,
   MdClose,
   MdRestaurant,
+  MdLocalCafe,
 } from "react-icons/md";
 
 const AdminLayout = () => {
@@ -30,6 +31,16 @@ const AdminLayout = () => {
       path: "/admin/n64-bookings",
       label: "N64 Bookings",
       icon: <MdVideogameAsset size={20} />,
+    },
+    {
+      path: "/admin/cafe-bookings",
+      label: "Cafe Bookings",
+      icon: <MdLocalCafe size={20} />,
+    },
+    {
+      path: "/admin/cafe-settings",
+      label: "Cafe Settings",
+      icon: <MdLocalCafe size={20} />,
     },
     {
       path: "/admin/karaoke-rooms",

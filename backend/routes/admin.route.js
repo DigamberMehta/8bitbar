@@ -5,6 +5,8 @@ import N64Booking from "../models/N64Booking.js";
 import KaraokeRoom from "../models/KaraokeRoom.js";
 import N64Room from "../models/N64Room.js";
 import CafeLayout from "../models/CafeLayout.js";
+import CafeBooking from "../models/CafeBooking.js";
+import CafeSettings from "../models/CafeSettings.js";
 
 const router = express.Router();
 
@@ -45,6 +47,15 @@ router.get("/n64-rooms/count", async (req, res) => {
     res.json({ count });
   } catch (error) {
     res.status(500).json({ message: "Error fetching N64 rooms count" });
+  }
+});
+
+router.get("/cafe-bookings/count", async (req, res) => {
+  try {
+    const count = await CafeBooking.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching cafe bookings count" });
   }
 });
 
@@ -102,6 +113,37 @@ router.patch("/n64-bookings/:id/status", async (req, res) => {
       { status },
       { new: true }
     );
+    res.json({ booking });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating booking status" });
+  }
+});
+
+// Cafe Bookings Management
+router.get("/cafe-bookings", async (req, res) => {
+  try {
+    const { status } = req.query;
+    const filter = status && status !== "all" ? { status } : {};
+
+    const bookings = await CafeBooking.find(filter)
+      .populate("userId", "name email")
+      .sort({ createdAt: -1 });
+
+    res.json({ bookings });
+  } catch (error) {
+    console.error("Error fetching cafe bookings:", error);
+    res.status(500).json({ message: "Error fetching cafe bookings" });
+  }
+});
+
+router.patch("/cafe-bookings/:id/status", async (req, res) => {
+  try {
+    const { status } = req.body;
+    const booking = await CafeBooking.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    ).populate("userId", "name email");
     res.json({ booking });
   } catch (error) {
     res.status(500).json({ message: "Error updating booking status" });
@@ -176,16 +218,24 @@ router.put("/cafe-layout", async (req, res) => {
       canvasHeight,
       deviceType,
     } = req.body;
-    const layout = await CafeLayout.create({
-      chairs,
-      tables,
-      bgImageUrl,
-      canvasWidth,
-      canvasHeight,
-      deviceType: deviceType || "desktop",
-      updatedBy: req.userId,
-      changeType: changeType || "updated",
-    });
+    // Find and update existing layout or create new one
+    const layout = await CafeLayout.findOneAndUpdate(
+      { deviceType: deviceType || "desktop" },
+      {
+        chairs,
+        tables,
+        bgImageUrl,
+        canvasWidth,
+        canvasHeight,
+        updatedBy: req.userId,
+        changeType: changeType || "updated",
+      },
+      {
+        new: true,
+        upsert: true, // Create if doesn't exist
+        runValidators: true,
+      }
+    );
     res.json({ layout });
   } catch (error) {
     res.status(500).json({ message: "Error updating cafe layout" });
@@ -234,6 +284,74 @@ router.delete("/cafe-layout/item/:itemId", async (req, res) => {
     res.json({ layout });
   } catch (error) {
     res.status(500).json({ message: "Error removing item from cafe layout" });
+  }
+});
+
+// --- Cafe Settings Management ---
+// Get cafe settings
+router.get("/cafe-settings", async (req, res) => {
+  try {
+    let settings = await CafeSettings.findOne();
+
+    // Create default settings if none exist
+    if (!settings) {
+      settings = await CafeSettings.create({
+        timeSlots: [
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+          "18:00",
+          "19:00",
+          "20:00",
+          "21:00",
+          "22:00",
+        ],
+        pricePerChairPerHour: 10,
+        maxDuration: 8,
+        openingTime: "14:00",
+        closingTime: "23:00",
+        updatedBy: req.userId,
+      });
+    }
+
+    res.json({ settings });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching cafe settings" });
+  }
+});
+
+// Update cafe settings
+router.put("/cafe-settings", async (req, res) => {
+  try {
+    const {
+      timeSlots,
+      pricePerChairPerHour,
+      maxDuration,
+      openingTime,
+      closingTime,
+    } = req.body;
+
+    const settings = await CafeSettings.findOneAndUpdate(
+      {},
+      {
+        timeSlots,
+        pricePerChairPerHour,
+        maxDuration,
+        openingTime,
+        closingTime,
+        updatedBy: req.userId,
+      },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+      }
+    );
+
+    res.json({ settings });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating cafe settings" });
   }
 });
 
