@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Auth Test</title>
+  </head>
+  <body>
+    <h1>Authentication Test</h1>
+    <div id="result"></div>
+
+    <script>
+      // Test function to check if our auth fix works
+      async function testAuth() {
+        const resultDiv = document.getElementById("result");
+
+        try {
+          // Test login
+          const loginResponse = await fetch(
+            "https://eightbitbar.onrender.com/api/v1/user/login",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify({
+                email: "admin@test.com", // Replace with actual admin credentials
+                password: "password123",
+              }),
+            }
+          );
+
+          const loginData = await loginResponse.json();
+          console.log("Login response:", loginData);
+
+          if (loginData.success && loginData.token) {
+            // Store token
+            localStorage.setItem("token", loginData.token);
+
+            // Test admin route with Authorization header
+            const adminResponse = await fetch(
+              "https://eightbitbar.onrender.com/api/v1/admin/karaoke/karaoke-rooms",
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${loginData.token}`,
+                  "Content-Type": "application/json",
+                },
+                credentials: "include",
+              }
+            );
+
+            const adminData = await adminResponse.json();
+            console.log("Admin response:", adminData);
+
+            if (adminResponse.ok) {
+              resultDiv.innerHTML =
+                '<p style="color: green;">✅ Authentication fix working! Admin route accessible.</p>';
+            } else {
+              resultDiv.innerHTML =
+                '<p style="color: red;">❌ Admin route still failing: ' +
+                adminData.message +
+                "</p>";
+            }
+          } else {
+            resultDiv.innerHTML =
+              '<p style="color: red;">❌ Login failed: ' +
+              loginData.message +
+              "</p>";
+          }
+        } catch (error) {
+          console.error("Test error:", error);
+          resultDiv.innerHTML =
+            '<p style="color: red;">❌ Test error: ' + error.message + "</p>";
+        }
+      }
+
+      // Run test when page loads
+      testAuth();
+    </script>
+  </body>
+</html>
