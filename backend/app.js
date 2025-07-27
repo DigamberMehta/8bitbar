@@ -9,7 +9,8 @@ import adminRoutes from "./routes/admin.route.js";
 import cafeRoutes from "./routes/cafe.route.js";
 import paymentRoutes from "./routes/payment.route.js";
 import cookieParser from "cookie-parser";
-dotenv.config({});
+
+dotenv.config();
 
 const app = express();
 
@@ -20,15 +21,19 @@ const getConfig = () => {
 
   return {
     corsOrigins: isProduction
-      ? ["https://8bitbar.com.au", "https://www.8bitbar.com.au"] // Production origins
-      : ["http://localhost:5173", "http://192.168.31.163:5173"], // Development origins
+      ? [
+          "https://8bitbar.com.au",
+          "https://www.8bitbar.com.au",
+          "https://8bitbar.vercel.app"
+        ]
+      : ["http://localhost:5173", "http://192.168.31.163:5173"],
     port: process.env.PORT || 3000,
   };
 };
 
 const config = getConfig();
 
-// Default middlewares
+// Middleware
 app.use(express.json());
 app.use(
   cors({
@@ -36,10 +41,9 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(cookieParser());
 
-//apis
+// API routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/karaoke-rooms", karaokeRoutes);
 app.use("/api/v1/n64-rooms", n64Routes);
@@ -47,10 +51,20 @@ app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/cafe", cafeRoutes);
 app.use("/api/v1/payments", paymentRoutes);
 
-// call the connectDB function
+// ✅ Health check route
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is healthy",
+    environment: process.env.SQUARE_ENVIRONMENT || "sandbox",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Connect to DB and start server
 connectDB();
 app.listen(config.port, () => {
-  console.log(`Server is running on port ${config.port}`);
-  console.log(`Environment: ${process.env.SQUARE_ENVIRONMENT || "sandbox"}`);
-  console.log(`CORS Origins: ${config.corsOrigins.join(", ")}`);
+  console.log(`🚀 Server running on port ${config.port}`);
+  console.log(`🌐 Environment: ${process.env.SQUARE_ENVIRONMENT || "sandbox"}`);
+  console.log(`🔓 CORS Origins: ${config.corsOrigins.join(", ")}`);
 });
