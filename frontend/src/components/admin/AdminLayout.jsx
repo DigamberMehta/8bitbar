@@ -32,7 +32,7 @@ const AdminLayout = () => {
       icon: <MdMusicNote size={20} />,
     },
     {
-      path: "/admin/karaoke-rooms",
+      path: "/admin/karaoke/karaoke-rooms",
       label: "Karaoke Rooms",
       icon: <MdMeetingRoom size={20} />,
     },

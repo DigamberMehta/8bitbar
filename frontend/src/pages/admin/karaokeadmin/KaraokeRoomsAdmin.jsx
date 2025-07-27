@@ -63,7 +63,7 @@ const KaraokeRoomsAdmin = () => {
                     <div className="flex-shrink-0">
                       <button
                         onClick={() =>
-                          navigate(`/admin/karaoke-room/edit?id=${room._id}`)
+                          navigate(`/admin/karaoke/karaoke-room/edit?id=${room._id}`)
                         }
                         className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md"
                       >

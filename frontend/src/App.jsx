@@ -79,19 +79,22 @@ function App() {
                   path="karaoke-bookings"
                   element={<KaraokeBookingsAdmin />}
                 />
-                <Route path="n64-bookings" element={<N64BookingsAdmin />} />
-                <Route path="cafe-bookings" element={<CafeBookingsAdmin />} />
-                <Route path="cafe-settings" element={<CafeSettingsAdmin />} />
-                <Route path="karaoke-rooms" element={<KaraokeRoomsAdmin />} />
                 <Route
-                  path="karaoke-room/edit"
+                  path="karaoke/karaoke-room/edit"
                   element={<KaraokeRoomEditAdmin />}
                 />
-                <Route path="n64-rooms" element={<N64RoomsAdmin />} />
+                <Route
+                  path="karaoke/karaoke-rooms"
+                  element={<KaraokeRoomsAdmin />}
+                />
+                <Route path="n64-bookings" element={<N64BookingsAdmin />} />
                 <Route
                   path="n64-rooms/:id/edit"
                   element={<N64RoomEditAdmin />}
                 />
+                <Route path="n64-rooms" element={<N64RoomsAdmin />} />
+                <Route path="cafe-bookings" element={<CafeBookingsAdmin />} />
+                <Route path="cafe-settings" element={<CafeSettingsAdmin />} />
                 <Route path="cafe-layout" element={<BarMapEditor />} />
                 <Route path="users" element={<UserManagement />} />
               </Route>

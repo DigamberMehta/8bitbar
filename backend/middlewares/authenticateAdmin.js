@@ -8,12 +8,12 @@ const authenticateAdmin = async (req, res, next) => {
     const token = cookieToken || headerToken;
 
     // Debug logging for production issues
-    console.log("Admin auth debug:", {
-      hasCookieToken: !!cookieToken,
-      hasHeaderToken: !!headerToken,
-      userAgent: req.get("User-Agent"),
-      origin: req.get("Origin"),
-    });
+    // console.log("Admin auth debug:", {
+    //   hasCookieToken: !!cookieToken,
+    //   hasHeaderToken: !!headerToken,
+    //   userAgent: req.get("User-Agent"),
+    //   origin: req.get("Origin"),
+    // });
 
     if (!token) {
       return res.status(401).json({

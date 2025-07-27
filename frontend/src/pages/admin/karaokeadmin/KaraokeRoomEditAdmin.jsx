@@ -137,7 +137,8 @@ const FormTextarea = ({ label, id, name, ...props }) => (
 );
 
 function useQuery() {
-  return new URLSearchParams(useLocation().search);
+  const location = useLocation();
+  return new URLSearchParams(location?.search || "");
 }
 
 // --- MAIN COMPONENT ---
@@ -162,8 +163,15 @@ const KaraokeRoomEditAdmin = () => {
   // Core logic for fetching and submitting data remains unchanged
   useEffect(() => {
     async function fetchRoom() {
+      if (!id) {
+        setError("No room ID provided");
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
+        setError("");
         const res = await api.get(`/admin/karaoke/karaoke-rooms`);
         const room = res.data.rooms.find((r) => r._id === id);
         if (!room) {
@@ -182,6 +190,7 @@ const KaraokeRoomEditAdmin = () => {
         setFeaturesArr(room.inclusions?.features || []);
         setTimeSlotsArr(room.timeSlots || []);
       } catch (err) {
+        console.error("Error fetching room:", err);
         setError("Failed to fetch room data");
       } finally {
         setLoading(false);
@@ -192,7 +201,13 @@ const KaraokeRoomEditAdmin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!id) {
+      setError("No room ID provided");
+      return;
+    }
+
     try {
+      setError("");
       await api.put(`/admin/karaoke/karaoke-rooms/${id}`, {
         name: formData.name,
         description: formData.description,
@@ -210,6 +225,7 @@ const KaraokeRoomEditAdmin = () => {
 
       navigate("/admin/karaoke/karaoke-rooms");
     } catch (err) {
+      console.error("Error updating room:", err);
       setError("Failed to update room");
     }
   };
@@ -217,10 +233,23 @@ const KaraokeRoomEditAdmin = () => {
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading...
+        <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-indigo-600"></div>
       </div>
     );
-  if (error) return <div className="text-red-600 text-center p-8">{error}</div>;
+  if (error)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">{error}</div>
+          <button
+            onClick={() => navigate("/admin/karaoke/karaoke-rooms")}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            Back to Rooms
+          </button>
+        </div>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-50">
