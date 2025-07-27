@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { CreditCard } from "lucide-react";
 import axios from "../utils/axios";
+import SquarePaymentForm from "../components/payments/SquarePaymentForm";
 
 const CheckoutPage = () => {
   const { user } = useAuth(); // Get user details from AuthContext
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const [paymentData, setPaymentData] = useState(null);
   const [billingDetails, setBillingDetails] = useState({
     firstName: "",
     lastName: "",
@@ -48,15 +51,16 @@ const CheckoutPage = () => {
     0
   );
 
-  const handlePlaceOrder = async () => {
-    if (!user) {
-      alert("Please log in to place an order");
-      return;
-    }
+  const handlePaymentSuccess = async (payment) => {
+    setPaymentCompleted(true);
+    setPaymentData(payment);
 
     setLoading(true);
     try {
-      // Process each item in the cart
+      // Convert Square payment status to lowercase for database compatibility
+      const paymentStatus = payment.status.toLowerCase();
+
+      // Now create bookings after successful payment
       for (const item of cart) {
         if (item.type === "cafe") {
           // Handle cafe booking
@@ -71,25 +75,67 @@ const CheckoutPage = () => {
             customerEmail: billingDetails.email || user.email,
             customerPhone: billingDetails.phone,
             deviceType: item.deviceType,
+            paymentId: payment.id, // Link booking to payment
+            paymentStatus: paymentStatus,
+          });
+        } else if (item.type === "karaoke") {
+          // Handle karaoke booking
+          await axios.post("/karaoke-rooms/bookings", {
+            customerName:
+              `${billingDetails.firstName} ${billingDetails.lastName}`.trim() ||
+              user.name,
+            customerEmail: billingDetails.email || user.email,
+            customerPhone: billingDetails.phone,
+            numberOfPeople: item.people,
+            date: item.date,
+            time: item.time,
+            durationHours: item.duration,
+            totalPrice: item.totalCost,
+            paymentId: payment.id,
+            paymentStatus: paymentStatus,
+          });
+        } else if (item.type === "n64") {
+          // Handle N64 booking
+          await axios.post("/n64-rooms/bookings", {
+            customerName:
+              `${billingDetails.firstName} ${billingDetails.lastName}`.trim() ||
+              user.name,
+            customerEmail: billingDetails.email || user.email,
+            customerPhone: billingDetails.phone,
+            numberOfPeople: item.people,
+            roomId: item.roomId,
+            roomType: item.roomType,
+            date: item.date,
+            time: item.time,
+            durationHours: item.duration,
+            totalPrice: item.totalCost,
+            paymentId: payment.id,
+            paymentStatus: paymentStatus,
           });
         }
-        // Add other booking types here (karaoke, n64, etc.)
       }
 
       // Clear cart after successful booking
       localStorage.removeItem("cart");
       setCart([]);
 
-      alert("Order placed successfully! Check your bookings in your account.");
-    } catch (error) {
-      console.error("Order placement failed:", error);
       alert(
-        error.response?.data?.message ||
-          "Failed to place order. Please try again."
+        "Payment successful! Your booking has been confirmed. Check your bookings in your account."
+      );
+    } catch (error) {
+      console.error("Booking creation failed after payment:", error);
+      alert(
+        "Payment was successful, but there was an issue creating your booking. Please contact support with payment ID: " +
+          payment.id
       );
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePaymentError = (error) => {
+    console.error("Payment failed:", error);
+    alert("Payment failed: " + error);
   };
 
   const renderInputField = (
@@ -207,30 +253,32 @@ const CheckoutPage = () => {
                 <h3 className="font-['Orbitron'] text-xl font-bold text-white mb-4">
                   Payment Details
                 </h3>
-                <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
-                  <div className="flex items-center gap-3 text-gray-400">
-                    <CreditCard className="h-6 w-6 text-cyan-400" />
-                    <p>Pay securely using your credit card.</p>
-                  </div>
-                  {/* Placeholder for a payment element like Stripe */}
-                  <div className="mt-4 bg-gray-900 h-12 rounded-md border border-gray-500" />
-                </div>
-              </div>
-
-              <button
-                onClick={handlePlaceOrder}
-                disabled={loading}
-                className="w-full mt-8 py-3 bg-gradient-to-r from-cyan-400 to-pink-500 text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-all duration-300 text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Processing...
+                {paymentCompleted ? (
+                  <div className="bg-green-800 border border-green-600 rounded-lg p-6">
+                    <div className="text-center">
+                      <div className="text-green-400 text-2xl mb-2">✓</div>
+                      <h3 className="text-white font-bold mb-2">
+                        Payment Successful!
+                      </h3>
+                      <p className="text-green-300 text-sm">
+                        Payment ID: {paymentData?.id}
+                      </p>
+                      <p className="text-green-300 text-sm">
+                        Amount: $
+                        {(paymentData?.amountMoney?.amount / 100).toFixed(2)}{" "}
+                        {paymentData?.amountMoney?.currency}
+                      </p>
+                    </div>
                   </div>
                 ) : (
-                  "Place Order"
+                  <SquarePaymentForm
+                    amount={estimatedTotal}
+                    onPaymentSuccess={handlePaymentSuccess}
+                    onPaymentError={handlePaymentError}
+                    disabled={loading || cart.length === 0}
+                  />
                 )}
-              </button>
+              </div>
             </div>
           </div>
         </div>

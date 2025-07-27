@@ -10,17 +10,9 @@ const Cart = () => {
   const { user } = useAuth();
   const { openLogin } = useModal();
 
-  // Helper to get the user-specific cart key
-  const getCartKey = () => (user ? `cart_${user.id}` : null);
-
   // Helper to load cart from localStorage and update state
   const loadCart = () => {
-    const cartKey = getCartKey();
-    if (!cartKey) {
-      setCart([]);
-      return;
-    }
-    const stored = JSON.parse(localStorage.getItem(cartKey) || "[]");
+    const stored = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(stored);
   };
 
@@ -28,8 +20,7 @@ const Cart = () => {
   useEffect(() => {
     loadCart();
     const onStorageChange = (e) => {
-      const cartKey = getCartKey();
-      if (cartKey && e.key === cartKey) {
+      if (e.key === "cart") {
         loadCart();
       }
     };
@@ -42,10 +33,7 @@ const Cart = () => {
   const handleRemoveItem = (itemIndex) => {
     const updatedCart = cart.filter((_, index) => index !== itemIndex);
     setCart(updatedCart);
-    const cartKey = getCartKey();
-    if (cartKey) {
-      localStorage.setItem(cartKey, JSON.stringify(updatedCart));
-    }
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
   // Function to handle the checkout button click

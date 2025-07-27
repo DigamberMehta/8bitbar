@@ -55,6 +55,15 @@ const cafeBookingSchema = new mongoose.Schema(
       enum: ["desktop", "mobile"],
       default: "desktop",
     },
+    paymentId: {
+      type: String,
+      sparse: true, // Allow multiple null values but unique non-null values
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "completed", "failed", "refunded"],
+      default: "pending",
+    },
   },
   {
     timestamps: true,

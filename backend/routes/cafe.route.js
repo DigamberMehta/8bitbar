@@ -139,6 +139,8 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       customerPhone,
       specialRequests,
       deviceType,
+      paymentId,
+      paymentStatus,
     } = req.body;
 
     if (!chairIds || !chairIds.length || !date || !time || !duration) {
@@ -189,6 +191,12 @@ router.post("/bookings", authenticateUser, async (req, res) => {
     // Calculate total cost (each chair costs $10 per hour)
     const totalCost = chairIds.length * 10 * duration;
 
+    // Determine booking status based on payment status
+    const bookingStatus =
+      paymentStatus === "completed" || paymentStatus === "COMPLETED"
+        ? "confirmed"
+        : "pending";
+
     const newBooking = new CafeBooking({
       userId: req.user.id,
       chairIds,
@@ -201,6 +209,9 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       customerPhone,
       specialRequests,
       deviceType: deviceType || "desktop",
+      paymentId,
+      paymentStatus: paymentStatus || "pending",
+      status: bookingStatus, // Set status based on payment status
     });
 
     await newBooking.save();

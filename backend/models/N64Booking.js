@@ -58,6 +58,15 @@ const n64BookingSchema = new mongoose.Schema(
       enum: ["pending", "confirmed", "cancelled", "completed"],
       default: "pending",
     },
+    paymentId: {
+      type: String,
+      sparse: true,
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "completed", "failed", "refunded"],
+      default: "pending",
+    },
   },
   {
     timestamps: true,
