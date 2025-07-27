@@ -110,9 +110,12 @@ router.post("/login", authLimiter, async (req, res) => {
 
 // --- Logout Route ---
 router.post("/logout", (req, res) => {
+  const isProduction = process.env.SQUARE_ENVIRONMENT === "production";
+  
   res.clearCookie("token", {
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: isProduction ? "none" : "strict",
+    secure: isProduction,
   });
   res.status(200).json({ success: true, message: "Logged out successfully" });
 });

@@ -11,11 +11,14 @@ export const generateToken = (res, user, message) => {
     expiresIn: "30d",
   });
 
+  const isProduction = process.env.SQUARE_ENVIRONMENT === "production";
+  
   return res
     .status(200)
     .cookie("token", token, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: isProduction ? "none" : "strict",
+      secure: isProduction, // Required for sameSite: "none"
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     })
     .json({
