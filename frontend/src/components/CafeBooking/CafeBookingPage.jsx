@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useModal } from "../../contexts/ModalContext";
 import CafeLayoutViewer from "./CafeLayoutViewer";
@@ -20,6 +21,7 @@ const CafeBookingPage = () => {
   const [deviceType, setDeviceType] = useState("desktop");
   const { user } = useAuth();
   const { openLogin } = useModal();
+  const navigate = useNavigate();
 
   // Detect device type
   useEffect(() => {
@@ -107,13 +109,11 @@ const CafeBookingPage = () => {
     }
 
     if (selectedChairs.length === 0) {
-      alert("Please select at least one chair");
-      return;
+      return; // Don't show alert, just return silently
     }
 
     if (!bookingDetails.date || !bookingDetails.time) {
-      alert("Please select date and time");
-      return;
+      return; // Don't show alert, just return silently
     }
 
     const totalCost = selectedChairs.length * 10 * bookingDetails.duration;
@@ -144,7 +144,8 @@ const CafeBookingPage = () => {
     // Clear selections
     setSelectedChairs([]);
 
-    alert("Added to cart successfully!");
+    // Navigate to cart page
+    navigate("/cart");
   };
 
   const calculateTotal = () => {
