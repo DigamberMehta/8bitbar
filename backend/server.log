@@ -1,0 +1,18 @@
+Server is running on port 3000
+MongoDB Connected
+Payment webhook received: test_payment_123 - COMPLETED
+Updated booking status for payment test_payment_123 to confirmed
+Payment request received: {
+  sourceId: 'Present',
+  amount: 170,
+  currency: 'AUD',
+  locationId: undefined,
+  userId: '6880c8209e5e934d00a57827'
+}
+Processing payment: {
+  amountInCents: 17000,
+  currency: 'AUD',
+  locationId: 'L40KMSWMN7GV4',
+  userId: '6880c8209e5e934d00a57827'
+}
+Payment successful: 9sBDz2pZVzvI1wPafeLsaNF7IQSZY

@@ -12,8 +12,8 @@ const router = express.Router();
 router.use(authenticateAdmin);
 
 // Mount service-specific admin routes
-router.use("/karaoke", adminKaraokeRoutes);
-router.use("/n64", adminN64Routes);
-router.use("/cafe", adminCafeRoutes);
+router.use("/", adminKaraokeRoutes);
+router.use("/", adminN64Routes);
+router.use("/", adminCafeRoutes);
 
 export default router;

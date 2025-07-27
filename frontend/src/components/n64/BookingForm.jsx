@@ -75,6 +75,8 @@ const BookingForm = ({ booths, bookings }) => {
         type: "n64",
         title: "N64 Booth",
         boothName: selectedBooth.name,
+        roomId: selectedBooth._id, // Store roomId for easier checkout
+        roomType: selectedBooth.roomType || (selectedBooth.name?.toLowerCase().includes("mickey") ? "mickey" : "minnie"),
         imageUrl:
           "https://8bitbar.com.au/wp-content/uploads/2025/03/20250419_212301-scaled.jpg",
         date: selectedDate,
