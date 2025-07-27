@@ -25,8 +25,12 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Cookies are automatically sent with requests
-    // No need to manually add Authorization header
+    // Cookies are automatically sent with requests, but add Authorization header as fallback
+    // This helps with mobile browsers and incognito mode that may have cookie issues
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -41,8 +45,14 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
+      // Handle unauthorized access - clear stored auth data
       console.error("Unauthorized access");
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      // Redirect to home page if not already there
+      if (window.location.pathname.startsWith("/admin")) {
+        window.location.href = "/";
+      }
     }
     return Promise.reject(error);
   }

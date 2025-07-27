@@ -3,8 +3,17 @@ import User from "../models/user.model.js";
 
 const authenticateAdmin = async (req, res, next) => {
   try {
-    const token =
-      req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
+    const cookieToken = req.cookies.token;
+    const headerToken = req.header("Authorization")?.replace("Bearer ", "");
+    const token = cookieToken || headerToken;
+
+    // Debug logging for production issues
+    console.log("Admin auth debug:", {
+      hasCookieToken: !!cookieToken,
+      hasHeaderToken: !!headerToken,
+      userAgent: req.get("User-Agent"),
+      origin: req.get("Origin"),
+    });
 
     if (!token) {
       return res.status(401).json({

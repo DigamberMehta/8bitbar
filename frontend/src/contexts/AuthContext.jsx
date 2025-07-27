@@ -18,8 +18,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is logged in on app start
     const savedUser = localStorage.getItem("user");
-    if (savedUser) {
+    const savedToken = localStorage.getItem("token");
+
+    // Only set user if both user data and token exist
+    if (savedUser && savedToken) {
       setUser(JSON.parse(savedUser));
+    } else if (savedUser && !savedToken) {
+      // Clean up orphaned user data without token
+      localStorage.removeItem("user");
     }
     setLoading(false);
   }, []);
@@ -31,6 +37,12 @@ export const AuthProvider = ({ children }) => {
       if (response.status === 200 && data.success) {
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
+
+        // Store token for fallback authentication
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+
         return { success: true };
       } else if (data.message) {
         return { success: false, error: data.message };
@@ -108,6 +120,7 @@ export const AuthProvider = ({ children }) => {
     }
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   const value = {
