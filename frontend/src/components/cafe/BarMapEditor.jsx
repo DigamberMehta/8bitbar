@@ -454,7 +454,7 @@ const BarMapEditor = () => {
   };
 
   return (
-    <div className="bar-map-editor-root p-2 md:p-4 overflow-hidden">
+    <div className="bar-map-editor-root p-2 md:p-4">
       <EditorSettings
         deviceType={deviceType}
         setDeviceType={setDeviceType}

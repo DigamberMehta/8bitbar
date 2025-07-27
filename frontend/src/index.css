@@ -75,28 +75,3 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #db2777;
 }
-
-/* Mobile scrolling improvements for admin panel */
-@media (max-width: 768px) {
-  .bar-map-editor-stage-container {
-    /* Improve mobile touch scrolling */
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-x pan-y;
-    /* Prevent momentum scrolling from affecting parent */
-    isolation: isolate;
-  }
-
-  /* Prevent body scroll when interacting with stage container */
-  body.stage-scrolling {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-  }
-
-  /* Ensure proper stacking for mobile scrolling */
-  .bar-map-editor-root {
-    position: relative;
-    z-index: 1;
-  }
-}
