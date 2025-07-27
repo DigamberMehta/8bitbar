@@ -5,15 +5,17 @@ import authenticateAdmin from "../middlewares/authenticateAdmin.js";
 import adminKaraokeRoutes from "./admin/karaoke.route.js";
 import adminN64Routes from "./admin/n64.route.js";
 import adminCafeRoutes from "./admin/cafe.route.js";
+import adminUserRoutes from "./admin/user.route.js";
 
 const router = express.Router();
 
 // Apply admin authentication to all routes
 router.use(authenticateAdmin);
 
-// Mount service-specific admin routes
-router.use("/", adminKaraokeRoutes);
-router.use("/", adminN64Routes);
-router.use("/", adminCafeRoutes);
+// Mount service-specific admin routes at unique paths
+router.use("/karaoke", adminKaraokeRoutes);
+router.use("/n64", adminN64Routes);
+router.use("/cafe", adminCafeRoutes);
+router.use("/users", adminUserRoutes);
 
 export default router;

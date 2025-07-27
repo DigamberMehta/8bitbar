@@ -17,6 +17,21 @@ router.get("/karaoke-bookings/count", async (req, res) => {
   }
 });
 
+router.get("/karaoke-bookings/revenue", async (req, res) => {
+  try {
+    const revenue = await KaraokeBooking.aggregate([
+      { $match: { status: { $ne: "cancelled" } } },
+      { $group: { _id: null, totalRevenue: { $sum: "$totalPrice" } } },
+    ]);
+    const totalRevenue = revenue.length > 0 ? revenue[0].totalRevenue : 0;
+    res.json({ revenue: totalRevenue });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching karaoke bookings revenue" });
+  }
+});
+
 router.get("/karaoke-rooms/count", async (req, res) => {
   try {
     const count = await KaraokeRoom.countDocuments();

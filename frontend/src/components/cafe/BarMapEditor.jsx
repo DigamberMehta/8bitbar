@@ -11,7 +11,7 @@ import useImage from "use-image";
 import Toolbar from "./Toolbar";
 import StageArea from "./StageArea";
 import ShapeRenderer from "./ShapeRenderer";
-import axios from "../../utils/axios";
+import api from "../../utils/axios";
 import EditorSettings from "./EditorSettings";
 
 const DEFAULT_MAP_URL =
@@ -167,10 +167,10 @@ const BarMapEditor = () => {
     const fetchLayout = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          `/admin/cafe-layout?deviceType=${deviceType}`
+        const response = await api.get(
+          `/admin/cafe/cafe-layout?deviceType=${deviceType}`
         );
-        const layout = res.data.layout;
+        const layout = response.data.layout;
         if (layout) {
           // Convert backend format to shapes array
           const loadedShapes = [
@@ -254,7 +254,7 @@ const BarMapEditor = () => {
           height: s.height,
           color: chairColor,
         }));
-      await axios.put("/admin/cafe-layout", {
+      await api.put("/admin/cafe-layout", {
         tables,
         chairs,
         bgImageUrl: mapUrl,

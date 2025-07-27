@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../../../utils/axios";
+import api from "../../../utils/axios";
 import BookingFilters from "./BookingFilters";
 import BookingTable from "./BookingTable";
 import BookingCards from "./BookingCards";
@@ -22,8 +22,10 @@ const CafeBookingsAdmin = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/admin/cafe-bookings");
-      setBookings(response.data.bookings);
+      const response = await api.get(
+        `/admin/cafe/cafe-bookings?status=${statusFilter}`
+      );
+      setBookings(response.data.bookings || []);
     } catch (error) {
       console.error("Error fetching cafe bookings:", error);
     } finally {
@@ -49,7 +51,7 @@ const CafeBookingsAdmin = () => {
 
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
-      await axios.patch(`/admin/cafe-bookings/${bookingId}/status`, {
+      await api.patch(`/admin/cafe/cafe-bookings/${bookingId}/status`, {
         status: newStatus,
       });
       fetchBookings(); // Refresh the list

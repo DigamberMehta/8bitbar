@@ -15,7 +15,9 @@ const N64BookingsAdmin = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/admin/n64-bookings?status=${filter}`);
+      const response = await api.get(
+        `/admin/n64/n64-bookings?status=${filter}`
+      );
       setBookings(response.data.bookings || []);
     } catch (error) {
       console.error("Error fetching N64 bookings:", error);
@@ -26,12 +28,13 @@ const N64BookingsAdmin = () => {
 
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
-      await api.patch(`/admin/n64-bookings/${bookingId}/status`, {
+      await api.patch(`/admin/n64/n64-bookings/${bookingId}/status`, {
         status: newStatus,
       });
-      fetchBookings(); // Refresh the list after updating
+      fetchBookings(); // Refresh the list
     } catch (error) {
       console.error("Error updating booking status:", error);
+      alert("Failed to update booking status");
     }
   };
 
@@ -316,6 +319,38 @@ const N64BookingsAdmin = () => {
             No bookings found for the selected filters.
           </div>
         )}
+
+        {/* Summary Stats */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-2xl font-bold text-blue-600">
+              {bookings.filter((b) => b.status === "pending").length}
+            </div>
+            <div className="text-sm text-gray-600">Pending Bookings</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-2xl font-bold text-green-600">
+              {bookings.filter((b) => b.status === "confirmed").length}
+            </div>
+            <div className="text-sm text-gray-600">Confirmed Bookings</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-2xl font-bold text-gray-600">
+              {bookings.filter((b) => b.status === "completed").length}
+            </div>
+            <div className="text-sm text-gray-600">Completed Bookings</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-2xl font-bold text-green-600">
+              $
+              {bookings
+                .filter((b) => b.status !== "cancelled")
+                .reduce((sum, b) => sum + b.totalPrice, 0)
+                .toFixed(2)}
+            </div>
+            <div className="text-sm text-gray-600">Total Revenue</div>
+          </div>
+        </div>
       </div>
     </div>
   );

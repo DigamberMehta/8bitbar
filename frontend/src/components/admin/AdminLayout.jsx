@@ -10,6 +10,7 @@ import {
   MdClose,
   MdRestaurant,
   MdLocalCafe,
+  MdPeople,
 } from "react-icons/md";
 
 const AdminLayout = () => {
@@ -63,6 +64,12 @@ const AdminLayout = () => {
       path: "/admin/cafe-settings",
       label: "Cafe Settings",
       icon: <MdLocalCafe size={20} />,
+    },
+    // User Management
+    {
+      path: "/admin/users",
+      label: "Users",
+      icon: <MdPeople size={20} />,
     },
   ];
 

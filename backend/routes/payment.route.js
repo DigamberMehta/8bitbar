@@ -14,7 +14,7 @@ const getSquareConfig = () => {
 
   return {
     baseURL: isProduction
-      ? "https://connect.squareup.com"
+    ? "https://connect.squareup.com"
       : "https://connect.squareupsandbox.com",
     version: "2023-10-18",
     environment: environment,

@@ -1,3 +1,12 @@
-/backend/node_modules
-/frontend/node_modules
+# Ignore node_modules folders
+/backend/node_modules/
+/frontend/node_modules/
+
+# Ignore all env files
 /backend/.env
+/backend/.env.*
+/frontend/.env
+/frontend/.env.*
+
+# Optional: system files
+.DS_Store

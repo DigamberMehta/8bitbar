@@ -25,6 +25,7 @@ import KaraokeRoomsAdmin from "./pages/admin/karaokeadmin/KaraokeRoomsAdmin";
 import N64RoomsAdmin from "./pages/admin/n64admin/N64RoomsAdmin";
 import CafeBookingsAdmin from "./pages/admin/cafeadmin/CafeBookingsAdmin";
 import CafeSettingsAdmin from "./pages/admin/cafeadmin/CafeSettingsAdmin";
+import UserManagement from "./pages/admin/UserManagement";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import N64RoomEditAdmin from "./pages/admin/n64admin/N64RoomEditAdmin";
 import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmin";
@@ -92,6 +93,7 @@ function App() {
                   element={<N64RoomEditAdmin />}
                 />
                 <Route path="cafe-layout" element={<BarMapEditor />} />
+                <Route path="users" element={<UserManagement />} />
               </Route>
             </Routes>
           </main>
