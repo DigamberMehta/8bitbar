@@ -12,7 +12,7 @@ export const generateToken = (res, user, message) => {
   });
 
   const isProduction = process.env.SQUARE_ENVIRONMENT === "production";
-  
+
   return res
     .status(200)
     .cookie("token", token, {
@@ -25,5 +25,6 @@ export const generateToken = (res, user, message) => {
       success: true,
       message,
       user,
+      token, // Include token in response for fallback authentication
     });
 };
