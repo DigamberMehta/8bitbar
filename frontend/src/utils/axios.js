@@ -2,20 +2,15 @@ import axios from "axios";
 
 // Get environment-specific base URL
 const getBaseURL = () => {
-  const environment = import.meta.env.VITE_SQUARE_ENVIRONMENT || "sandbox";
-  const isProduction = environment === "production";
-
-  // Use environment variable if set, otherwise use default based on environment
+  // Use environment variable if set, otherwise use development URL
   const customBaseURL = import.meta.env.VITE_API_BASE_URL;
 
   if (customBaseURL) {
     return customBaseURL;
   }
 
-  // Default URLs based on environment
-  return isProduction
-    ? "https://https://8bitbar.com.au.com/api/v1" // Production URL
-    : "http://localhost:3000/api/v1"; // Development URL
+  // Default to development URL
+  return "http://localhost:3000/api/v1";
 };
 
 // Create axios instance with base configuration
