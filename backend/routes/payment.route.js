@@ -8,11 +8,20 @@ import N64Booking from "../models/N64Booking.js";
 const router = express.Router();
 
 // Square API configuration
-const SQUARE_BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://connect.squareup.com"
-    : "https://connect.squareupsandbox.com";
-const SQUARE_VERSION = "2023-10-18";
+const getSquareConfig = () => {
+  const environment = process.env.SQUARE_ENVIRONMENT || "sandbox";
+  const isProduction = environment === "production";
+
+  return {
+    baseURL: isProduction
+      ? "https://connect.squareup.com"
+      : "https://connect.squareupsandbox.com",
+    version: "2023-10-18",
+    environment: environment,
+  };
+};
+
+const SQUARE_CONFIG = getSquareConfig();
 
 // Test route to verify Square API setup
 router.get("/test", authenticateUser, async (req, res) => {
@@ -23,16 +32,14 @@ router.get("/test", authenticateUser, async (req, res) => {
       process.env.SQUARE_ACCESS_TOKEN ? "Set" : "Not set"
     );
     console.log("Location ID:", process.env.SQUARE_LOCATION_ID);
-    console.log(
-      "Environment:",
-      process.env.NODE_ENV === "production" ? "Production" : "Sandbox"
-    );
+    console.log("Environment:", SQUARE_CONFIG.environment);
+    console.log("Base URL:", SQUARE_CONFIG.baseURL);
 
     // Test the locations API to verify credentials
-    const response = await fetch(`${SQUARE_BASE_URL}/v2/locations`, {
+    const response = await fetch(`${SQUARE_CONFIG.baseURL}/v2/locations`, {
       method: "GET",
       headers: {
-        "Square-Version": SQUARE_VERSION,
+        "Square-Version": SQUARE_CONFIG.version,
         Authorization: `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
         "Content-Type": "application/json",
       },
@@ -50,8 +57,8 @@ router.get("/test", authenticateUser, async (req, res) => {
             name: loc.name,
             status: loc.status,
           })) || [],
-        environment:
-          process.env.NODE_ENV === "production" ? "Production" : "Sandbox",
+        environment: SQUARE_CONFIG.environment,
+        baseURL: SQUARE_CONFIG.baseURL,
       });
     } else {
       throw new Error(`Square API error: ${JSON.stringify(data)}`);
@@ -113,10 +120,10 @@ router.post("/process", authenticateUser, async (req, res) => {
       note: `User ID: ${req.user.id}`,
     };
 
-    const response = await fetch(`${SQUARE_BASE_URL}/v2/payments`, {
+    const response = await fetch(`${SQUARE_CONFIG.baseURL}/v2/payments`, {
       method: "POST",
       headers: {
-        "Square-Version": SQUARE_VERSION,
+        "Square-Version": SQUARE_CONFIG.version,
         Authorization: `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
         "Content-Type": "application/json",
       },
@@ -181,10 +188,10 @@ router.post("/refund", authenticateUser, async (req, res) => {
       reason: reason || "Customer requested refund",
     };
 
-    const response = await fetch(`${SQUARE_BASE_URL}/v2/refunds`, {
+    const response = await fetch(`${SQUARE_CONFIG.baseURL}/v2/refunds`, {
       method: "POST",
       headers: {
-        "Square-Version": SQUARE_VERSION,
+        "Square-Version": SQUARE_CONFIG.version,
         Authorization: `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
         "Content-Type": "application/json",
       },

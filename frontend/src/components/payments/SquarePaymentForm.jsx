@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CreditCard, Loader2 } from "lucide-react";
+import api from "../../utils/axios";
 
 const SquarePaymentForm = ({
   amount,
@@ -13,14 +14,24 @@ const SquarePaymentForm = ({
   const paymentsRef = useRef(null);
   const cardRef = useRef(null);
 
-  // Load Square Web Payments SDK (sandbox for development)
+  // Load Square Web Payments SDK (sandbox for development, production for production)
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = "https://sandbox.web.squarecdn.com/v1/square.js";
+
+    // Use environment variable to determine Square SDK URL
+    const environment = import.meta.env.VITE_SQUARE_ENVIRONMENT || "sandbox";
+    const squareSdkUrl =
+      environment === "production"
+        ? "https://web.squarecdn.com/v1/square.js" // Production URL
+        : "https://sandbox.web.squarecdn.com/v1/square.js"; // Sandbox URL
+
+    script.src = squareSdkUrl;
     script.async = true;
     script.onload = () => {
       setIsSquareLoaded(true);
-      console.log("Square Web Payments SDK loaded successfully");
+      console.log(
+        `Square Web Payments SDK loaded successfully (${environment})`
+      );
     };
     script.onerror = (e) => {
       console.error("Failed to load Square Web Payments SDK", e);
@@ -85,29 +96,15 @@ const SquarePaymentForm = ({
         console.log("Sending payment request with token:", token);
         console.log("Amount:", amount);
 
-        const authToken = localStorage.getItem("token");
-        console.log("Auth token present:", authToken ? "Yes" : "No");
-
-        const response = await fetch(
-          "http://localhost:3000/api/v1/payments/process",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authToken}`,
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              sourceId: token,
-              amount: amount,
-              currency: "AUD",
-            }),
-          }
-        );
+        const response = await api.post("/payments/process", {
+          sourceId: token,
+          amount: amount,
+          currency: "AUD",
+        });
 
         console.log("Payment response status:", response.status);
 
-        const data = await response.json();
+        const data = response.data;
 
         if (data.success) {
           onPaymentSuccess(data.payment);

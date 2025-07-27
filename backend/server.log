@@ -16,3 +16,31 @@ Processing payment: {
   userId: '6880c8209e5e934d00a57827'
 }
 Payment successful: 9sBDz2pZVzvI1wPafeLsaNF7IQSZY
+Payment request received: {
+  sourceId: 'Present',
+  amount: 20,
+  currency: 'AUD',
+  locationId: undefined,
+  userId: '6880c8209e5e934d00a57827'
+}
+Processing payment: {
+  amountInCents: 2000,
+  currency: 'AUD',
+  locationId: 'L40KMSWMN7GV4',
+  userId: '6880c8209e5e934d00a57827'
+}
+Payment successful: dGStZ8wr8pihvhUsKkENBCxpnrEZY
+Payment request received: {
+  sourceId: 'Present',
+  amount: 20,
+  currency: 'AUD',
+  locationId: undefined,
+  userId: '6880c8209e5e934d00a57827'
+}
+Processing payment: {
+  amountInCents: 2000,
+  currency: 'AUD',
+  locationId: 'L40KMSWMN7GV4',
+  userId: '6880c8209e5e934d00a57827'
+}
+Payment successful: RYCd0cbr9MKsr9c7OS4lpFHRhjOZY

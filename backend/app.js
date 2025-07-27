@@ -13,11 +13,26 @@ dotenv.config({});
 
 const app = express();
 
+// Get environment-specific configuration
+const getConfig = () => {
+  const environment = process.env.SQUARE_ENVIRONMENT || "sandbox";
+  const isProduction = environment === "production";
+
+  return {
+    corsOrigins: isProduction
+      ? ["https://8bitbar.com.au", "https://www.8bitbar.com.au"] // Production origins
+      : ["http://localhost:5173", "http://192.168.31.163:5173"], // Development origins
+    port: process.env.PORT || 3000,
+  };
+};
+
+const config = getConfig();
+
 // Default middlewares
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://192.168.31.163:5173"],
+    origin: config.corsOrigins,
     credentials: true,
   })
 );
@@ -34,7 +49,8 @@ app.use("/api/v1/payments", paymentRoutes);
 
 // call the connectDB function
 connectDB();
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(config.port, () => {
+  console.log(`Server is running on port ${config.port}`);
+  console.log(`Environment: ${process.env.SQUARE_ENVIRONMENT || "sandbox"}`);
+  console.log(`CORS Origins: ${config.corsOrigins.join(", ")}`);
 });
