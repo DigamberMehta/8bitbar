@@ -4,8 +4,15 @@ import api from "../../../utils/axios";
 
 // Allowed time slots for selection
 const ALLOWED_TIMES = [
-  "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
-  "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM",
+  "2:00 PM",
+  "3:00 PM",
+  "4:00 PM",
+  "5:00 PM",
+  "6:00 PM",
+  "7:00 PM",
+  "8:00 PM",
+  "9:00 PM",
+  "10:00 PM",
 ];
 
 // --- HELPER COMPONENTS (REUSABLE & REFINED) ---
@@ -51,10 +58,12 @@ function FeaturesInput({ features, setFeatures }) {
     setFeatures(features.map((f, idx) => (idx === i ? val : f)));
   const removeFeature = (i) =>
     setFeatures(features.filter((_, idx) => idx !== i));
-    
+
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700">Features</label>
+      <label className="block text-sm font-medium text-gray-700">
+        Features
+      </label>
       {features.map((feature, i) => (
         <div key={i} className="flex items-center gap-3">
           <input
@@ -70,8 +79,17 @@ function FeaturesInput({ features, setFeatures }) {
             className="text-gray-400 hover:text-red-500 transition-colors"
             aria-label="Remove feature"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
             </svg>
           </button>
         </div>
@@ -116,21 +134,20 @@ const FormTextarea = ({ label, id, name, ...props }) => (
 );
 
 const FormSelect = ({ label, id, name, children, ...props }) => (
-    <div>
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-            {label}
-        </label>
-        <select
-            id={id}
-            name={name || id}
-            {...props}
-            className="px-3 py-2 mt-1 block w-full text-gray-900 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        >
-            {children}
-        </select>
-    </div>
+  <div>
+    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <select
+      id={id}
+      name={name || id}
+      {...props}
+      className="px-3 py-2 mt-1 block w-full text-gray-900 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+    >
+      {children}
+    </select>
+  </div>
 );
-
 
 // --- MAIN COMPONENT ---
 
@@ -155,7 +172,7 @@ const N64RoomEditAdmin = () => {
     async function fetchRoom() {
       try {
         setLoading(true);
-        const res = await api.get(`/admin/n64-rooms`);
+        const res = await api.get(`/admin/n64/n64-rooms`);
         const room = res.data.rooms.find((r) => r._id === id);
         if (!room) {
           setError("Room not found");
@@ -185,7 +202,7 @@ const N64RoomEditAdmin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/admin/n64-rooms/${id}`, {
+      await api.put(`/admin/n64/n64-rooms/${id}`, {
         name: formData.name,
         maxPeople: parseInt(formData.maxPeople),
         pricePerHour: parseFloat(formData.pricePerHour),
@@ -204,7 +221,12 @@ const N64RoomEditAdmin = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   if (error) return <div className="text-red-600 text-center p-8">{error}</div>;
 
   return (
@@ -219,81 +241,100 @@ const N64RoomEditAdmin = () => {
           <div className="border-t border-gray-200 px-4 py-5 sm:p-6 space-y-8">
             {/* --- GENERAL INFO SECTION --- */}
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">General Information</h3>
+              <h3 className="text-lg font-medium leading-6 text-gray-900">
+                General Information
+              </h3>
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-3">
-                   <FormInput
+                  <FormInput
                     label="Booth Name"
                     id="name"
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
                   />
                 </div>
                 <div className="sm:col-span-3">
-                   <FormSelect
+                  <FormSelect
                     label="Booth Type"
                     id="roomType"
                     value={formData.roomType}
-                    onChange={(e) => setFormData({ ...formData, roomType: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, roomType: e.target.value })
+                    }
                     required
-                   >
-                     <option value="">Select a type</option>
-                     <option value="mickey">Mickey</option>
-                     <option value="minnie">Minnie</option>
-                   </FormSelect>
+                  >
+                    <option value="">Select a type</option>
+                    <option value="mickey">Mickey</option>
+                    <option value="minnie">Minnie</option>
+                  </FormSelect>
                 </div>
                 <div className="sm:col-span-3">
-                   <FormInput
+                  <FormInput
                     label="Capacity (Max People)"
                     id="maxPeople"
                     type="number"
                     value={formData.maxPeople}
-                    onChange={(e) => setFormData({ ...formData, maxPeople: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, maxPeople: e.target.value })
+                    }
                     required
                   />
                 </div>
-                 <div className="sm:col-span-6">
-                    <FormTextarea
-                        label="Description"
-                        id="description"
-                        rows="3"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    />
+                <div className="sm:col-span-6">
+                  <FormTextarea
+                    label="Description"
+                    id="description"
+                    rows="3"
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                  />
                 </div>
               </div>
             </div>
 
             <hr className="border-gray-200" />
-            
+
             {/* --- PRICING & INCLUSIONS SECTION --- */}
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Pricing & Inclusions</h3>
+              <h3 className="text-lg font-medium leading-6 text-gray-900">
+                Pricing & Inclusions
+              </h3>
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                 <div className="sm:col-span-3">
-                   <FormInput
+                <div className="sm:col-span-3">
+                  <FormInput
                     label="Price Per Hour ($)"
                     id="pricePerHour"
                     type="number"
                     step="0.01"
                     value={formData.pricePerHour}
-                    onChange={(e) => setFormData({ ...formData, pricePerHour: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, pricePerHour: e.target.value })
+                    }
                     required
                   />
                 </div>
-                 <div className="sm:col-span-3">
-                   <FormInput
+                <div className="sm:col-span-3">
+                  <FormInput
                     label="Controllers"
                     id="controllers"
                     type="number"
                     value={formData.controllers}
-                    onChange={(e) => setFormData({ ...formData, controllers: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, controllers: e.target.value })
+                    }
                   />
                 </div>
                 <div className="sm:col-span-6">
-                    <FeaturesInput features={featuresArr} setFeatures={setFeaturesArr} />
+                  <FeaturesInput
+                    features={featuresArr}
+                    setFeatures={setFeaturesArr}
+                  />
                 </div>
               </div>
             </div>
@@ -302,32 +343,40 @@ const N64RoomEditAdmin = () => {
 
             {/* --- AVAILABILITY & IMAGE SECTION --- */}
             <div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Availability & Image</h3>
+              <h3 className="text-lg font-medium leading-6 text-gray-900">
+                Availability & Image
+              </h3>
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-6">
-                    <MultiSelect
-                      options={ALLOWED_TIMES}
-                      selected={timeSlotsArr}
-                      onChange={setTimeSlotsArr}
-                      label="Available Time Slots"
-                    />
+                  <MultiSelect
+                    options={ALLOWED_TIMES}
+                    selected={timeSlotsArr}
+                    onChange={setTimeSlotsArr}
+                    label="Available Time Slots"
+                  />
                 </div>
                 <div className="sm:col-span-6">
-                   <FormInput
+                  <FormInput
                     label="Image URL"
                     id="imageUrl"
                     type="text"
                     value={formData.imageUrl || ""}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, imageUrl: e.target.value })
+                    }
                   />
-                   {formData.imageUrl && (
-                    <img src={formData.imageUrl} alt="Booth preview" className="mt-4 h-40 w-auto rounded-lg object-cover"/>
-                   )}
+                  {formData.imageUrl && (
+                    <img
+                      src={formData.imageUrl}
+                      alt="Booth preview"
+                      className="mt-4 h-40 w-auto rounded-lg object-cover"
+                    />
+                  )}
                 </div>
               </div>
             </div>
           </div>
-          
+
           {/* --- ACTION BUTTONS --- */}
           <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-xl">
             <button

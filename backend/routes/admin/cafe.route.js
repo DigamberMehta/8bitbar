@@ -18,6 +18,19 @@ router.get("/cafe-bookings/count", async (req, res) => {
   }
 });
 
+router.get("/cafe-bookings/revenue", async (req, res) => {
+  try {
+    const revenue = await CafeBooking.aggregate([
+      { $match: { status: { $ne: "cancelled" } } },
+      { $group: { _id: null, totalRevenue: { $sum: "$totalCost" } } },
+    ]);
+    const totalRevenue = revenue.length > 0 ? revenue[0].totalRevenue : 0;
+    res.json({ revenue: totalRevenue });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching cafe bookings revenue" });
+  }
+});
+
 // Cafe Bookings Management
 router.get("/cafe-bookings", async (req, res) => {
   try {

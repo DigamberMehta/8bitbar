@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../../../utils/axios";
+import api from "../../../utils/axios";
 
 const CafeSettingsAdmin = () => {
   const [settings, setSettings] = useState({
@@ -14,28 +14,27 @@ const CafeSettingsAdmin = () => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get("/admin/cafe/cafe-settings");
+        setSettings(response.data.settings);
+      } catch (error) {
+        console.error("Error fetching cafe settings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSettings();
   }, []);
 
-  const fetchSettings = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get("/admin/cafe-settings");
-      setSettings(response.data.settings);
-    } catch (error) {
-      console.error("Error fetching cafe settings:", error);
-      setMessage("Failed to load settings");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSaveSettings = async () => {
+  const handleSubmit = async () => {
     try {
       setSaving(true);
       setMessage("");
 
-      await axios.put("/admin/cafe-settings", settings);
+      await api.put("/admin/cafe/cafe-settings", settings);
       setMessage("Settings saved successfully!");
 
       setTimeout(() => setMessage(""), 3000);
@@ -118,231 +117,252 @@ const CafeSettingsAdmin = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-16 w-16 sm:h-24 sm:w-24 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Cafe Settings</h1>
-        <button
-          onClick={handleSaveSettings}
-          disabled={saving}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-        >
-          {saving ? "Saving..." : "Save Settings"}
-        </button>
-      </div>
-
-      {message && (
-        <div
-          className={`mb-4 p-3 rounded ${
-            message.includes("success")
-              ? "bg-green-100 text-green-700 border border-green-300"
-              : "bg-red-100 text-red-700 border border-red-300"
-          }`}
-        >
-          {message}
+    <div className="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+            Cafe Settings
+          </h1>
+          <button
+            onClick={handleSubmit}
+            disabled={saving}
+            className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm sm:text-base font-medium self-start sm:self-auto"
+          >
+            {saving ? "Saving..." : "Save Settings"}
+          </button>
         </div>
-      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Basic Settings */}
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Basic Settings</h2>
+        {/* Message */}
+        {message && (
+          <div
+            className={`mb-4 p-3 rounded text-sm ${
+              message.includes("success")
+                ? "bg-green-100 text-green-700 border border-green-300"
+                : "bg-red-100 text-red-700 border border-red-300"
+            }`}
+          >
+            {message}
+          </div>
+        )}
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Price per Chair per Hour ($)
-              </label>
-              <input
-                type="number"
-                min="1"
-                step="0.01"
-                value={settings.pricePerChairPerHour}
-                onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    pricePerChairPerHour: parseFloat(e.target.value) || 1,
-                  }))
-                }
-                placeholder="Enter price (e.g., 10.00)"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-              />
-            </div>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+          {/* Basic Settings */}
+          <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
+              Basic Settings
+            </h2>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Maximum Duration (hours)
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="12"
-                value={settings.maxDuration}
-                onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    maxDuration: parseInt(e.target.value) || 1,
-                  }))
-                }
-                placeholder="Enter max hours (e.g., 8)"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Opening Time
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  Price per Chair per Hour ($)
                 </label>
                 <input
-                  type="time"
-                  value={settings.openingTime}
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  value={settings.pricePerChairPerHour}
                   onChange={(e) =>
                     setSettings((prev) => ({
                       ...prev,
-                      openingTime: e.target.value,
+                      pricePerChairPerHour: parseFloat(e.target.value) || 1,
                     }))
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter price (e.g., 10.00)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Closing Time
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  Maximum Duration (hours)
                 </label>
                 <input
-                  type="time"
-                  value={settings.closingTime}
+                  type="number"
+                  min="1"
+                  max="12"
+                  value={settings.maxDuration}
                   onChange={(e) =>
                     setSettings((prev) => ({
                       ...prev,
-                      closingTime: e.target.value,
+                      maxDuration: parseInt(e.target.value) || 1,
                     }))
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter max hours (e.g., 8)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm"
                 />
               </div>
-            </div>
 
-            <button
-              onClick={generateTimeSlots}
-              className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-            >
-              Generate Time Slots from Opening Hours
-            </button>
-          </div>
-        </div>
-
-        {/* Time Slots Management */}
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold">Available Time Slots</h2>
-              <button
-                onClick={addTimeSlot}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm flex items-center gap-2"
-              >
-                <span>+</span>
-                Add Time Slot
-              </button>
-            </div>
-            <p className="text-sm text-gray-600">
-              These are the available booking time slots for customers. Each
-              slot represents a 1-hour booking window.
-            </p>
-          </div>
-
-          <div className="space-y-3 max-h-96 overflow-y-auto">
-            {settings.timeSlots.map((slot, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 p-3 border border-gray-200 rounded-md hover:border-blue-300 transition-colors"
-              >
-                <div className="flex items-center gap-2 flex-1">
-                  <span className="text-sm font-medium text-gray-700 min-w-[60px]">
-                    Slot {index + 1}:
-                  </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                    Opening Time
+                  </label>
                   <input
                     type="time"
-                    value={slot}
-                    onChange={(e) => updateTimeSlot(index, e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    min="14:00"
-                    max="23:00"
+                    value={settings.openingTime}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        openingTime: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   />
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-blue-600 min-w-[80px]">
-                    {formatTimeForDisplay(slot)}
-                  </span>
-                  <button
-                    onClick={() => removeTimeSlot(index)}
-                    className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm flex items-center gap-1"
-                    title="Remove this time slot"
-                  >
-                    <span>×</span>
-                    Remove
-                  </button>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                    Closing Time
+                  </label>
+                  <input
+                    type="time"
+                    value={settings.closingTime}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        closingTime: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
                 </div>
               </div>
-            ))}
+
+              <button
+                onClick={generateTimeSlots}
+                className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                Generate Time Slots from Opening Hours
+              </button>
+            </div>
           </div>
 
-          {settings.timeSlots.length === 0 && (
-            <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-              <div className="text-gray-400 text-4xl mb-2">⏰</div>
-              <p className="text-gray-500 font-medium mb-2">
-                No time slots configured
-              </p>
-              <p className="text-gray-400 text-sm">
-                Click "Add Time Slot" above or "Generate Time Slots" to get
-                started
+          {/* Time Slots Management */}
+          <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
+            <div className="mb-3 sm:mb-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                  Available Time Slots
+                </h2>
+                <button
+                  onClick={addTimeSlot}
+                  className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 self-start sm:self-auto"
+                >
+                  <span>+</span>
+                  <span className="hidden xs:inline">Add Time Slot</span>
+                  <span className="xs:hidden">Add</span>
+                </button>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600">
+                These are the available booking time slots for customers. Each
+                slot represents a 1-hour booking window.
               </p>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Preview */}
-      <div className="mt-8 bg-white shadow-md rounded-lg p-6 text-gray-900">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900">Preview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
-          <div>
-            <strong>Operating Hours:</strong>
-            <br />
-            {formatTimeForDisplay(settings.openingTime)} -{" "}
-            {formatTimeForDisplay(settings.closingTime)}
-          </div>
-          <div>
-            <strong>Pricing:</strong>
-            <br />${settings.pricePerChairPerHour}/chair/hour
-          </div>
-          <div>
-            <strong>Max Duration:</strong>
-            <br />
-            {settings.maxDuration} hours
+            <div className="space-y-2 sm:space-y-3 max-h-80 sm:max-h-96 overflow-y-auto">
+              {settings.timeSlots.map((slot, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 border border-gray-200 rounded-md hover:border-blue-300 transition-colors"
+                >
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-xs sm:text-sm font-medium text-gray-700 min-w-[45px] sm:min-w-[60px]">
+                      Slot {index + 1}:
+                    </span>
+                    <input
+                      type="time"
+                      value={slot}
+                      onChange={(e) => updateTimeSlot(index, e.target.value)}
+                      className="flex-1 sm:flex-none px-2 sm:px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
+                      min="14:00"
+                      max="23:00"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+                    <span className="text-xs sm:text-sm font-semibold text-blue-600 min-w-[70px] sm:min-w-[80px]">
+                      {formatTimeForDisplay(slot)}
+                    </span>
+                    <button
+                      onClick={() => removeTimeSlot(index)}
+                      className="px-2 sm:px-3 py-1 sm:py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-xs sm:text-sm flex items-center gap-1 font-medium"
+                      title="Remove this time slot"
+                    >
+                      <span>×</span>
+                      <span className="hidden sm:inline">Remove</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {settings.timeSlots.length === 0 && (
+              <div className="text-center py-6 sm:py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                <div className="text-gray-400 text-2xl sm:text-4xl mb-2">⏰</div>
+                <p className="text-gray-500 font-medium mb-1 sm:mb-2 text-sm sm:text-base">
+                  No time slots configured
+                </p>
+                <p className="text-gray-400 text-xs sm:text-sm px-2">
+                  Click "Add Time Slot" above or "Generate Time Slots" to get
+                  started
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="mt-4 text-gray-700">
-          <strong className="text-gray-900">
-            Available Time Slots ({settings.timeSlots.length}):
-          </strong>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {settings.timeSlots.map((slot, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm"
-              >
-                {formatTimeForDisplay(slot)}
+        {/* Preview */}
+        <div className="mt-6 sm:mt-8 bg-white shadow-md rounded-lg p-4 sm:p-6 text-gray-900">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
+            Preview
+          </h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm text-gray-700 mb-4">
+            <div className="p-3 bg-gray-50 rounded-md">
+              <strong className="text-gray-900 block mb-1">Operating Hours:</strong>
+              <span>
+                {formatTimeForDisplay(settings.openingTime)} -{" "}
+                {formatTimeForDisplay(settings.closingTime)}
               </span>
-            ))}
+            </div>
+            <div className="p-3 bg-gray-50 rounded-md">
+              <strong className="text-gray-900 block mb-1">Pricing:</strong>
+              <span>${settings.pricePerChairPerHour}/chair/hour</span>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-md sm:col-span-2 lg:col-span-1">
+              <strong className="text-gray-900 block mb-1">Max Duration:</strong>
+              <span>{settings.maxDuration} hours</span>
+            </div>
+          </div>
+
+          <div className="text-gray-700">
+            <strong className="text-gray-900 text-sm sm:text-base">
+              Available Time Slots ({settings.timeSlots.length}):
+            </strong>
+            <div className="flex flex-wrap gap-1 sm:gap-2 mt-2">
+              {settings.timeSlots.length > 0 ? (
+                settings.timeSlots.map((slot, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs sm:text-sm font-medium"
+                  >
+                    {formatTimeForDisplay(slot)}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-500 text-xs sm:text-sm italic">
+                  No time slots configured
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

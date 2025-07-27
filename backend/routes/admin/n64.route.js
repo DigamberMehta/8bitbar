@@ -17,6 +17,19 @@ router.get("/n64-bookings/count", async (req, res) => {
   }
 });
 
+router.get("/n64-bookings/revenue", async (req, res) => {
+  try {
+    const revenue = await N64Booking.aggregate([
+      { $match: { status: { $ne: "cancelled" } } },
+      { $group: { _id: null, totalRevenue: { $sum: "$totalPrice" } } },
+    ]);
+    const totalRevenue = revenue.length > 0 ? revenue[0].totalRevenue : 0;
+    res.json({ revenue: totalRevenue });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching N64 bookings revenue" });
+  }
+});
+
 router.get("/n64-rooms/count", async (req, res) => {
   try {
     const count = await N64Room.countDocuments();
