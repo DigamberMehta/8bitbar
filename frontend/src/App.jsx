@@ -29,6 +29,8 @@ import UserManagement from "./pages/admin/UserManagement";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import N64RoomEditAdmin from "./pages/admin/n64admin/N64RoomEditAdmin";
 import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmin";
+import KaraokeRoomCreateAdmin from "./pages/admin/karaokeadmin/KaraokeRoomCreateAdmin";
+
 import BarMapEditor from "./components/cafe/BarMapEditor";
 
 // Import Context Provider
@@ -84,9 +86,14 @@ function App() {
                   element={<KaraokeRoomEditAdmin />}
                 />
                 <Route
+                  path="karaoke/karaoke-room/create"
+                  element={<KaraokeRoomCreateAdmin />}
+                />
+                <Route
                   path="karaoke/karaoke-rooms"
                   element={<KaraokeRoomsAdmin />}
                 />
+
                 <Route path="n64-bookings" element={<N64BookingsAdmin />} />
                 <Route
                   path="n64-rooms/:id/edit"

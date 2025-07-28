@@ -46,6 +46,18 @@ const karaokeRoomSchema = new mongoose.Schema(
     imageUrl: {
       type: String,
     },
+    images: {
+      type: [String],
+      default: [],
+    },
+    isVisible: {
+      type: Boolean,
+      default: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

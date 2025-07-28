@@ -87,6 +87,7 @@ const CheckoutPage = () => {
             customerEmail: billingDetails.email || user.email,
             customerPhone: billingDetails.phone,
             numberOfPeople: item.people,
+            roomId: item.roomId,
             date: item.date,
             time: item.time,
             durationHours: item.duration,

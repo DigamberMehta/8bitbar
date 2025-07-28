@@ -49,6 +49,7 @@ router.get("/karaoke-bookings", async (req, res) => {
 
     const bookings = await KaraokeBooking.find(filter)
       .populate("userId", "name email")
+      .populate("roomId", "name")
       .sort({ createdAt: -1 });
 
     res.json({ bookings });
@@ -65,7 +66,7 @@ router.patch("/karaoke-bookings/:id/status", async (req, res) => {
       req.params.id,
       { status },
       { new: true }
-    ).populate("userId", "name email");
+    ).populate("userId", "name email").populate("roomId", "name");
     res.json({ booking });
   } catch (error) {
     res.status(500).json({ message: "Error updating booking status" });
@@ -82,6 +83,57 @@ router.get("/karaoke-rooms", async (req, res) => {
   }
 });
 
+// Create new karaoke room
+router.post("/karaoke-rooms", async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+      maxPeople,
+      pricePerHour,
+      timeSlots,
+      inclusions,
+      imageUrl,
+      images,
+      isVisible,
+    } = req.body;
+
+    const newRoom = new KaraokeRoom({
+      name,
+      description,
+      maxPeople: parseInt(maxPeople),
+      pricePerHour: parseFloat(pricePerHour),
+      timeSlots: timeSlots || [
+        "2:00 PM",
+        "3:00 PM",
+        "4:00 PM",
+        "5:00 PM",
+        "6:00 PM",
+        "7:00 PM",
+        "8:00 PM",
+        "9:00 PM",
+        "10:00 PM",
+      ],
+      inclusions: {
+        microphones: inclusions?.microphones || 4,
+        features: inclusions?.features || [
+          "Pick-your-own songs displayed with lyrics on a large screen",
+          "Professional karaoke system",
+        ],
+      },
+      imageUrl,
+      images: images || [],
+      isVisible: isVisible !== undefined ? isVisible : true,
+    });
+
+    const savedRoom = await newRoom.save();
+    res.status(201).json({ room: savedRoom });
+  } catch (error) {
+    console.error("Error creating karaoke room:", error);
+    res.status(500).json({ message: "Error creating karaoke room" });
+  }
+});
+
 router.put("/karaoke-rooms/:id", async (req, res) => {
   try {
     const room = await KaraokeRoom.findByIdAndUpdate(req.params.id, req.body, {
@@ -90,6 +142,119 @@ router.put("/karaoke-rooms/:id", async (req, res) => {
     res.json({ room });
   } catch (error) {
     res.status(500).json({ message: "Error updating karaoke room" });
+  }
+});
+
+// Delete karaoke room
+router.delete("/karaoke-rooms/:id", async (req, res) => {
+  try {
+    await KaraokeRoom.findByIdAndDelete(req.params.id);
+    res.json({ message: "Karaoke room deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting karaoke room" });
+  }
+});
+
+// Get available time slots for all rooms
+router.get("/time-slots", async (req, res) => {
+  try {
+    const rooms = await KaraokeRoom.find({}, "timeSlots name");
+    const allTimeSlots = new Set();
+
+    rooms.forEach((room) => {
+      room.timeSlots.forEach((slot) => allTimeSlots.add(slot));
+    });
+
+    res.json({
+      timeSlots: Array.from(allTimeSlots).sort(),
+      rooms: rooms.map((room) => ({
+        id: room._id,
+        name: room.name,
+        timeSlots: room.timeSlots,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching time slots" });
+  }
+});
+
+// Add new time slot to a specific room
+router.post("/karaoke-rooms/:id/time-slots", async (req, res) => {
+  try {
+    const { timeSlot } = req.body;
+    const room = await KaraokeRoom.findById(req.params.id);
+
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+
+    if (!room.timeSlots.includes(timeSlot)) {
+      room.timeSlots.push(timeSlot);
+      room.timeSlots.sort();
+      await room.save();
+    }
+
+    res.json({ room });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding time slot" });
+  }
+});
+
+// Remove time slot from a specific room
+router.delete("/karaoke-rooms/:id/time-slots/:timeSlot", async (req, res) => {
+  try {
+    const room = await KaraokeRoom.findById(req.params.id);
+
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+
+    room.timeSlots = room.timeSlots.filter(
+      (slot) => slot !== req.params.timeSlot
+    );
+    await room.save();
+
+    res.json({ room });
+  } catch (error) {
+    res.status(500).json({ message: "Error removing time slot" });
+  }
+});
+
+// Toggle room visibility
+router.patch("/karaoke-rooms/:id/visibility", async (req, res) => {
+  try {
+    const { isVisible } = req.body;
+    const room = await KaraokeRoom.findById(req.params.id);
+    
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+    
+    room.isVisible = isVisible;
+    await room.save();
+    
+    res.json({ room });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating room visibility" });
+  }
+});
+
+// Toggle room active status
+router.patch("/karaoke-rooms/:id/active", async (req, res) => {
+  try {
+    const { isActive } = req.body;
+    const room = await KaraokeRoom.findById(req.params.id);
+    
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+    
+    room.isActive = isActive;
+    await room.save();
+    
+    res.json({ room });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating room active status" });
   }
 });
 

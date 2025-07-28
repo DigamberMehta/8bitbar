@@ -5,10 +5,10 @@ import authenticateUser from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
-// GET /api/v1/karaoke-rooms - fetch all karaoke rooms
+// GET /api/v1/karaoke-rooms - fetch all visible and active karaoke rooms
 router.get("/", async (req, res) => {
   try {
-    const rooms = await KaraokeRoom.find();
+    const rooms = await KaraokeRoom.find({ isVisible: true, isActive: true });
     res.status(200).json({ success: true, rooms });
   } catch (error) {
     res
@@ -57,6 +57,7 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       totalPrice,
       paymentId,
       paymentStatus,
+      roomId,
     } = req.body;
 
     if (
@@ -66,7 +67,8 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       !date ||
       !time ||
       !durationHours ||
-      !totalPrice
+      !totalPrice ||
+      !roomId
     ) {
       return res.status(400).json({
         success: false,
@@ -97,6 +99,7 @@ router.post("/bookings", authenticateUser, async (req, res) => {
 
     const newBooking = new KaraokeBooking({
       userId: req.user.id,
+      roomId,
       customerName,
       customerEmail,
       customerPhone,

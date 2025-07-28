@@ -8,21 +8,24 @@ import axios from "../../utils/axios";
  * * This component sets up the main layout for the karaoke booking page.
  * It arranges the RoomInfo and BookingForm components in a responsive grid.
  * Now fetches room data and passes it to children.
+ * Supports multiple rooms with tabbed interface.
  */
 const KaraokeBooking = () => {
-  const [room, setRoom] = useState(null);
+  const [rooms, setRooms] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchRoom = async () => {
+    const fetchRooms = async () => {
       try {
         const res = await axios.get("/karaoke-rooms");
         const data = res.data;
         if (data.success && data.rooms.length > 0) {
-          setRoom(data.rooms[0]);
+          setRooms(data.rooms);
+          setSelectedRoom(data.rooms[0]);
         } else {
-          setError("No karaoke room data found.");
+          setError("No karaoke rooms found.");
         }
       } catch (err) {
         setError("Failed to fetch room info.");
@@ -30,14 +33,14 @@ const KaraokeBooking = () => {
         setLoading(false);
       }
     };
-    fetchRoom();
+    fetchRooms();
   }, []);
 
   if (loading)
     return <div className="text-center py-12">Loading room info...</div>;
   if (error)
     return <div className="text-center text-red-400 py-12">{error}</div>;
-  if (!room) return null;
+  if (!selectedRoom) return null;
 
   return (
     <div className="min-h-screen bg-gray-900 py-12 text-white">
@@ -48,15 +51,35 @@ const KaraokeBooking = () => {
             🎤 KARAOKE ROOM BOOKING
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Welcome to Wonderland! Book your unforgettable karaoke experience in
-            our Alice in Wonderland-themed room.
+            Choose your perfect karaoke room and book your unforgettable experience!
           </p>
         </div>
 
+        {/* Room Selection Tabs */}
+        {rooms.length > 1 && (
+          <div className="mb-8">
+            <div className="flex flex-wrap justify-center gap-2">
+              {rooms.map((room) => (
+                <button
+                  key={room._id}
+                  onClick={() => setSelectedRoom(room)}
+                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                    selectedRoom._id === room._id
+                      ? "bg-gradient-to-r from-pink-500 to-cyan-400 text-white shadow-lg"
+                      : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
+                  }`}
+                >
+                  {room.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Main Content Grid */}
         <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 gap-12">
-          <RoomInfo room={room} />
-          <BookingForm room={room} />
+          <RoomInfo room={selectedRoom} />
+          <BookingForm room={selectedRoom} />
         </div>
       </div>
     </div>
