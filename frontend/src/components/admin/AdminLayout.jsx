@@ -11,6 +11,7 @@ import {
   MdRestaurant,
   MdLocalCafe,
   MdPeople,
+  MdAdd,
 } from "react-icons/md";
 
 const AdminLayout = () => {
@@ -23,6 +24,13 @@ const AdminLayout = () => {
       path: "/admin/dashboard",
       label: "Dashboard",
       icon: <MdDashboard size={20} />,
+    },
+
+    // Manual Booking
+    {
+      path: "/admin/manual-booking",
+      label: "Manual Booking",
+      icon: <MdAdd size={20} />,
     },
 
     // Karaoke Section

@@ -30,6 +30,7 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import N64RoomEditAdmin from "./pages/admin/n64admin/N64RoomEditAdmin";
 import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmin";
 import KaraokeRoomCreateAdmin from "./pages/admin/karaokeadmin/KaraokeRoomCreateAdmin";
+import ManualBooking from "./pages/admin/manualbooking";
 
 import BarMapEditor from "./components/cafe/BarMapEditor";
 
@@ -77,6 +78,7 @@ function App() {
               >
                 <Route index element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="manual-booking" element={<ManualBooking />} />
                 <Route
                   path="karaoke-bookings"
                   element={<KaraokeBookingsAdmin />}
