@@ -15,6 +15,7 @@ const CafeLayoutViewer = ({
   bookedChairs,
   onChairSelect,
   deviceType,
+  chairSelectionEnabled,
 }) => {
   const [mapImage] = useImage(layout.bgImageUrl);
 
@@ -42,10 +43,11 @@ const CafeLayoutViewer = ({
   };
 
   const isChairClickable = (chairId) => {
-    return !bookedChairs.includes(chairId);
+    return !bookedChairs.includes(chairId) && chairSelectionEnabled;
   };
 
   const handleChairClick = (chairId) => {
+    if (!chairSelectionEnabled) return;
     if (isChairClickable(chairId)) {
       onChairSelect(chairId);
     }
@@ -180,6 +182,22 @@ const CafeLayoutViewer = ({
         </div>
       </div>
 
+      {/* Selection Summary */}
+      {selectedChairs.length > 0 && (
+        <div className="mt-4 p-3 bg-green-900/30 border border-green-500/50 rounded">
+          <p className="text-green-400 font-semibold">
+            Selected Chairs: {selectedChairs.join(", ")} (
+            {selectedChairs.length} chair{selectedChairs.length > 1 ? "s" : ""})
+          </p>
+        </div>
+      )}
+
+      {!chairSelectionEnabled && (
+        <div className="mb-2 text-sm text-red-700 bg-red-50 rounded px-3 py-2">
+          Please select a date and time before choosing a chair.
+        </div>
+      )}
+
       <div
         className="border border-gray-600 rounded overflow-auto"
         style={{
@@ -221,16 +239,6 @@ const CafeLayoutViewer = ({
           </Stage>
         </div>
       </div>
-
-      {/* Selection Summary */}
-      {selectedChairs.length > 0 && (
-        <div className="mt-4 p-3 bg-green-900/30 border border-green-500/50 rounded">
-          <p className="text-green-400 font-semibold">
-            Selected Chairs: {selectedChairs.join(", ")} (
-            {selectedChairs.length} chair{selectedChairs.length > 1 ? "s" : ""})
-          </p>
-        </div>
-      )}
     </div>
   );
 };

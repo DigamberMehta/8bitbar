@@ -231,7 +231,17 @@ const BookingForm = ({
             <div className="flex justify-between">
               <span>Price per chair per hour:</span>
               <span className="text-green-400">
-                ${(cafeSettings?.pricePerChairPerHour || 10).toFixed(2)}
+                {cafeSettings &&
+                cafeSettings.pricePerChairPerHour !== undefined &&
+                cafeSettings.pricePerChairPerHour === 0 ? (
+                  <span className="text-green-400 font-bold">FREE</span>
+                ) : (
+                  `$${(cafeSettings &&
+                  cafeSettings.pricePerChairPerHour !== undefined
+                    ? cafeSettings.pricePerChairPerHour
+                    : 10
+                  ).toFixed(2)}`
+                )}
               </span>
             </div>
             <div className="flex justify-between">
@@ -249,7 +259,13 @@ const BookingForm = ({
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
                 <span className="text-green-400">
-                  ${calculateTotal().toFixed(2)}
+                  {cafeSettings &&
+                  cafeSettings.pricePerChairPerHour !== undefined &&
+                  cafeSettings.pricePerChairPerHour === 0 ? (
+                    <span className="text-green-400 font-bold">FREE</span>
+                  ) : (
+                    `$${calculateTotal().toFixed(2)}`
+                  )}
                 </span>
               </div>
             </div>
@@ -272,6 +288,10 @@ const BookingForm = ({
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
               Checking Availability...
             </div>
+          ) : cafeSettings &&
+            cafeSettings.pricePerChairPerHour !== undefined &&
+            cafeSettings.pricePerChairPerHour === 0 ? (
+            "Book Free Chairs"
           ) : (
             `Add to Cart - $${calculateTotal().toFixed(2)}`
           )}

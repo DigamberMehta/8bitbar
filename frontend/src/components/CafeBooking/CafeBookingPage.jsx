@@ -63,28 +63,16 @@ const CafeBookingPage = () => {
   const checkAvailability = async () => {
     try {
       setLoading(true);
-      const [availabilityResponse, bookingsResponse] = await Promise.all([
-        axios.get("/cafe/bookings/check", {
-          params: {
-            date: bookingDetails.date,
-            time: bookingDetails.time,
-            duration: bookingDetails.duration,
-          },
-        }),
-        axios.get("/admin/cafe-bookings"), // Get all bookings for conflict checking
-      ]);
-
+      const availabilityResponse = await axios.get("/cafe/bookings/check", {
+        params: {
+          date: bookingDetails.date,
+          time: bookingDetails.time,
+          duration: bookingDetails.duration,
+        },
+      });
       setBookedChairs(availabilityResponse.data.bookedChairs);
-      setAllBookings(bookingsResponse.data.bookings || []);
     } catch (error) {
       console.error("Failed to check availability:", error);
-      // Try to get bookings even if availability check fails
-      try {
-        const bookingsResponse = await axios.get("/admin/cafe-bookings");
-        setAllBookings(bookingsResponse.data.bookings || []);
-      } catch (bookingsError) {
-        console.error("Failed to fetch bookings:", bookingsError);
-      }
     } finally {
       setLoading(false);
     }
@@ -116,7 +104,18 @@ const CafeBookingPage = () => {
       return; // Don't show alert, just return silently
     }
 
-    const totalCost = selectedChairs.length * 10 * bookingDetails.duration;
+    const pricePerChair =
+      cafeSettings && cafeSettings.pricePerChairPerHour !== undefined
+        ? cafeSettings.pricePerChairPerHour
+        : 10;
+    const totalCost =
+      selectedChairs.length * pricePerChair * bookingDetails.duration;
+
+    // If it's a free booking (price is 0), book directly without going to cart
+    if (pricePerChair === 0) {
+      handleDirectBooking();
+      return;
+    }
 
     const cartItem = {
       type: "cafe",
@@ -148,10 +147,51 @@ const CafeBookingPage = () => {
     navigate("/cart");
   };
 
+  const handleDirectBooking = async () => {
+    try {
+      setLoading(true);
+
+      const bookingData = {
+        chairIds: selectedChairs,
+        date: bookingDetails.date,
+        time: bookingDetails.time,
+        duration: bookingDetails.duration,
+        totalCost: 0,
+        status: "confirmed", // Auto-confirm free bookings
+      };
+
+      const response = await axios.post("/cafe/bookings", bookingData);
+
+      if (response.data.success) {
+        alert(
+          "Free booking confirmed successfully! You can now use your selected chairs."
+        );
+        setSelectedChairs([]);
+        setBookingDetails({
+          date: "",
+          time: "",
+          duration: 1,
+        });
+        checkAvailability(); // Refresh availability
+      }
+    } catch (error) {
+      console.error("Failed to book free chairs:", error);
+      alert("Failed to book chairs. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const calculateTotal = () => {
-    const pricePerChair = cafeSettings?.pricePerChairPerHour || 10;
+    const pricePerChair =
+      cafeSettings && cafeSettings.pricePerChairPerHour !== undefined
+        ? cafeSettings.pricePerChairPerHour
+        : 10;
     return selectedChairs.length * pricePerChair * bookingDetails.duration;
   };
+
+  const isBookingDetailsComplete =
+    bookingDetails.date && bookingDetails.time && bookingDetails.duration;
 
   if (!layout) {
     return (
@@ -195,6 +235,7 @@ const CafeBookingPage = () => {
               bookedChairs={bookedChairs}
               onChairSelect={handleChairSelect}
               deviceType={deviceType}
+              chairSelectionEnabled={isBookingDetailsComplete}
             />
           </div>
         </div>
@@ -209,7 +250,21 @@ const CafeBookingPage = () => {
                 to select them
               </p>
               <p className="mb-2">
-                💰 <strong>Pricing:</strong> Each chair costs $10 per hour
+                💰 <strong>Pricing:</strong>{" "}
+                {cafeSettings &&
+                cafeSettings.pricePerChairPerHour !== undefined &&
+                cafeSettings.pricePerChairPerHour === 0 ? (
+                  <span className="text-green-400 font-bold">
+                    FREE - No payment required!
+                  </span>
+                ) : (
+                  `Each chair costs $${
+                    cafeSettings &&
+                    cafeSettings.pricePerChairPerHour !== undefined
+                      ? cafeSettings.pricePerChairPerHour
+                      : 10
+                  } per hour`
+                )}
               </p>
             </div>
             <div>
@@ -218,8 +273,19 @@ const CafeBookingPage = () => {
                 selected time
               </p>
               <p className="mb-2">
-                🛒 <strong>Multiple Selection:</strong> Select multiple chairs
-                and add to cart
+                {cafeSettings &&
+                cafeSettings.pricePerChairPerHour !== undefined &&
+                cafeSettings.pricePerChairPerHour === 0 ? (
+                  <span>
+                    🎉 <strong>Free Booking:</strong> Book directly without
+                    checkout
+                  </span>
+                ) : (
+                  <span>
+                    🛒 <strong>Multiple Selection:</strong> Select multiple
+                    chairs and add to cart
+                  </span>
+                )}
               </p>
             </div>
           </div>

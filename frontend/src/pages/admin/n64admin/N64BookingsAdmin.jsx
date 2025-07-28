@@ -190,13 +190,13 @@ const N64BookingsAdmin = () => {
                     Name
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phone
+                    Contact Info
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Booking Details
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Cost
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
@@ -218,11 +218,11 @@ const N64BookingsAdmin = () => {
                       <div className="text-sm text-gray-500">
                         {booking.customerEmail || "N/A"}
                       </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {booking.customerPhone || "N/A"}
-                      </div>
+                      {booking.customerPhone && (
+                        <div className="text-sm text-gray-500">
+                          {booking.customerPhone}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
@@ -234,14 +234,16 @@ const N64BookingsAdmin = () => {
                         {booking.durationHours}h
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
-                        Payment: {booking.paymentId ? (
+                        Payment:{" "}
+                        {booking.paymentId ? (
                           <span className="text-green-600 font-mono text-xs">
                             {booking.paymentId}
                           </span>
                         ) : (
-                          <span className="text-gray-400 text-xs">No payment ID</span>
-                        )}
-                        {" "}
+                          <span className="text-gray-400 text-xs">
+                            No payment ID
+                          </span>
+                        )}{" "}
                         <span
                           className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
                             booking.paymentStatus === "completed"
@@ -255,6 +257,14 @@ const N64BookingsAdmin = () => {
                         >
                           {booking.paymentStatus || "pending"}
                         </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-green-600">
+                        $
+                        {booking.totalPrice
+                          ? booking.totalPrice.toFixed(2)
+                          : "0.00"}
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -329,18 +339,24 @@ const N64BookingsAdmin = () => {
                     {booking.durationHours} hours
                   </dd>
 
-                  <dt className="text-sm font-medium text-gray-500">Payment ID</dt>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Payment ID
+                  </dt>
                   <dd className="text-sm text-gray-900">
                     {booking.paymentId ? (
                       <span className="text-green-600 font-mono text-xs">
                         {booking.paymentId}
                       </span>
                     ) : (
-                      <span className="text-gray-400 text-xs">No payment ID</span>
+                      <span className="text-gray-400 text-xs">
+                        No payment ID
+                      </span>
                     )}
                   </dd>
 
-                  <dt className="text-sm font-medium text-gray-500">Payment Status</dt>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Payment Status
+                  </dt>
                   <dd className="text-sm text-gray-900">
                     <span
                       className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
@@ -355,6 +371,16 @@ const N64BookingsAdmin = () => {
                     >
                       {booking.paymentStatus || "pending"}
                     </span>
+                  </dd>
+
+                  <dt className="text-sm font-medium text-gray-500">
+                    Total Cost
+                  </dt>
+                  <dd className="text-sm font-medium text-green-600">
+                    $
+                    {booking.totalPrice
+                      ? booking.totalPrice.toFixed(2)
+                      : "0.00"}
                   </dd>
                 </dl>
               </div>

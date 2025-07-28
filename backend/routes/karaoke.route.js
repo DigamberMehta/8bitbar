@@ -67,7 +67,7 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       !date ||
       !time ||
       !durationHours ||
-      !totalPrice ||
+      totalPrice === undefined || // Allow 0 for free bookings
       !roomId
     ) {
       return res.status(400).json({
@@ -91,9 +91,11 @@ router.post("/bookings", authenticateUser, async (req, res) => {
     const endDateTime = new Date(startDateTime);
     endDateTime.setHours(startDateTime.getHours() + durationHours);
 
-    // Determine booking status based on payment status
+    // Determine booking status - free bookings are auto-confirmed
     const bookingStatus =
-      paymentStatus === "completed" || paymentStatus === "COMPLETED"
+      totalPrice === 0
+        ? "confirmed"
+        : paymentStatus === "completed" || paymentStatus === "COMPLETED"
         ? "confirmed"
         : "pending";
 
@@ -108,9 +110,10 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       endDateTime,
       durationHours,
       totalPrice,
-      paymentId,
-      paymentStatus: paymentStatus || "pending",
-      status: bookingStatus, // Set status based on payment status
+      paymentId: totalPrice === 0 ? "FREE_BOOKING" : paymentId,
+      paymentStatus:
+        totalPrice === 0 ? "completed" : paymentStatus || "pending",
+      status: bookingStatus,
     });
 
     await newBooking.save();

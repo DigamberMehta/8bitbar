@@ -22,6 +22,7 @@ const tableSchema = new mongoose.Schema({
 
 const cafeLayoutSchema = new mongoose.Schema(
   {
+    templateName: { type: String, required: true, default: "Template 1" },
     chairs: [chairSchema],
     tables: [tableSchema],
     bgImageUrl: { type: String, default: "" },
@@ -38,8 +39,13 @@ const cafeLayoutSchema = new mongoose.Schema(
       enum: ["desktop", "mobile"],
       default: "desktop",
     },
+    isActive: { type: Boolean, default: true },
+    isActiveForBooking: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+
+// Compound index to ensure unique templates per device type
+cafeLayoutSchema.index({ templateName: 1, deviceType: 1 }, { unique: true });
 
 export default mongoose.model("CafeLayout", cafeLayoutSchema);

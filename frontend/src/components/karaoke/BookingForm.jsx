@@ -41,7 +41,8 @@ const BookingForm = ({ room }) => {
 
   const timeSlots = room.timeSlots || [];
   const maxPeople = room.maxPeople || 12;
-  const pricePerHour = room.pricePerHour || 60;
+  const pricePerHour =
+    room && room.pricePerHour !== undefined ? room.pricePerHour : 60;
   const totalCost = pricePerHour * numberOfHours;
 
   // Helper: get all booked slots for the selected date (overlapping logic)
@@ -111,6 +112,12 @@ const BookingForm = ({ room }) => {
 
   const handleAddToCart = () => {
     if (selectedDate && selectedTime) {
+      // If it's a free booking (price is 0), book directly without going to cart
+      if (pricePerHour === 0) {
+        handleDirectBooking();
+        return;
+      }
+
       // Prepare cart item
       const cartItem = {
         type: "karaoke",
@@ -134,6 +141,46 @@ const BookingForm = ({ room }) => {
       navigate("/cart");
     } else {
       setError("Please select a date and a start time to proceed.");
+    }
+  };
+
+  const handleDirectBooking = async () => {
+    try {
+      setError("");
+
+      const bookingData = {
+        customerName: "Free Booking User", // You might want to get this from user context
+        customerEmail: "free@booking.com", // You might want to get this from user context
+        customerPhone: "",
+        numberOfPeople,
+        date: selectedDate,
+        time: selectedTime,
+        durationHours: numberOfHours,
+        totalPrice: 0,
+        roomId: room._id,
+        paymentId: "FREE_BOOKING",
+        paymentStatus: "completed",
+      };
+
+      const response = await axios.post("/karaoke-rooms/bookings", bookingData);
+
+      if (response.data.success) {
+        alert(
+          "Free karaoke room booking confirmed successfully! You can now use your room."
+        );
+        setSelectedDate("");
+        setSelectedTime("");
+        setNumberOfPeople(2);
+        setNumberOfHours(1);
+        // Refresh bookings to show the new booking
+        const res = await axios.get("/karaoke-rooms/bookings");
+        if (res.data.success) {
+          setBookings(res.data.bookings);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to book free karaoke room:", error);
+      setError("Failed to book room. Please try again.");
     }
   };
 
@@ -251,11 +298,23 @@ const BookingForm = ({ room }) => {
             <span className="text-gray-300">
               Price ({numberOfHours} {numberOfHours > 1 ? "hours" : "hour"}):
             </span>
-            <span className="text-white">${totalCost}</span>
+            <span className="text-white">
+              {pricePerHour === 0 ? (
+                <span className="text-green-400 font-bold">FREE</span>
+              ) : (
+                `$${totalCost}`
+              )}
+            </span>
           </div>
           <div className="flex justify-between items-center text-xl">
             <span className="text-gray-300 font-semibold">Total:</span>
-            <span className="text-green-400 font-bold">${totalCost}</span>
+            <span className="text-green-400 font-bold">
+              {pricePerHour === 0 ? (
+                <span className="text-green-400 font-bold">FREE</span>
+              ) : (
+                `$${totalCost}`
+              )}
+            </span>
           </div>
         </div>
 
@@ -270,7 +329,7 @@ const BookingForm = ({ room }) => {
           }
           className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          🛒 ADD TO CART
+          {pricePerHour === 0 ? "🎉 BOOK FREE ROOM" : "🛒 ADD TO CART"}
         </button>
       </div>
     </div>
