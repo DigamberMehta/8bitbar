@@ -596,28 +596,5 @@ npm run build
 npm run lint
 ```
 
-### Log Locations
 
-- **Backend**: `server.log` (if configured)
-- **Frontend**: Browser console
-- **Database**: MongoDB logs
 
-## Support & Contact
-
-### Documentation Updates
-
-- Keep this document updated with any changes
-- Document new features and API changes
-- Maintain deployment procedures
-
-### Emergency Contacts
-
-- **Developer**: [Your contact information]
-- **Hosting**: [Hosting provider contact]
-- **Square Support**: [Square developer support]
-
----
-
-**Last Updated**: [Current Date]
-**Version**: 1.0.0
-**Maintained By**: [Your Name/Company]
