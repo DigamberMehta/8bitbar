@@ -86,6 +86,32 @@ const BookingCards = ({ bookings, onUpdateStatus }) => {
                 ${booking.totalCost.toFixed(2)}
               </p>
             </div>
+            <div>
+              <span className="font-medium text-gray-700">Payment:</span>
+              <p className="text-gray-900">
+                {booking.paymentId ? (
+                  <span className="text-green-600 font-mono text-xs">
+                    {booking.paymentId}
+                  </span>
+                ) : (
+                  <span className="text-gray-400 text-xs">No payment ID</span>
+                )}
+                {" "}
+                <span
+                  className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
+                    booking.paymentStatus === "completed"
+                      ? "bg-green-100 text-green-800"
+                      : booking.paymentStatus === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : booking.paymentStatus === "failed"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {booking.paymentStatus || "pending"}
+                </span>
+              </p>
+            </div>
           </div>
 
           {/* Chairs */}
