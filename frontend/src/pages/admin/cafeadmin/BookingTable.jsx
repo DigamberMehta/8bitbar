@@ -42,13 +42,7 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                 Customer
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date & Time
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Chairs
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Duration
+                Booking Details
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Total Cost
@@ -82,16 +76,15 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4">
                   <div className="text-sm text-gray-900">
                     {formatDate(booking.date)}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {formatTime(booking.time)}
+                    {formatTime(booking.time)} | {booking.duration} hour
+                    {booking.duration > 1 ? "s" : ""}
                   </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1 mt-2">
                     {booking.chairIds.map((chairId) => (
                       <span
                         key={chairId}
@@ -105,9 +98,6 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                     {booking.chairIds.length} chair
                     {booking.chairIds.length > 1 ? "s" : ""}
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {booking.duration} hour{booking.duration > 1 ? "s" : ""}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
                   ${booking.totalCost.toFixed(2)}

@@ -9,32 +9,66 @@ const CafeSettingsAdmin = () => {
     openingTime: "14:00",
     closingTime: "23:00",
   });
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState("Template 1");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get("/admin/cafe/cafe-settings");
-        setSettings(response.data.settings);
-      } catch (error) {
-        console.error("Error fetching cafe settings:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSettings();
+    fetchTemplates();
   }, []);
+
+  useEffect(() => {
+    if (selectedTemplate) {
+      fetchSettings();
+    }
+  }, [selectedTemplate]);
+
+  const fetchTemplates = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/admin/cafe/cafe-layout/templates");
+      const templateNames = [
+        ...new Set(response.data.templates.map((t) => t.templateName)),
+      ];
+      setTemplates(templateNames);
+      if (
+        templateNames.length > 0 &&
+        !templateNames.includes(selectedTemplate)
+      ) {
+        setSelectedTemplate(templateNames[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(
+        `/admin/cafe/cafe-settings?templateName=${selectedTemplate}`
+      );
+      setSettings(response.data.settings);
+    } catch (error) {
+      console.error("Error fetching cafe settings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
       setSaving(true);
       setMessage("");
 
-      await api.put("/admin/cafe/cafe-settings", settings);
+      await api.put("/admin/cafe/cafe-settings", {
+        ...settings,
+        templateName: selectedTemplate,
+      });
       setMessage("Settings saved successfully!");
 
       setTimeout(() => setMessage(""), 3000);
@@ -139,6 +173,32 @@ const CafeSettingsAdmin = () => {
           </button>
         </div>
 
+        {/* Template Selection */}
+        <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
+            Template Settings
+          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700">
+              Select Template:
+            </label>
+            <select
+              value={selectedTemplate}
+              onChange={(e) => setSelectedTemplate(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm"
+            >
+              {templates.map((template) => (
+                <option key={template} value={template}>
+                  {template}
+                </option>
+              ))}
+            </select>
+            <span className="text-xs sm:text-sm text-gray-500">
+              Settings for: <strong>{selectedTemplate}</strong>
+            </span>
+          </div>
+        </div>
+
         {/* Message */}
         {message && (
           <div
@@ -157,7 +217,7 @@ const CafeSettingsAdmin = () => {
           {/* Basic Settings */}
           <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
-              Basic Settings
+              Basic Settings for {selectedTemplate}
             </h2>
 
             <div className="space-y-3 sm:space-y-4">
@@ -167,16 +227,16 @@ const CafeSettingsAdmin = () => {
                 </label>
                 <input
                   type="number"
-                  min="1"
+                  min="0"
                   step="0.01"
                   value={settings.pricePerChairPerHour}
                   onChange={(e) =>
                     setSettings((prev) => ({
                       ...prev,
-                      pricePerChairPerHour: parseFloat(e.target.value) || 1,
+                      pricePerChairPerHour: parseFloat(e.target.value) || 0,
                     }))
                   }
-                  placeholder="Enter price (e.g., 10.00)"
+                  placeholder="Enter price (e.g., 10.00 or 0 for free)"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm"
                 />
               </div>
@@ -236,13 +296,6 @@ const CafeSettingsAdmin = () => {
                   />
                 </div>
               </div>
-
-              <button
-                onClick={generateTimeSlots}
-                className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
-              >
-                Generate Time Slots from Opening Hours
-              </button>
             </div>
           </div>
 
@@ -251,7 +304,7 @@ const CafeSettingsAdmin = () => {
             <div className="mb-3 sm:mb-4">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-                  Available Time Slots
+                  Available Time Slots for {selectedTemplate}
                 </h2>
                 <button
                   onClick={addTimeSlot}
@@ -306,7 +359,9 @@ const CafeSettingsAdmin = () => {
 
             {settings.timeSlots.length === 0 && (
               <div className="text-center py-6 sm:py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                <div className="text-gray-400 text-2xl sm:text-4xl mb-2">⏰</div>
+                <div className="text-gray-400 text-2xl sm:text-4xl mb-2">
+                  ⏰
+                </div>
                 <p className="text-gray-500 font-medium mb-1 sm:mb-2 text-sm sm:text-base">
                   No time slots configured
                 </p>
@@ -322,12 +377,14 @@ const CafeSettingsAdmin = () => {
         {/* Preview */}
         <div className="mt-6 sm:mt-8 bg-white shadow-md rounded-lg p-4 sm:p-6 text-gray-900">
           <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
-            Preview
+            Preview for {selectedTemplate}
           </h2>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm text-gray-700 mb-4">
             <div className="p-3 bg-gray-50 rounded-md">
-              <strong className="text-gray-900 block mb-1">Operating Hours:</strong>
+              <strong className="text-gray-900 block mb-1">
+                Operating Hours:
+              </strong>
               <span>
                 {formatTimeForDisplay(settings.openingTime)} -{" "}
                 {formatTimeForDisplay(settings.closingTime)}
@@ -338,7 +395,9 @@ const CafeSettingsAdmin = () => {
               <span>${settings.pricePerChairPerHour}/chair/hour</span>
             </div>
             <div className="p-3 bg-gray-50 rounded-md sm:col-span-2 lg:col-span-1">
-              <strong className="text-gray-900 block mb-1">Max Duration:</strong>
+              <strong className="text-gray-900 block mb-1">
+                Max Duration:
+              </strong>
               <span>{settings.maxDuration} hours</span>
             </div>
           </div>

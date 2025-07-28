@@ -358,14 +358,17 @@ const KaraokeRoomCreateAdmin = () => {
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-3">
                   <FormInput
-                    label="Price Per Hour ($)"
+                    label="Price per Hour ($)"
                     id="pricePerHour"
+                    name="pricePerHour"
                     type="number"
+                    min="0"
                     step="0.01"
                     value={formData.pricePerHour}
                     onChange={(e) =>
                       setFormData({ ...formData, pricePerHour: e.target.value })
                     }
+                    placeholder="Enter price (e.g., 50.00 or 0 for free)"
                     required
                   />
                 </div>

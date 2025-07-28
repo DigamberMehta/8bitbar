@@ -190,13 +190,13 @@ const KaraokeBookingsAdmin = () => {
                     Name
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phone
+                    Contact Info
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Booking Details
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Cost
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
@@ -218,11 +218,11 @@ const KaraokeBookingsAdmin = () => {
                       <div className="text-sm text-gray-500">
                         {booking.customerEmail || "N/A"}
                       </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {booking.customerPhone || "N/A"}
-                      </div>
+                      {booking.customerPhone && (
+                        <div className="text-sm text-gray-500">
+                          {booking.customerPhone}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
@@ -256,6 +256,14 @@ const KaraokeBookingsAdmin = () => {
                         >
                           {booking.paymentStatus || "pending"}
                         </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-green-600">
+                        $
+                        {booking.totalPrice
+                          ? booking.totalPrice.toFixed(2)
+                          : "0.00"}
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -362,6 +370,16 @@ const KaraokeBookingsAdmin = () => {
                     >
                       {booking.paymentStatus || "pending"}
                     </span>
+                  </dd>
+
+                  <dt className="text-sm font-medium text-gray-500">
+                    Total Cost
+                  </dt>
+                  <dd className="text-sm font-medium text-green-600">
+                    $
+                    {booking.totalPrice
+                      ? booking.totalPrice.toFixed(2)
+                      : "0.00"}
                   </dd>
                 </dl>
               </div>

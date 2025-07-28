@@ -13,6 +13,7 @@ import StageArea from "./StageArea";
 import ShapeRenderer from "./ShapeRenderer";
 import api from "../../utils/axios";
 import EditorSettings from "./EditorSettings";
+import TemplateManager from "./TemplateManager";
 
 const DEFAULT_MAP_URL =
   "https://8bitbar.com.au/wp-content/uploads/2025/06/map-layout-0-resturant-scaled.jpg";
@@ -65,6 +66,7 @@ const BarMapEditor = () => {
   const [textColor, setTextColor] = useState(DEFAULT_TEXT_COLOR);
   const [deviceType, setDeviceType] = useState("desktop"); // Layout type being edited
   const [actualDeviceType, setActualDeviceType] = useState("desktop"); // Actual device being used
+  const [currentTemplate, setCurrentTemplate] = useState("Template 1"); // Current template
 
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
@@ -168,7 +170,7 @@ const BarMapEditor = () => {
       setLoading(true);
       try {
         const response = await api.get(
-          `/admin/cafe/cafe-layout?deviceType=${deviceType}`
+          `/admin/cafe/cafe-layout?deviceType=${deviceType}&templateName=${currentTemplate}`
         );
         const layout = response.data.layout;
         if (layout) {
@@ -224,7 +226,7 @@ const BarMapEditor = () => {
     };
     fetchLayout();
     // eslint-disable-next-line
-  }, [deviceType]);
+  }, [deviceType, currentTemplate]);
 
   // Save layout to backend
   const handleSaveLayout = async (shapesToSave) => {
@@ -261,6 +263,7 @@ const BarMapEditor = () => {
         canvasWidth,
         canvasHeight,
         deviceType,
+        templateName: currentTemplate,
         changeType: "updated",
       });
       setSaveStatus("Layout saved successfully!");
@@ -269,6 +272,11 @@ const BarMapEditor = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle template change
+  const handleTemplateChange = (templateName) => {
+    setCurrentTemplate(templateName);
   };
 
   // --- Helper to get next ID for any shape ---
@@ -466,6 +474,15 @@ const BarMapEditor = () => {
         setCanvasHeight={setCanvasHeight}
         DEVICE_TYPES={DEVICE_TYPES}
       />
+
+      {/* Template Manager */}
+      <TemplateManager
+        currentTemplate={currentTemplate}
+        onTemplateChange={handleTemplateChange}
+        deviceType={deviceType}
+        onSaveLayout={() => handleSaveLayout(shapes)}
+      />
+
       {loading && (
         <div className="text-black bg-yellow-200 px-4 py-2 rounded mb-2 font-medium">
           Loading...
@@ -500,13 +517,6 @@ const BarMapEditor = () => {
         </div>
       )}
 
-      <button
-        className="bar-map-editor-button mt-3 mb-3 ml-0 md:ml-2 text-white bg-slate-500 p-2 md:p-1 rounded-md text-sm md:text-base"
-        onClick={() => handleSaveLayout(shapes)}
-        disabled={loading}
-      >
-        Save Layout
-      </button>
       <StageArea
         shapes={shapes}
         renderShape={renderShape}

@@ -4,10 +4,30 @@ import api from "../../../utils/axios";
 
 // Extended time slots for more flexibility
 const EXTENDED_TIME_SLOTS = [
-  "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", 
-  "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM",
-  "12:00 AM", "1:00 AM", "2:00 AM", "3:00 AM", "4:00 AM", "5:00 AM",
-  "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM"
+  "12:00 PM",
+  "1:00 PM",
+  "2:00 PM",
+  "3:00 PM",
+  "4:00 PM",
+  "5:00 PM",
+  "6:00 PM",
+  "7:00 PM",
+  "8:00 PM",
+  "9:00 PM",
+  "10:00 PM",
+  "11:00 PM",
+  "12:00 AM",
+  "1:00 AM",
+  "2:00 AM",
+  "3:00 AM",
+  "4:00 AM",
+  "5:00 AM",
+  "6:00 AM",
+  "7:00 AM",
+  "8:00 AM",
+  "9:00 AM",
+  "10:00 AM",
+  "11:00 AM",
 ];
 
 // --- HELPER COMPONENTS (REFINED) ---
@@ -105,8 +125,7 @@ function ImagesInput({ images, setImages }) {
   const addImage = () => setImages([...images, ""]);
   const updateImage = (i, val) =>
     setImages(images.map((img, idx) => (idx === i ? val : img)));
-  const removeImage = (i) =>
-    setImages(images.filter((_, idx) => idx !== i));
+  const removeImage = (i) => setImages(images.filter((_, idx) => idx !== i));
 
   return (
     <div className="space-y-4">
@@ -149,7 +168,7 @@ function ImagesInput({ images, setImages }) {
               alt={`Room image ${i + 1}`}
               className="h-32 w-auto rounded-lg object-cover"
               onError={(e) => {
-                e.target.style.display = 'none';
+                e.target.style.display = "none";
               }}
             />
           )}
@@ -376,14 +395,17 @@ const KaraokeRoomEditAdmin = () => {
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-3">
                   <FormInput
-                    label="Price Per Hour ($)"
+                    label="Price per Hour ($)"
                     id="pricePerHour"
+                    name="pricePerHour"
                     type="number"
+                    min="0"
                     step="0.01"
                     value={formData.pricePerHour}
                     onChange={(e) =>
                       setFormData({ ...formData, pricePerHour: e.target.value })
                     }
+                    placeholder="Enter price (e.g., 50.00 or 0 for free)"
                     required
                   />
                 </div>

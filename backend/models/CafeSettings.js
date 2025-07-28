@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const cafeSettingsSchema = new mongoose.Schema(
   {
+    templateName: {
+      type: String,
+      required: true,
+      default: "Template 1",
+    },
     timeSlots: {
       type: [String],
       default: [
@@ -47,7 +52,7 @@ const cafeSettingsSchema = new mongoose.Schema(
   }
 );
 
-// Ensure only one settings document exists
-cafeSettingsSchema.index({}, { unique: true });
+// Ensure unique settings per template
+cafeSettingsSchema.index({ templateName: 1 }, { unique: true });
 
 export default mongoose.model("CafeSettings", cafeSettingsSchema);

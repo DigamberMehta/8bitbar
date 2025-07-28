@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Clock, Mic, Music, Star, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Clock,
+  Mic,
+  Music,
+  Star,
+  Phone,
+  Mail,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 /**
  * RoomInfo Component
@@ -7,23 +16,20 @@ import { Clock, Mic, Music, Star, Phone, Mail, ChevronLeft, ChevronRight } from 
  */
 const RoomInfo = ({ room }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
+
   if (!room) return null;
 
   // Combine main image with additional images
-  const allImages = [
-    room.imageUrl,
-    ...(room.images || [])
-  ].filter(Boolean);
+  const allImages = [room.imageUrl, ...(room.images || [])].filter(Boolean);
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === allImages.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === 0 ? allImages.length - 1 : prev - 1
     );
   };
@@ -64,8 +70,8 @@ const RoomInfo = ({ room }) => {
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
                       className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                        index === currentImageIndex 
-                          ? "bg-white" 
+                        index === currentImageIndex
+                          ? "bg-white"
                           : "bg-white/50 hover:bg-white/75"
                       }`}
                     />
@@ -123,7 +129,11 @@ const RoomInfo = ({ room }) => {
               <p className="text-gray-400 text-sm">Price per hour of singing</p>
             </div>
             <span className="text-2xl font-bold text-green-400">
-              ${room.pricePerHour}
+              {room.pricePerHour === 0 ? (
+                <span className="text-green-400 font-bold">FREE</span>
+              ) : (
+                `$${room.pricePerHour}`
+              )}
             </span>
           </div>
         </div>

@@ -6,14 +6,31 @@ import authenticateUser from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
-// GET /api/v1/cafe/settings - fetch cafe settings
+// GET /api/v1/cafe/settings - fetch cafe settings for active template
 router.get("/settings", async (req, res) => {
   try {
-    let settings = await CafeSettings.findOne();
+    // First find the active template for booking
+    const activeLayout = await CafeLayout.findOne({
+      isActiveForBooking: true,
+      isActive: true,
+    }).sort({ updatedAt: -1 });
 
-    // Create default settings if none exist
+    if (!activeLayout) {
+      return res.status(404).json({
+        success: false,
+        message: "No active template found for booking",
+      });
+    }
+
+    // Get settings for the active template
+    let settings = await CafeSettings.findOne({
+      templateName: activeLayout.templateName,
+    });
+
+    // Create default settings if none exist for this template
     if (!settings) {
       settings = await CafeSettings.create({
+        templateName: activeLayout.templateName,
         timeSlots: [
           "14:00",
           "15:00",
@@ -49,14 +66,26 @@ router.get("/settings", async (req, res) => {
 router.get("/layout", async (req, res) => {
   try {
     const { deviceType = "desktop" } = req.query;
-    const layout = await CafeLayout.findOne({ deviceType }).sort({
-      updatedAt: -1,
-    });
+
+    // First try to find the active template for the requested device type
+    let layout = await CafeLayout.findOne({
+      deviceType,
+      isActiveForBooking: true,
+      isActive: true,
+    }).sort({ updatedAt: -1 });
+
+    // If not found for the specific device type, try to find any active template
+    if (!layout) {
+      layout = await CafeLayout.findOne({
+        isActiveForBooking: true,
+        isActive: true,
+      }).sort({ updatedAt: -1 });
+    }
 
     if (!layout) {
       return res.status(404).json({
         success: false,
-        message: "Layout not found for this device type",
+        message: "No active layout found for booking",
       });
     }
 
@@ -141,6 +170,7 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       deviceType,
       paymentId,
       paymentStatus,
+      totalCost, // Allow frontend to pass total cost for free bookings
     } = req.body;
 
     if (!chairIds || !chairIds.length || !date || !time || !duration) {
@@ -188,12 +218,34 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       });
     }
 
-    // Calculate total cost (each chair costs $10 per hour)
-    const totalCost = chairIds.length * 10 * duration;
+    // Get active template settings for pricing
+    const activeLayout = await CafeLayout.findOne({
+      isActiveForBooking: true,
+      isActive: true,
+    }).sort({ updatedAt: -1 });
 
-    // Determine booking status based on payment status
+    let pricePerChairPerHour = 10; // Default fallback
+    if (activeLayout) {
+      const templateSettings = await CafeSettings.findOne({
+        templateName: activeLayout.templateName,
+      });
+      if (templateSettings) {
+        pricePerChairPerHour = templateSettings.pricePerChairPerHour;
+      }
+    }
+
+    // Calculate total cost using template-specific pricing
+    const calculatedTotalCost =
+      chairIds.length * pricePerChairPerHour * duration;
+
+    // Use provided totalCost if it's a free booking (0), otherwise use calculated
+    const finalTotalCost = totalCost === 0 ? 0 : calculatedTotalCost;
+
+    // Determine booking status - free bookings are auto-confirmed
     const bookingStatus =
-      paymentStatus === "completed" || paymentStatus === "COMPLETED"
+      finalTotalCost === 0
+        ? "confirmed"
+        : paymentStatus === "completed" || paymentStatus === "COMPLETED"
         ? "confirmed"
         : "pending";
 
@@ -203,15 +255,16 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       date,
       time,
       duration,
-      totalCost,
+      totalCost: finalTotalCost,
       customerName: customerName || req.user.name,
       customerEmail: customerEmail || req.user.email,
       customerPhone,
       specialRequests,
       deviceType: deviceType || "desktop",
-      paymentId,
-      paymentStatus: paymentStatus || "pending",
-      status: bookingStatus, // Set status based on payment status
+      paymentId: finalTotalCost === 0 ? "FREE_BOOKING" : paymentId,
+      paymentStatus:
+        finalTotalCost === 0 ? "completed" : paymentStatus || "pending",
+      status: bookingStatus,
     });
 
     await newBooking.save();
