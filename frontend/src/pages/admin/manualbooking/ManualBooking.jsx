@@ -334,15 +334,15 @@ const ManualBooking = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Manual Booking</h1>
+    <div className="p-2 sm:p-4 md:p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">Manual Booking</h1>
 
       {/* Service Selection */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">
           Select Service
         </h2>
-        <div className="flex space-x-4">
+        <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
           <ServiceTab
             service="karaoke"
             icon={<MdMusicNote size={20} />}
@@ -367,7 +367,7 @@ const ManualBooking = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 md:space-y-8">
         {/* Customer Information */}
         <CustomerInfoForm
           formData={formData}
@@ -375,8 +375,8 @@ const ManualBooking = () => {
         />
 
         {/* Booking Details */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
+          <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
             {activeService.charAt(0).toUpperCase() + activeService.slice(1)}{" "}
             Booking Details
           </h3>
@@ -416,13 +416,13 @@ const ManualBooking = () => {
           )}
 
           {/* Price Display */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-2 text-lg font-semibold text-gray-700">
-                <MdAttachMoney size={20} />
+              <span className="flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base md:text-lg font-semibold text-gray-700">
+                <MdAttachMoney size={16} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
                 <span>Total Price:</span>
               </span>
-              <span className="text-2xl font-bold text-green-600">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
                 ${calculatePrice().toFixed(2)}
               </span>
             </div>
@@ -434,7 +434,7 @@ const ManualBooking = () => {
           <button
             type="submit"
             disabled={loading}
-            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 bg-blue-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creating Booking..." : "Create Booking"}
           </button>
@@ -444,21 +444,21 @@ const ManualBooking = () => {
       {/* Result Display */}
       {result && (
         <div
-          className={`mt-6 p-4 rounded-lg ${
+          className={`mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg ${
             result.success
               ? "bg-green-50 border border-green-200"
               : "bg-red-50 border border-red-200"
           }`}
         >
           <div
-            className={`font-semibold ${
+            className={`text-sm sm:text-base font-semibold ${
               result.success ? "text-green-800" : "text-red-800"
             }`}
           >
             {result.success ? "✅ Success!" : "❌ Error"}
           </div>
           <p
-            className={`mt-1 ${
+            className={`mt-1 text-xs sm:text-sm ${
               result.success ? "text-green-700" : "text-red-700"
             }`}
           >
@@ -466,11 +466,11 @@ const ManualBooking = () => {
           </p>
 
           {result.success && result.userInfo?.isNewUser && (
-            <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <p className="text-yellow-800 font-medium">New User Created!</p>
-              <p className="text-yellow-700 text-sm">
+            <div className="mt-3 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <p className="text-yellow-800 text-xs sm:text-sm font-medium">New User Created!</p>
+              <p className="text-yellow-700 text-xs sm:text-sm">
                 Temporary Password:{" "}
-                <code className="bg-yellow-100 px-1 rounded">
+                <code className="bg-yellow-100 px-1 rounded text-xs">
                   {result.userInfo.tempPassword}
                 </code>
               </p>

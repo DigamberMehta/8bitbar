@@ -342,9 +342,9 @@ const N64BookingsAdmin = () => {
                   <dt className="text-sm font-medium text-gray-500">
                     Payment ID
                   </dt>
-                  <dd className="text-sm text-gray-900">
+                  <dd className="text-sm text-gray-900 break-all">
                     {booking.paymentId ? (
-                      <span className="text-green-600 font-mono text-xs">
+                      <span className="text-green-600 font-mono text-xs break-words">
                         {booking.paymentId}
                       </span>
                     ) : (

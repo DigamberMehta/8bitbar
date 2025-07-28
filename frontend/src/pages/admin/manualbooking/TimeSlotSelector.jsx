@@ -28,7 +28,7 @@ const TimeSlotSelector = ({
   }
 
   return (
-    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 sm:gap-2">
       {timeSlots.map((timeSlot) => {
         const isBlocked = blockedSlots.includes(timeSlot);
         const slotDate = getSlotDate(date, timeSlot);
@@ -46,7 +46,7 @@ const TimeSlotSelector = ({
               }
             }}
             disabled={isBlocked}
-            className={`p-2 border rounded-md text-center transition-all duration-300 text-sm ${
+            className={`p-1.5 sm:p-2 border rounded-md text-center transition-all duration-300 text-xs sm:text-sm ${
               isBlocked
                 ? "opacity-50 cursor-not-allowed border-red-300 bg-red-100 text-red-600"
                 : isSelected
@@ -54,9 +54,9 @@ const TimeSlotSelector = ({
                 : "border-gray-300 bg-white text-gray-700 hover:border-green-500 hover:bg-green-50 hover:text-green-700"
             }`}
           >
-            <MdAccessTime className="h-3 w-3 mx-auto mb-1" />
+            <MdAccessTime className="h-2.5 w-2.5 sm:h-3 sm:w-3 mx-auto mb-0.5 sm:mb-1" />
             <span className="text-xs font-mono block">{timeSlot}</span>
-            <div className="text-xs mt-1">
+            <div className="text-xs mt-0.5 sm:mt-1">
               {isBlocked ? "Booked" : isSelected ? "Selected" : "Available"}
             </div>
           </button>
