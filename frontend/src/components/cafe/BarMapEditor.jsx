@@ -254,7 +254,7 @@ const BarMapEditor = () => {
           height: s.height,
           color: chairColor,
         }));
-      await api.put("/admin/cafe-layout", {
+      await api.put("/admin/cafe/cafe-layout", {
         tables,
         chairs,
         bgImageUrl: mapUrl,
