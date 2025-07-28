@@ -10,9 +10,9 @@ const CafeBookingForm = ({
   handleBookingDataChange,
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Date, Time, Duration Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
         <InputField
           label="Date"
           icon={<MdCalendarToday size={16} />}
@@ -60,12 +60,12 @@ const CafeBookingForm = ({
       </div>
 
       {/* Chair Selection */}
-      <div className="space-y-3">
-        <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
-          <MdLocalCafe size={16} />
+      <div className="space-y-2 sm:space-y-3">
+        <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
+          <MdLocalCafe size={14} className="sm:w-4 sm:h-4" />
           <span>Select Chairs</span>
           {bookingData.cafe.chairIds.length > 0 && (
-            <span className="text-blue-600">
+            <span className="text-blue-600 text-xs sm:text-sm">
               ({bookingData.cafe.chairIds.length} selected)
             </span>
           )}
@@ -76,7 +76,7 @@ const CafeBookingForm = ({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           </div>
         ) : chairsWithAvailability.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2 sm:p-3 md:p-4">
             {chairsWithAvailability.map((chair) => {
               const isSelected = bookingData.cafe.chairIds.includes(chair.id);
               const isAvailable = chair.isAvailable;
@@ -96,7 +96,7 @@ const CafeBookingForm = ({
                     handleBookingDataChange("cafe", "chairIds", newChairs);
                   }}
                   disabled={!isAvailable}
-                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                  className={`p-2 sm:p-3 rounded-lg border-2 text-xs sm:text-sm font-medium transition-all ${
                     !isAvailable
                       ? "bg-red-50 border-red-200 text-red-400 cursor-not-allowed"
                       : isSelected
@@ -104,8 +104,8 @@ const CafeBookingForm = ({
                       : "bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300"
                   }`}
                 >
-                  <div className="flex flex-col items-center space-y-1">
-                    <MdLocalCafe size={20} />
+                  <div className="flex flex-col items-center space-y-0.5 sm:space-y-1">
+                    <MdLocalCafe size={16} className="sm:w-5 sm:h-5" />
                     <span>{chair.id}</span>
                     <span className="text-xs">
                       {!isAvailable
@@ -138,8 +138,8 @@ const CafeBookingForm = ({
 
       {/* Special Requests */}
       <div className="space-y-1">
-        <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
-          <MdLocalCafe size={16} />
+        <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
+          <MdLocalCafe size={14} className="sm:w-4 sm:h-4" />
           <span>Special Requests</span>
         </label>
         <textarea
@@ -149,7 +149,7 @@ const CafeBookingForm = ({
           }
           placeholder="Any special requests..."
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 resize-vertical"
+          className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 resize-vertical text-xs sm:text-sm"
         />
       </div>
     </div>

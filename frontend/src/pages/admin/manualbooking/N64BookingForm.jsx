@@ -18,9 +18,9 @@ const N64BookingForm = ({
   getBlockedSlots,
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Room and Basic Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <SelectField
           label="Room"
           icon={<MdVideogameAsset size={16} />}
@@ -64,7 +64,7 @@ const N64BookingForm = ({
       </div>
 
       {/* Date and Duration Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <InputField
           label="Date"
           icon={<MdCalendarToday size={16} />}
@@ -109,9 +109,9 @@ const N64BookingForm = ({
 
       {/* Time Slot Selection */}
       {bookingData.n64.roomId && bookingData.n64.startDateTime && (
-        <div className="space-y-3">
-          <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <MdAccessTime size={16} />
+        <div className="space-y-2 sm:space-y-3">
+          <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
+            <MdAccessTime size={14} className="sm:w-4 sm:h-4" />
             <span>Select Start Time</span>
           </label>
 

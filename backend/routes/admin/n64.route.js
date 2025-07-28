@@ -10,7 +10,23 @@ router.use(authenticateAdmin);
 // Dashboard stats endpoints
 router.get("/n64-bookings/count", async (req, res) => {
   try {
-    const count = await N64Booking.countDocuments();
+    const { startDate, endDate } = req.query;
+    let filter = {};
+
+    // Add date filtering if provided
+    if (startDate || endDate) {
+      filter.startDateTime = {};
+      if (startDate) {
+        filter.startDateTime.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const endDateObj = new Date(endDate);
+        endDateObj.setHours(23, 59, 59, 999); // Include the entire end date
+        filter.startDateTime.$lte = endDateObj;
+      }
+    }
+
+    const count = await N64Booking.countDocuments(filter);
     res.json({ count });
   } catch (error) {
     res.status(500).json({ message: "Error fetching N64 bookings count" });
@@ -19,8 +35,24 @@ router.get("/n64-bookings/count", async (req, res) => {
 
 router.get("/n64-bookings/revenue", async (req, res) => {
   try {
+    const { startDate, endDate } = req.query;
+    let matchFilter = { status: { $ne: "cancelled" } };
+
+    // Add date filtering if provided
+    if (startDate || endDate) {
+      matchFilter.startDateTime = {};
+      if (startDate) {
+        matchFilter.startDateTime.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const endDateObj = new Date(endDate);
+        endDateObj.setHours(23, 59, 59, 999); // Include the entire end date
+        matchFilter.startDateTime.$lte = endDateObj;
+      }
+    }
+
     const revenue = await N64Booking.aggregate([
-      { $match: { status: { $ne: "cancelled" } } },
+      { $match: matchFilter },
       { $group: { _id: null, totalRevenue: { $sum: "$totalPrice" } } },
     ]);
     const totalRevenue = revenue.length > 0 ? revenue[0].totalRevenue : 0;

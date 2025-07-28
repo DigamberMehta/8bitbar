@@ -11,7 +11,21 @@ router.use(authenticateAdmin);
 // Dashboard stats endpoints
 router.get("/cafe-bookings/count", async (req, res) => {
   try {
-    const count = await CafeBooking.countDocuments();
+    const { startDate, endDate } = req.query;
+    let filter = {};
+
+    // Add date filtering if provided
+    if (startDate || endDate) {
+      filter.date = {};
+      if (startDate) {
+        filter.date.$gte = startDate;
+      }
+      if (endDate) {
+        filter.date.$lte = endDate;
+      }
+    }
+
+    const count = await CafeBooking.countDocuments(filter);
     res.json({ count });
   } catch (error) {
     res.status(500).json({ message: "Error fetching cafe bookings count" });
@@ -20,8 +34,22 @@ router.get("/cafe-bookings/count", async (req, res) => {
 
 router.get("/cafe-bookings/revenue", async (req, res) => {
   try {
+    const { startDate, endDate } = req.query;
+    let matchFilter = { status: { $ne: "cancelled" } };
+
+    // Add date filtering if provided
+    if (startDate || endDate) {
+      matchFilter.date = {};
+      if (startDate) {
+        matchFilter.date.$gte = startDate;
+      }
+      if (endDate) {
+        matchFilter.date.$lte = endDate;
+      }
+    }
+
     const revenue = await CafeBooking.aggregate([
-      { $match: { status: { $ne: "cancelled" } } },
+      { $match: matchFilter },
       { $group: { _id: null, totalRevenue: { $sum: "$totalCost" } } },
     ]);
     const totalRevenue = revenue.length > 0 ? revenue[0].totalRevenue : 0;
