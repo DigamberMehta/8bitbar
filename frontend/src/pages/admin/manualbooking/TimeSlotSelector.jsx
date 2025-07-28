@@ -1,0 +1,69 @@
+import React from "react";
+import { MdAccessTime } from "react-icons/md";
+
+const TimeSlotSelector = ({
+  timeSlots,
+  blockedSlots,
+  selectedTime,
+  date,
+  onTimeSelect,
+  getSlotDate,
+  loading,
+}) => {
+  if (loading) {
+    return (
+      <div className="flex justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (timeSlots.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <MdAccessTime size={48} className="mx-auto mb-2 text-gray-300" />
+        <p>No time slots available for this room</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+      {timeSlots.map((timeSlot) => {
+        const isBlocked = blockedSlots.includes(timeSlot);
+        const slotDate = getSlotDate(date, timeSlot);
+        const timeValue = slotDate ? slotDate.toTimeString().slice(0, 5) : "";
+        const isSelected = selectedTime === timeValue;
+
+        return (
+          <button
+            key={timeSlot}
+            type="button"
+            onClick={() => {
+              if (!isBlocked && slotDate) {
+                const dateTime = `${date}T${timeValue}`;
+                onTimeSelect(dateTime);
+              }
+            }}
+            disabled={isBlocked}
+            className={`p-2 border rounded-md text-center transition-all duration-300 text-sm ${
+              isBlocked
+                ? "opacity-50 cursor-not-allowed border-red-300 bg-red-100 text-red-600"
+                : isSelected
+                ? "border-blue-500 bg-blue-100 text-blue-700 shadow-md"
+                : "border-gray-300 bg-white text-gray-700 hover:border-green-500 hover:bg-green-50 hover:text-green-700"
+            }`}
+          >
+            <MdAccessTime className="h-3 w-3 mx-auto mb-1" />
+            <span className="text-xs font-mono block">{timeSlot}</span>
+            <div className="text-xs mt-1">
+              {isBlocked ? "Booked" : isSelected ? "Selected" : "Available"}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+export default TimeSlotSelector;
