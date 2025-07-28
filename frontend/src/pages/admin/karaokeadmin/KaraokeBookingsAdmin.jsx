@@ -232,6 +232,31 @@ const KaraokeBookingsAdmin = () => {
                         {formatDate(booking.startDateTime)} for{" "}
                         {booking.durationHours}h
                       </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        Payment:{" "}
+                        {booking.paymentId ? (
+                          <span className="text-green-600 font-mono text-xs">
+                            {booking.paymentId}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">
+                            No payment ID
+                          </span>
+                        )}{" "}
+                        <span
+                          className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
+                            booking.paymentStatus === "completed"
+                              ? "bg-green-100 text-green-800"
+                              : booking.paymentStatus === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : booking.paymentStatus === "failed"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {booking.paymentStatus || "pending"}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
@@ -303,6 +328,40 @@ const KaraokeBookingsAdmin = () => {
                   </dt>
                   <dd className="text-sm text-gray-900">
                     {booking.durationHours} hours
+                  </dd>
+
+                  <dt className="text-sm font-medium text-gray-500">
+                    Payment ID
+                  </dt>
+                  <dd className="text-sm text-gray-900">
+                    {booking.paymentId ? (
+                      <span className="text-green-600 font-mono text-xs">
+                        {booking.paymentId}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 text-xs">
+                        No payment ID
+                      </span>
+                    )}
+                  </dd>
+
+                  <dt className="text-sm font-medium text-gray-500">
+                    Payment Status
+                  </dt>
+                  <dd className="text-sm text-gray-900">
+                    <span
+                      className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
+                        booking.paymentStatus === "completed"
+                          ? "bg-green-100 text-green-800"
+                          : booking.paymentStatus === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : booking.paymentStatus === "failed"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {booking.paymentStatus || "pending"}
+                    </span>
                   </dd>
                 </dl>
               </div>
