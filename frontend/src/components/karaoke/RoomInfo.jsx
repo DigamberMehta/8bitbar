@@ -1,29 +1,86 @@
-import React from "react";
-import { Clock, Mic, Music, Star, Phone, Mail } from "lucide-react";
+import React, { useState } from "react";
+import { Clock, Mic, Music, Star, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
  * RoomInfo Component
  * * This component displays all the informational content about the karaoke room, now receives data as a prop.
  */
 const RoomInfo = ({ room }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
   if (!room) return null;
+
+  // Combine main image with additional images
+  const allImages = [
+    room.imageUrl,
+    ...(room.images || [])
+  ].filter(Boolean);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === allImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? allImages.length - 1 : prev - 1
+    );
+  };
+
   return (
     <div className="space-y-8">
       {/* Main Image and Description */}
       <div className="bg-black/50 border border-pink-500/30 rounded-lg overflow-hidden">
-        <img
-          src={
-            room.imageUrl ||
-            "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room"
-          }
-          alt={room.name}
-          className="w-full h-64 object-cover"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src =
-              "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room";
-          }}
-        />
+        {allImages.length > 0 ? (
+          <div className="relative">
+            <img
+              src={allImages[currentImageIndex]}
+              alt={room.name}
+              className="w-full h-64 object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room";
+              }}
+            />
+            {allImages.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {allImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                        index === currentImageIndex 
+                          ? "bg-white" 
+                          : "bg-white/50 hover:bg-white/75"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <img
+            src="https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room"
+            alt={room.name}
+            className="w-full h-64 object-cover"
+          />
+        )}
         <div className="p-6">
           <h2 className="font-['Orbitron'] text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
             {room.name}

@@ -47,6 +47,10 @@ const n64RoomSchema = new mongoose.Schema(
     imageUrl: {
       type: String,
     },
+    images: {
+      type: [String],
+      default: [],
+    },
     roomType: {
       type: String,
       enum: ["mickey", "minnie"],

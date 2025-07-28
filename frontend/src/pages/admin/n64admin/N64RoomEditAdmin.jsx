@@ -105,6 +105,70 @@ function FeaturesInput({ features, setFeatures }) {
   );
 }
 
+function ImagesInput({ images, setImages }) {
+  const addImage = () => setImages([...images, ""]);
+  const updateImage = (i, val) =>
+    setImages(images.map((img, idx) => (idx === i ? val : img)));
+  const removeImage = (i) => setImages(images.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="space-y-4">
+      <label className="block text-sm font-medium text-gray-700">
+        Additional Images
+      </label>
+      {images.map((image, i) => (
+        <div key={i} className="space-y-2">
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder={`Image URL ${i + 1}`}
+              value={image}
+              onChange={(e) => updateImage(i, e.target.value)}
+              className="px-3 py-2 mt-1 block w-full text-gray-900 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+            <button
+              type="button"
+              onClick={() => removeImage(i)}
+              className="text-gray-400 hover:text-red-500 transition-colors"
+              aria-label="Remove image"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+          {image && (
+            <img
+              src={image}
+              alt={`Room image ${i + 1}`}
+              className="h-32 w-auto rounded-lg object-cover"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
+          )}
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addImage}
+        className="mt-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        + Add Image
+      </button>
+    </div>
+  );
+}
+
 const FormInput = ({ label, id, name, ...props }) => (
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-700">
@@ -163,6 +227,7 @@ const N64RoomEditAdmin = () => {
     roomType: "",
     controllers: "",
     imageUrl: "",
+    images: [],
   });
   const [featuresArr, setFeaturesArr] = useState([]);
   const [timeSlotsArr, setTimeSlotsArr] = useState([]);
@@ -187,6 +252,7 @@ const N64RoomEditAdmin = () => {
           roomType: room.roomType || "",
           controllers: room.inclusions?.controllers?.toString() || "4",
           imageUrl: room.imageUrl || "",
+          images: room.images || [],
         });
         setFeaturesArr(room.inclusions?.features || []);
         setTimeSlotsArr(room.timeSlots || []);
@@ -209,6 +275,7 @@ const N64RoomEditAdmin = () => {
         description: formData.description,
         roomType: formData.roomType,
         imageUrl: formData.imageUrl,
+        images: formData.images.filter((img) => img.trim() !== ""),
         inclusions: {
           controllers: parseInt(formData.controllers) || 4,
           features: featuresArr.filter((f) => f.trim()),
@@ -344,7 +411,7 @@ const N64RoomEditAdmin = () => {
             {/* --- AVAILABILITY & IMAGE SECTION --- */}
             <div>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
-                Availability & Image
+                Availability & Images
               </h3>
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-6">
@@ -357,7 +424,7 @@ const N64RoomEditAdmin = () => {
                 </div>
                 <div className="sm:col-span-6">
                   <FormInput
-                    label="Image URL"
+                    label="Main Image URL"
                     id="imageUrl"
                     type="text"
                     value={formData.imageUrl || ""}
@@ -372,6 +439,12 @@ const N64RoomEditAdmin = () => {
                       className="mt-4 h-40 w-auto rounded-lg object-cover"
                     />
                   )}
+                </div>
+                <div className="sm:col-span-6">
+                  <ImagesInput
+                    images={formData.images}
+                    setImages={(images) => setFormData({ ...formData, images })}
+                  />
                 </div>
               </div>
             </div>

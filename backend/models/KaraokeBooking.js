@@ -7,6 +7,11 @@ const karaokeBookingSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    roomId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "KaraokeRoom",
+      required: true,
+    },
     customerName: {
       type: String,
       required: true,
