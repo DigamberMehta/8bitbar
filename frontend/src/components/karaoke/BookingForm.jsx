@@ -20,10 +20,12 @@ const BookingForm = ({ room }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch all bookings
+    // Fetch bookings for this specific room only
     const fetchBookings = async () => {
       try {
-        const res = await axios.get("/karaoke-rooms/bookings");
+        const res = await axios.get(
+          `/karaoke-rooms/bookings?roomId=${room._id}`
+        );
         const data = res.data;
         if (data.success) {
           setBookings(data.bookings);
@@ -35,7 +37,7 @@ const BookingForm = ({ room }) => {
       }
     };
     fetchBookings();
-  }, []);
+  }, [room._id]);
 
   if (!room) return null;
 

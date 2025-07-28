@@ -6,8 +6,6 @@ const CafeSettingsAdmin = () => {
     timeSlots: [],
     pricePerChairPerHour: 10,
     maxDuration: 8,
-    openingTime: "14:00",
-    closingTime: "23:00",
   });
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("Template 1");
@@ -80,62 +78,40 @@ const CafeSettingsAdmin = () => {
     }
   };
 
-  const generateTimeSlots = () => {
-    const slots = [];
-    const startHour = parseInt(settings.openingTime.split(":")[0]);
-    const endHour = parseInt(settings.closingTime.split(":")[0]);
+  // All available time slots (24 hours)
+  const allTimeSlots = [
+    "00:00",
+    "01:00",
+    "02:00",
+    "03:00",
+    "04:00",
+    "05:00",
+    "06:00",
+    "07:00",
+    "08:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+    "22:00",
+    "23:00",
+  ];
 
-    for (let hour = startHour; hour <= endHour; hour++) {
-      slots.push(`${hour.toString().padStart(2, "0")}:00`);
-    }
-
-    setSettings((prev) => ({ ...prev, timeSlots: slots }));
-  };
-
-  const addTimeSlot = () => {
-    // Find the next available hour after the last slot
-    const sortedSlots = settings.timeSlots.sort();
-    const lastSlot =
-      sortedSlots.length > 0 ? sortedSlots[sortedSlots.length - 1] : "13:00";
-
-    const lastHour = parseInt(lastSlot.split(":")[0]);
-    const nextHour = Math.min(lastHour + 1, 23); // Don't go past 11 PM
-    const newSlot = `${nextHour.toString().padStart(2, "0")}:00`;
-
-    // Only add if it doesn't already exist
-    if (!settings.timeSlots.includes(newSlot)) {
-      setSettings((prev) => ({
-        ...prev,
-        timeSlots: [...prev.timeSlots, newSlot].sort(),
-      }));
-    } else {
-      // If the next hour exists, try to find the first missing hour
-      for (let hour = 14; hour <= 23; hour++) {
-        const testSlot = `${hour.toString().padStart(2, "0")}:00`;
-        if (!settings.timeSlots.includes(testSlot)) {
-          setSettings((prev) => ({
-            ...prev,
-            timeSlots: [...prev.timeSlots, testSlot].sort(),
-          }));
-          break;
-        }
-      }
-    }
-  };
-
-  const removeTimeSlot = (index) => {
+  const toggleTimeSlot = (timeSlot) => {
     setSettings((prev) => ({
       ...prev,
-      timeSlots: prev.timeSlots.filter((_, i) => i !== index),
-    }));
-  };
-
-  const updateTimeSlot = (index, value) => {
-    setSettings((prev) => ({
-      ...prev,
-      timeSlots: prev.timeSlots
-        .map((slot, i) => (i === index ? value : slot))
-        .sort(),
+      timeSlots: prev.timeSlots.includes(timeSlot)
+        ? prev.timeSlots.filter((slot) => slot !== timeSlot)
+        : [...prev.timeSlots, timeSlot].sort(),
     }));
   };
 
@@ -213,9 +189,9 @@ const CafeSettingsAdmin = () => {
         )}
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Basic Settings */}
-          <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
+          <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 lg:col-span-1">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900">
               Basic Settings for {selectedTemplate}
             </h2>
@@ -260,117 +236,60 @@ const CafeSettingsAdmin = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm"
                 />
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                    Opening Time
-                  </label>
-                  <input
-                    type="time"
-                    value={settings.openingTime}
-                    onChange={(e) =>
-                      setSettings((prev) => ({
-                        ...prev,
-                        openingTime: e.target.value,
-                      }))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                    Closing Time
-                  </label>
-                  <input
-                    type="time"
-                    value={settings.closingTime}
-                    onChange={(e) =>
-                      setSettings((prev) => ({
-                        ...prev,
-                        closingTime: e.target.value,
-                      }))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  />
-                </div>
-              </div>
             </div>
           </div>
 
           {/* Time Slots Management */}
-          <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
+          <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 lg:col-span-2">
             <div className="mb-3 sm:mb-4">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-                  Available Time Slots for {selectedTemplate}
-                </h2>
-                <button
-                  onClick={addTimeSlot}
-                  className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 self-start sm:self-auto"
-                >
-                  <span>+</span>
-                  <span className="hidden xs:inline">Add Time Slot</span>
-                  <span className="xs:hidden">Add</span>
-                </button>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600">
-                These are the available booking time slots for customers. Each
-                slot represents a 1-hour booking window.
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                Available Time Slots for {selectedTemplate}
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-600 mb-4">
+                Click on time slots to enable/disable them. Selected slots will
+                be available for booking.
               </p>
             </div>
 
-            <div className="space-y-2 sm:space-y-3 max-h-80 sm:max-h-96 overflow-y-auto">
-              {settings.timeSlots.map((slot, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 border border-gray-200 rounded-md hover:border-blue-300 transition-colors"
-                >
-                  <div className="flex items-center gap-2 flex-1">
-                    <span className="text-xs sm:text-sm font-medium text-gray-700 min-w-[45px] sm:min-w-[60px]">
-                      Slot {index + 1}:
-                    </span>
-                    <input
-                      type="time"
-                      value={slot}
-                      onChange={(e) => updateTimeSlot(index, e.target.value)}
-                      className="flex-1 sm:flex-none px-2 sm:px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
-                      min="14:00"
-                      max="23:00"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
-                    <span className="text-xs sm:text-sm font-semibold text-blue-600 min-w-[70px] sm:min-w-[80px]">
-                      {formatTimeForDisplay(slot)}
-                    </span>
-                    <button
-                      onClick={() => removeTimeSlot(index)}
-                      className="px-2 sm:px-3 py-1 sm:py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-xs sm:text-sm flex items-center gap-1 font-medium"
-                      title="Remove this time slot"
-                    >
-                      <span>×</span>
-                      <span className="hidden sm:inline">Remove</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {allTimeSlots.map((timeSlot) => {
+                const isSelected = settings.timeSlots.includes(timeSlot);
+                return (
+                  <button
+                    key={timeSlot}
+                    onClick={() => toggleTimeSlot(timeSlot)}
+                    className={`px-2 sm:px-3 py-2 sm:py-3 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 flex-shrink-0 ${
+                      isSelected
+                        ? "bg-purple-600 text-white shadow-md"
+                        : "bg-white text-gray-700 border border-gray-300 hover:border-purple-400 hover:bg-purple-50"
+                    }`}
+                  >
+                    {formatTimeForDisplay(timeSlot)}
+                  </button>
+                );
+              })}
             </div>
 
-            {settings.timeSlots.length === 0 && (
-              <div className="text-center py-6 sm:py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                <div className="text-gray-400 text-2xl sm:text-4xl mb-2">
-                  ⏰
-                </div>
-                <p className="text-gray-500 font-medium mb-1 sm:mb-2 text-sm sm:text-base">
-                  No time slots configured
-                </p>
-                <p className="text-gray-400 text-xs sm:text-sm px-2">
-                  Click "Add Time Slot" above or "Generate Time Slots" to get
-                  started
-                </p>
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
+                <span className="text-gray-600">
+                  Selected:{" "}
+                  <strong className="text-purple-600">
+                    {settings.timeSlots.length}
+                  </strong>{" "}
+                  time slots
+                </span>
+                <span className="text-gray-500 text-xs">
+                  {settings.timeSlots.length > 0 && (
+                    <span className="break-words">
+                      {settings.timeSlots
+                        .map((slot) => formatTimeForDisplay(slot))
+                        .join(", ")}
+                    </span>
+                  )}
+                </span>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
@@ -382,19 +301,10 @@ const CafeSettingsAdmin = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm text-gray-700 mb-4">
             <div className="p-3 bg-gray-50 rounded-md">
-              <strong className="text-gray-900 block mb-1">
-                Operating Hours:
-              </strong>
-              <span>
-                {formatTimeForDisplay(settings.openingTime)} -{" "}
-                {formatTimeForDisplay(settings.closingTime)}
-              </span>
-            </div>
-            <div className="p-3 bg-gray-50 rounded-md">
               <strong className="text-gray-900 block mb-1">Pricing:</strong>
               <span>${settings.pricePerChairPerHour}/chair/hour</span>
             </div>
-            <div className="p-3 bg-gray-50 rounded-md sm:col-span-2 lg:col-span-1">
+            <div className="p-3 bg-gray-50 rounded-md">
               <strong className="text-gray-900 block mb-1">
                 Max Duration:
               </strong>

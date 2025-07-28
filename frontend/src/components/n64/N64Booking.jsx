@@ -47,7 +47,7 @@ const N64Booking = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 py-12 text-white">
-      <div className="w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full sm:w-[90%] mx-auto px-2 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-['Orbitron'] text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
