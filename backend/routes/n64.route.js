@@ -20,8 +20,16 @@ router.get("/", async (req, res) => {
 // GET /api/v1/n64-rooms/bookings - fetch all N64 bookings
 router.get("/bookings", async (req, res) => {
   try {
+    const { roomId } = req.query;
+    let filter = {};
+    
+    // If roomId is provided, filter bookings by that room
+    if (roomId) {
+      filter.roomId = roomId;
+    }
+    
     // Populate booth info for each booking
-    const bookings = await N64Booking.find().populate("roomId");
+    const bookings = await N64Booking.find(filter).populate("roomId");
     res.status(200).json({ success: true, bookings });
   } catch (error) {
     res

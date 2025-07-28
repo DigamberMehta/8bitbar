@@ -20,7 +20,18 @@ router.get("/", async (req, res) => {
 // GET /api/v1/karaoke-bookings - fetch all karaoke bookings
 router.get("/bookings", async (req, res) => {
   try {
-    const bookings = await KaraokeBooking.find();
+    const { roomId } = req.query;
+    let filter = {};
+
+    // If roomId is provided, filter bookings by that room
+    if (roomId) {
+      filter.roomId = roomId;
+    }
+
+    const bookings = await KaraokeBooking.find(filter).populate(
+      "roomId",
+      "name"
+    );
     res.status(200).json({ success: true, bookings });
   } catch (error) {
     res

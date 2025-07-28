@@ -44,7 +44,7 @@ const KaraokeBooking = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 py-12 text-white">
-      <div className="w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full sm:w-[90%] mx-auto px-2 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-['Orbitron'] text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
@@ -58,15 +58,15 @@ const KaraokeBooking = () => {
         {/* Room Selection Tabs */}
         {rooms.length > 1 && (
           <div className="mb-8">
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-3">
               {rooms.map((room) => (
                 <button
                   key={room._id}
                   onClick={() => setSelectedRoom(room)}
-                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 text-sm ${
                     selectedRoom._id === room._id
                       ? "bg-gradient-to-r from-pink-500 to-cyan-400 text-white shadow-lg"
-                      : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
+                      : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-600"
                   }`}
                 >
                   {room.name}

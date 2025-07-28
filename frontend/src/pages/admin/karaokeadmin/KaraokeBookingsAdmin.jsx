@@ -55,6 +55,25 @@ const KaraokeBookingsAdmin = () => {
     });
   };
 
+  const formatTimeRange = (startDateTime, durationHours) => {
+    const start = new Date(startDateTime);
+    const end = new Date(start);
+    end.setHours(end.getHours() + durationHours);
+    
+    const startTime = start.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    const endTime = end.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    
+    return `${startTime} - ${endTime}`;
+  };
+
   // Helper function to get status badge colors
   const getStatusColor = (status) => {
     switch (status) {
@@ -229,8 +248,7 @@ const KaraokeBookingsAdmin = () => {
                         Room: {booking.roomId?.name || "Karaoke Room"}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {formatDate(booking.startDateTime)} for{" "}
-                        {booking.durationHours}h
+                        {formatDate(booking.startDateTime)} ({formatTimeRange(booking.startDateTime, booking.durationHours)})
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
                         Payment:{" "}
@@ -326,16 +344,9 @@ const KaraokeBookingsAdmin = () => {
                     {formatDate(booking.startDateTime)}
                   </dd>
 
-                  <dt className="text-sm font-medium text-gray-500">Time</dt>
+                  <dt className="text-sm font-medium text-gray-500">Time Range</dt>
                   <dd className="text-sm text-gray-900">
-                    {formatTime(booking.startDateTime)}
-                  </dd>
-
-                  <dt className="text-sm font-medium text-gray-500">
-                    Duration
-                  </dt>
-                  <dd className="text-sm text-gray-900">
-                    {booking.durationHours} hours
+                    {formatTimeRange(booking.startDateTime, booking.durationHours)}
                   </dd>
 
                   <dt className="text-sm font-medium text-gray-500">
