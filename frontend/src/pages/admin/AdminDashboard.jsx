@@ -93,15 +93,21 @@ const AdminDashboard = () => {
   };
 
   const StatCard = ({ title, value, icon, color, isRevenue = false }) => (
-    <div className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6 lg:p-8 border-l-4 ${color} transform hover:-translate-y-1`}>
+    <div
+      className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6 lg:p-8 border-l-4 ${color} transform hover:-translate-y-1`}
+    >
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-gray-600 text-sm lg:text-base font-medium mb-2">{title}</p>
+          <p className="text-gray-600 text-sm lg:text-base font-medium mb-2">
+            {title}
+          </p>
           <p className="text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900">
             {isRevenue ? `${value.toFixed(2)}` : value.toLocaleString()}
           </p>
         </div>
-        <div className="text-3xl lg:text-4xl text-gray-400 ml-4 flex-shrink-0">{icon}</div>
+        <div className="text-3xl lg:text-4xl text-gray-400 ml-4 flex-shrink-0">
+          {icon}
+        </div>
       </div>
     </div>
   );

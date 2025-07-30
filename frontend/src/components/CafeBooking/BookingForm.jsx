@@ -322,6 +322,33 @@ const BookingForm = ({
                 {bookingDetails.duration > 1 ? "s" : ""}
               </span>
             </div>
+            {bookingDetails.time && bookingDetails.duration && (
+              <div className="text-xs text-blue-400 mt-1 px-2 py-1 bg-blue-900/20 rounded">
+                ℹ️ Actual time: {bookingDetails.time} -{" "}
+                {(() => {
+                  const [hour, minute] = bookingDetails.time.split(":");
+                  const startHour = parseInt(hour);
+                  let endHour = startHour + bookingDetails.duration;
+                  let endMinute = parseInt(minute) - 5;
+
+                  if (endMinute < 0) {
+                    endMinute += 60;
+                    endHour -= 1;
+                  }
+
+                  // Handle day rollover (24+ hours)
+                  endHour = endHour % 24;
+
+                  const endTime = `${endHour
+                    .toString()
+                    .padStart(2, "0")}:${endMinute
+                    .toString()
+                    .padStart(2, "0")}`;
+                  return endTime;
+                })()}{" "}
+                (5 min reserved for cleaning)
+              </div>
+            )}
             <div className="border-t border-gray-600 pt-2 mt-2">
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
