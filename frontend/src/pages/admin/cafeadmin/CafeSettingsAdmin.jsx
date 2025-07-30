@@ -6,6 +6,7 @@ const CafeSettingsAdmin = () => {
     timeSlots: [],
     pricePerChairPerHour: 10,
     maxDuration: 8,
+    weekDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
   });
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("Template 1");
@@ -112,6 +113,15 @@ const CafeSettingsAdmin = () => {
       timeSlots: prev.timeSlots.includes(timeSlot)
         ? prev.timeSlots.filter((slot) => slot !== timeSlot)
         : [...prev.timeSlots, timeSlot].sort(),
+    }));
+  };
+
+  const toggleWeekDay = (day) => {
+    setSettings((prev) => ({
+      ...prev,
+      weekDays: prev.weekDays.includes(day)
+        ? prev.weekDays.filter((d) => d !== day)
+        : [...prev.weekDays, day].sort(),
     }));
   };
 
@@ -236,6 +246,34 @@ const CafeSettingsAdmin = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm"
                 />
               </div>
+
+              {/* Week Days Selection */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  Available Week Days
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
+                    const isSelected = settings.weekDays.includes(day);
+                    return (
+                      <button
+                        key={day}
+                        onClick={() => toggleWeekDay(day)}
+                        className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                          isSelected
+                            ? "bg-green-600 text-white shadow-md"
+                            : "bg-white text-gray-700 border border-gray-300 hover:border-green-400 hover:bg-green-50"
+                        }`}
+                      >
+                        {day.slice(0, 3)}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Selected {settings.weekDays.length} day(s) - Customers can only book on selected days
+                </p>
+              </div>
             </div>
           </div>
 
@@ -309,6 +347,14 @@ const CafeSettingsAdmin = () => {
                 Max Duration:
               </strong>
               <span>{settings.maxDuration} hours</span>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-md">
+              <strong className="text-gray-900 block mb-1">
+                Available Days:
+              </strong>
+              <span>
+                {settings.weekDays.length === 7 ? "All days" : settings.weekDays.join(", ")}
+              </span>
             </div>
           </div>
 

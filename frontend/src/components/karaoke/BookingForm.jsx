@@ -191,10 +191,31 @@ const BookingForm = ({ room }) => {
     bookings.map((b) => new Date(b.startDateTime).toISOString().split("T")[0])
   );
 
-  // Date input: disable dates that are fully booked (all slots taken)
+  // Helper: check if a date falls on an available week day
+  const isDateAvailable = (dateStr) => {
+    if (!room.weekDays || room.weekDays.length === 0) return true; // If no week days specified, allow all
+    const date = new Date(dateStr);
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const dayName = dayNames[date.getDay()];
+    return room.weekDays.includes(dayName);
+  };
+
+  // Date input: disable dates that are fully booked (all slots taken) or not available
   const isDateFullyBooked = (dateStr) => {
     const bookedTimesForDate = getBookedTimesForDate(dateStr);
     return bookedTimesForDate.length >= timeSlots.length;
+  };
+
+  const isDateDisabled = (dateStr) => {
+    return !isDateAvailable(dateStr) || isDateFullyBooked(dateStr);
   };
 
   // For disabling dates in the date picker, we need to use min/max/step, but native input doesn't support disabling arbitrary dates.
@@ -233,7 +254,12 @@ const BookingForm = ({ room }) => {
           <select
             value={numberOfHours}
             onChange={(e) => setNumberOfHours(parseInt(e.target.value))}
-            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
+            disabled={selectedDate && !isDateAvailable(selectedDate)}
+            className={`w-full border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors ${
+              selectedDate && !isDateAvailable(selectedDate)
+                ? "bg-gray-700 opacity-50 cursor-not-allowed"
+                : "bg-gray-800"
+            }`}
           >
             {Array.from({ length: 4 }, (_, i) => i + 1).map((num) => (
               <option key={num} value={num}>
@@ -258,41 +284,71 @@ const BookingForm = ({ room }) => {
             min={new Date().toISOString().split("T")[0]}
             className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
           />
-          {selectedDate && isDateFullyBooked(selectedDate) && (
+
+          {/* Available Days Information */}
+          <div className="mt-2 text-sm text-gray-400">
+            <span className="font-medium text-green-400">Available on: </span>
+            {room.weekDays && room.weekDays.length > 0 ? (
+              room.weekDays.length === 7 ? (
+                <span className="text-gray-300">All days</span>
+              ) : (
+                <span className="text-gray-300">
+                  {room.weekDays.join(", ")}
+                </span>
+              )
+            ) : (
+              <span className="text-gray-300">All days</span>
+            )}
+          </div>
+
+          {selectedDate && !isDateAvailable(selectedDate) && (
             <div className="text-red-400 text-sm mt-2">
-              All time slots are booked for this date. Please select another
-              date.
+              This room is not available on{" "}
+              {new Date(selectedDate).toLocaleDateString("en-US", {
+                weekday: "long",
+              })}
+              . Please select another date.
             </div>
           )}
+          {selectedDate &&
+            isDateAvailable(selectedDate) &&
+            isDateFullyBooked(selectedDate) && (
+              <div className="text-red-400 text-sm mt-2">
+                All time slots are booked for this date. Please select another
+                date.
+              </div>
+            )}
         </div>
 
         {/* Time Selection */}
-        {selectedDate && !isDateFullyBooked(selectedDate) && (
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Select Start Time *
-            </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {timeSlots.map((time) => (
-                <button
-                  key={time}
-                  onClick={() => setSelectedTime(time)}
-                  disabled={blockedSlots.includes(time)}
-                  className={`p-3 border rounded-lg text-center transition-all duration-300 ${
-                    blockedSlots.includes(time)
-                      ? "opacity-50 cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500"
-                      : selectedTime === time
-                      ? "border-pink-500 bg-pink-500/20 text-pink-400"
-                      : "border-gray-700 hover:border-green-500 hover:bg-green-500/20 hover:text-green-400"
-                  }`}
-                >
-                  <Clock className="h-4 w-4 mx-auto mb-1" />
-                  <span className="text-sm font-mono">{time}</span>
-                </button>
-              ))}
+        {selectedDate &&
+          isDateAvailable(selectedDate) &&
+          !isDateFullyBooked(selectedDate) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Select Start Time *
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {timeSlots.map((time) => (
+                  <button
+                    key={time}
+                    onClick={() => setSelectedTime(time)}
+                    disabled={blockedSlots.includes(time)}
+                    className={`p-3 border rounded-lg text-center transition-all duration-300 ${
+                      blockedSlots.includes(time)
+                        ? "opacity-50 cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500"
+                        : selectedTime === time
+                        ? "border-pink-500 bg-pink-500/20 text-pink-400"
+                        : "border-gray-700 hover:border-green-500 hover:bg-green-500/20 hover:text-green-400"
+                    }`}
+                  >
+                    <Clock className="h-4 w-4 mx-auto mb-1" />
+                    <span className="text-sm font-mono">{time}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Total Cost */}
         <div className="border-t border-gray-700 pt-6">
@@ -327,7 +383,10 @@ const BookingForm = ({ room }) => {
         <button
           onClick={handleAddToCart}
           disabled={
-            !selectedDate || !selectedTime || isDateFullyBooked(selectedDate)
+            !selectedDate ||
+            !selectedTime ||
+            !isDateAvailable(selectedDate) ||
+            isDateFullyBooked(selectedDate)
           }
           className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >

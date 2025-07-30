@@ -134,6 +134,22 @@ const N64RoomsAdmin = () => {
                     ))}
                   </div>
                 </div>
+                
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Available Days
+                  </h3>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {room.weekDays?.map((day) => (
+                      <span
+                        key={day}
+                        className="px-2.5 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full"
+                      >
+                        {day}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           ))}
