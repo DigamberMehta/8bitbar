@@ -265,8 +265,8 @@ const BookingForm = ({ booths, bookings }) => {
 
         {/* Booking Time Info */}
         {selectedTime && duration && (
-          <div className="text-xs text-blue-400 px-3 py-2 bg-blue-900/20 rounded-lg border border-blue-500/30">
-            ℹ️ <strong>Actual N64 time:</strong> {selectedTime} -{" "}
+          <div className="text-sm text-red-300 px-4 py-3 bg-red-900/30 rounded-lg border border-red-500/50">
+            ⚠️ <strong>Actual N64 time:</strong> {selectedTime} -{" "}
             {(() => {
               const match = selectedTime.match(/(\d+):(\d+) (AM|PM)/);
               if (!match) return selectedTime;
