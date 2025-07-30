@@ -198,8 +198,8 @@ const Cart = () => {
                           <span className="font-semibold">Duration:</span>{" "}
                           {item.duration} {item.duration > 1 ? "hours" : "hour"}
                         </p>
-                        <div className="text-xs text-blue-400 mt-1 px-2 py-1 bg-blue-900/20 rounded border border-blue-500/30">
-                          ℹ️ <strong>Actual time:</strong> {item.time} -{" "}
+                        <div className="text-sm text-red-300 mt-2 px-3 py-2 bg-red-900/30 rounded-lg border border-red-500/50">
+                          ⚠️ <strong>Actual time:</strong> {item.time} -{" "}
                           {calculateEndTime(
                             item.time,
                             item.duration,

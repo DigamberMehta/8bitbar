@@ -323,8 +323,8 @@ const BookingForm = ({
               </span>
             </div>
             {bookingDetails.time && bookingDetails.duration && (
-              <div className="text-xs text-blue-400 mt-1 px-2 py-1 bg-blue-900/20 rounded">
-                ℹ️ Actual time: {bookingDetails.time} -{" "}
+              <div className="text-sm text-red-300 mt-2 px-3 py-2 bg-red-900/30 rounded-lg border border-red-500/50">
+                ⚠️ <strong>Actual time:</strong> {bookingDetails.time} -{" "}
                 {(() => {
                   const [hour, minute] = bookingDetails.time.split(":");
                   const startHour = parseInt(hour);
