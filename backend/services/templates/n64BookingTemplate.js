@@ -368,7 +368,7 @@ export const getN64BookingTemplate = (booking, roomName) => {
                 
                 <div class="detail-item">
                   <span class="detail-label">⏰ Reserved Time</span>
-                  <span class="detail-value">${startTime} - ${actualEndTime}</span>
+                  <span class="detail-value">${startTime}</span>
                 </div>
                 
                 <div class="detail-item">

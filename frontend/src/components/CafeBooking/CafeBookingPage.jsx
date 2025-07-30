@@ -124,7 +124,7 @@ const CafeBookingPage = () => {
       time: bookingDetails.time,
       duration: bookingDetails.duration,
       totalCost,
-      title: `Cafe Seating - ${selectedChairs.length} Chair${
+      title: `Ticket Show - ${selectedChairs.length} Chair${
         selectedChairs.length > 1 ? "s" : ""
       }`,
       description: `${selectedChairs.length} chair${
@@ -157,6 +157,9 @@ const CafeBookingPage = () => {
         time: bookingDetails.time,
         duration: bookingDetails.duration,
         totalCost: 0,
+        customerName: user?.name || "Free Booking User",
+        customerEmail: user?.email || "free@booking.com",
+        customerPhone: user?.phone || "",
         status: "confirmed", // Auto-confirm free bookings
       };
 
@@ -198,7 +201,7 @@ const CafeBookingPage = () => {
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-xl">Loading cafe layout...</p>
+          <p className="text-xl">Loading ticket show layout...</p>
         </div>
       </div>
     );
@@ -208,7 +211,7 @@ const CafeBookingPage = () => {
     <div className="min-h-screen bg-black text-white py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="font-['Orbitron'] text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400 text-center">
-          ☕ Cafe Seating Booking
+          🎫 Ticket Show Booking
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

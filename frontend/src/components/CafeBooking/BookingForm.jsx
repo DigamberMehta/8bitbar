@@ -179,7 +179,7 @@ const BookingForm = ({
             cafeSettings &&
             !isDateAvailable(bookingDetails.date) && (
               <div className="text-red-400 text-sm mt-2">
-                This cafe is not available on{" "}
+                This ticket show is not available on{" "}
                 {new Date(bookingDetails.date).toLocaleDateString("en-US", {
                   weekday: "long",
                 })}
