@@ -41,18 +41,6 @@ const ContactPage = () => {
     });
   };
 
-  const openingHours = [
-    { day: "Monday - Tuesday", hours: "Closed", status: "closed" },
-    {
-      day: "Wednesday - Thursday",
-      hours: "5:00 PM - 12:00 AM",
-      status: "open",
-    },
-    { day: "Friday", hours: "5:00 PM - 2:00 AM", status: "open" },
-    { day: "Saturday", hours: "2:00 PM - 2:00 AM", status: "open" },
-    { day: "Sunday", hours: "2:00 PM - 11:00 PM", status: "open" },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-900 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,7 +60,7 @@ const ContactPage = () => {
             {/* Location */}
             <div className="bg-black/50 border border-pink-500/30 rounded-lg p-6">
               <h3 className="font-['Orbitron'] text-xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
-                LOCATION & HOURS
+                LOCATION
               </h3>
 
               <div className="space-y-4">
@@ -87,29 +75,6 @@ const ContactPage = () => {
                     </p>
                     <p className="text-gray-300">QLD 4655</p>
                     <p className="text-gray-300">Australia</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <Clock className="h-6 w-6 text-cyan-400 mt-1 flex-shrink-0" />
-                  <div className="space-y-2">
-                    {openingHours.map((schedule, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center"
-                      >
-                        <span className="text-gray-300">{schedule.day}</span>
-                        <span
-                          className={`font-semibold ${
-                            schedule.status === "closed"
-                              ? "text-red-400"
-                              : "text-green-400"
-                          }`}
-                        >
-                          {schedule.hours}
-                        </span>
-                      </div>
-                    ))}
                   </div>
                 </div>
               </div>
@@ -140,10 +105,10 @@ const ContactPage = () => {
                   <div>
                     <p className="text-white font-semibold">Email</p>
                     <a
-                      href="mailto:play@8bitbar.com.au"
+                      href="mailto:info@8bitbar.com.au"
                       className="text-gray-300 hover:text-cyan-400 transition-colors"
                     >
-                      play@8bitbar.com.au
+                      info@8bitbar.com.au
                     </a>
                   </div>
                 </div>
