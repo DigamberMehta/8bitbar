@@ -160,7 +160,9 @@ const CafeLayoutViewer = ({
 
   return (
     <div className="bg-gray-900/50 border border-pink-500/30 rounded-lg p-4">
-      <h3 className="text-xl font-bold mb-4 text-cyan-400">Cafe Layout</h3>
+      <h3 className="text-xl font-bold mb-4 text-cyan-400">
+        Ticket Show Layout
+      </h3>
 
       {/* Legend */}
       <div className="flex flex-wrap gap-4 mb-4 text-sm">

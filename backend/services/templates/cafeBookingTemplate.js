@@ -28,7 +28,7 @@ export const getCafeBookingTemplate = (booking) => {
   const actualEndTime = calculateActualEndTime(booking.time, booking.duration);
 
   return {
-    subject: "Your Gaming Session is Confirmed - 8BitBar",
+    subject: "Your Ticket is Confirmed - 8BitBar",
     html: `
       <!DOCTYPE html>
       <html>
@@ -327,11 +327,11 @@ export const getCafeBookingTemplate = (booking) => {
           <div class="content">
             <div class="greeting">Hello ${booking.customerName},</div>
             <div class="intro-text">
-              Thank you for choosing 8BitBar! Your gaming session has been confirmed and we're excited to welcome you to our gaming lounge.
+              Thank you for choosing 8BitBar! Your ticket has been confirmed and we're excited to welcome you to our gaming lounge.
             </div>
             
             <div class="booking-card">
-              <div class="booking-title">Your Gaming Session Details</div>
+              <div class="booking-title">Your Ticket Details</div>
               
               <div class="detail-grid">
                 <div class="detail-item">
@@ -348,9 +348,7 @@ export const getCafeBookingTemplate = (booking) => {
                 
                 <div class="detail-item">
                   <span class="detail-label">⏰ Reserved Time</span>
-                  <span class="detail-value">${
-                    booking.time
-                  } - ${actualEndTime}</span>
+                  <span class="detail-value">${booking.time}</span>
                 </div>
                 
                 <div class="detail-item">
@@ -361,7 +359,7 @@ export const getCafeBookingTemplate = (booking) => {
                 </div>
                 
                 <div class="detail-item">
-                  <span class="detail-label">🎮 Gaming Chairs</span>
+                  <span class="detail-label">🎫 Selected Chair</span>
                   <div class="chairs-container">
                     ${booking.chairIds
                       .map(

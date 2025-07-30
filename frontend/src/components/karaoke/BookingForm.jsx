@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import axios from "../../utils/axios";
 
 /**
@@ -17,7 +18,9 @@ const BookingForm = ({ room }) => {
   const [error, setError] = useState("");
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
+  const [loadingBooking, setLoadingBooking] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     // Fetch bookings for this specific room only
@@ -148,12 +151,13 @@ const BookingForm = ({ room }) => {
 
   const handleDirectBooking = async () => {
     try {
+      setLoadingBooking(true);
       setError("");
 
       const bookingData = {
-        customerName: "Free Booking User", // You might want to get this from user context
-        customerEmail: "free@booking.com", // You might want to get this from user context
-        customerPhone: "",
+        customerName: user?.name || "Free Booking User",
+        customerEmail: user?.email || "free@booking.com",
+        customerPhone: user?.phone || "",
         numberOfPeople,
         date: selectedDate,
         time: selectedTime,
@@ -183,6 +187,8 @@ const BookingForm = ({ room }) => {
     } catch (error) {
       console.error("Failed to book free karaoke room:", error);
       setError("Failed to book room. Please try again.");
+    } finally {
+      setLoadingBooking(false);
     }
   };
 
@@ -422,11 +428,21 @@ const BookingForm = ({ room }) => {
             !selectedDate ||
             !selectedTime ||
             !isDateAvailable(selectedDate) ||
-            isDateFullyBooked(selectedDate)
+            isDateFullyBooked(selectedDate) ||
+            loadingBooking
           }
           className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          {pricePerHour === 0 ? "🎉 BOOK FREE ROOM" : "🛒 ADD TO CART"}
+          {loadingBooking ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2 inline-block"></div>
+              BOOKING...
+            </>
+          ) : pricePerHour === 0 ? (
+            "🎉 BOOK FREE ROOM"
+          ) : (
+            "🛒 ADD TO CART"
+          )}
         </button>
       </div>
     </div>
