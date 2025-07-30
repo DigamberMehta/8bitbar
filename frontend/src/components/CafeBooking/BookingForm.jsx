@@ -117,6 +117,24 @@ const BookingForm = ({
     });
   }
 
+  // Helper: check if a date falls on an available week day
+  const isDateAvailable = (dateStr) => {
+    if (!cafeSettings?.weekDays || cafeSettings.weekDays.length === 0)
+      return true; // If no week days specified, allow all
+    const date = new Date(dateStr);
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const dayName = dayNames[date.getDay()];
+    return cafeSettings.weekDays.includes(dayName);
+  };
+
   // Get minimum date (today)
   const today = new Date().toISOString().split("T")[0];
 
@@ -138,68 +156,117 @@ const BookingForm = ({
             className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
             required
           />
+
+          {/* Available Days Information */}
+          {cafeSettings && (
+            <div className="mt-2 text-sm text-gray-400">
+              <span className="font-medium text-green-400">Available on: </span>
+              {cafeSettings.weekDays && cafeSettings.weekDays.length > 0 ? (
+                cafeSettings.weekDays.length === 7 ? (
+                  <span className="text-gray-300">All days</span>
+                ) : (
+                  <span className="text-gray-300">
+                    {cafeSettings.weekDays.join(", ")}
+                  </span>
+                )
+              ) : (
+                <span className="text-gray-300">All days</span>
+              )}
+            </div>
+          )}
+
+          {bookingDetails.date &&
+            cafeSettings &&
+            !isDateAvailable(bookingDetails.date) && (
+              <div className="text-red-400 text-sm mt-2">
+                This cafe is not available on{" "}
+                {new Date(bookingDetails.date).toLocaleDateString("en-US", {
+                  weekday: "long",
+                })}
+                . Please select another date.
+              </div>
+            )}
         </div>
 
         {/* Time Selection */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Select Time
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {timeOptions.map((option) => {
-              const isBlocked = isTimeSlotBlocked(option.value);
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() =>
-                    !isBlocked && handleInputChange("time", option.value)
-                  }
-                  disabled={isBlocked}
-                  className={`p-3 border rounded-lg text-center transition-all duration-300 ${
-                    isBlocked
-                      ? "opacity-50 cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500"
-                      : bookingDetails.time === option.value
-                      ? "border-pink-500 bg-pink-500/20 text-pink-400"
-                      : "border-gray-700 hover:border-green-500 hover:bg-green-500/20 hover:text-green-400"
-                  }`}
-                >
-                  <span className="text-sm font-mono">{option.label}</span>
-                  {isBlocked && (
-                    <div className="text-xs text-red-400 mt-1">Unavailable</div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        {bookingDetails.date &&
+          (!cafeSettings || isDateAvailable(bookingDetails.date)) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Select Time
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {timeOptions.map((option) => {
+                  const isBlocked = isTimeSlotBlocked(option.value);
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() =>
+                        !isBlocked && handleInputChange("time", option.value)
+                      }
+                      disabled={isBlocked}
+                      className={`p-3 border rounded-lg text-center transition-all duration-300 ${
+                        isBlocked
+                          ? "opacity-50 cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500"
+                          : bookingDetails.time === option.value
+                          ? "border-pink-500 bg-pink-500/20 text-pink-400"
+                          : "border-gray-700 hover:border-green-500 hover:bg-green-500/20 hover:text-green-400"
+                      }`}
+                    >
+                      <span className="text-sm font-mono">{option.label}</span>
+                      {isBlocked && (
+                        <div className="text-xs text-red-400 mt-1">
+                          Unavailable
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
         {/* Duration Selection */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Duration
-          </label>
-          <select
-            value={Math.min(bookingDetails.duration, maxDuration)}
-            onChange={(e) =>
-              handleInputChange("duration", parseInt(e.target.value))
-            }
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-            required
-          >
-            {durationOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          {maxDuration < 8 && (
-            <p className="text-xs text-yellow-400 mt-1">
-              Maximum {maxDuration} hour{maxDuration > 1 ? "s" : ""} available
-              until closing time
-            </p>
+        {bookingDetails.date &&
+          (!cafeSettings || isDateAvailable(bookingDetails.date)) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Duration
+              </label>
+              <select
+                value={Math.min(bookingDetails.duration, maxDuration)}
+                onChange={(e) =>
+                  handleInputChange("duration", parseInt(e.target.value))
+                }
+                disabled={
+                  bookingDetails.date &&
+                  cafeSettings &&
+                  !isDateAvailable(bookingDetails.date)
+                }
+                className={`w-full px-3 py-2 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-pink-500 ${
+                  bookingDetails.date &&
+                  cafeSettings &&
+                  !isDateAvailable(bookingDetails.date)
+                    ? "bg-gray-700 opacity-50 cursor-not-allowed"
+                    : "bg-gray-800"
+                }`}
+                required
+              >
+                {durationOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {maxDuration < 8 && (
+                <p className="text-xs text-yellow-400 mt-1">
+                  Maximum {maxDuration} hour{maxDuration > 1 ? "s" : ""}{" "}
+                  available until closing time
+                </p>
+              )}
+            </div>
           )}
-        </div>
 
         {/* Selected Chairs Display */}
         <div>
@@ -279,7 +346,10 @@ const BookingForm = ({
             loading ||
             selectedChairs.length === 0 ||
             !bookingDetails.date ||
-            !bookingDetails.time
+            !bookingDetails.time ||
+            (bookingDetails.date &&
+              cafeSettings &&
+              !isDateAvailable(bookingDetails.date))
           }
           className="w-full py-3 bg-gradient-to-r from-pink-500 to-cyan-400 text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >

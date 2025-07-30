@@ -119,11 +119,6 @@ router.get("/cafe-layout/templates", async (req, res) => {
       .select("templateName updatedAt")
       .sort({ updatedAt: -1 });
 
-    console.log(
-      `Templates for ${deviceType}:`,
-      templates.map((t) => ({ name: t.templateName, updatedAt: t.updatedAt }))
-    );
-
     res.json({ templates });
   } catch (error) {
     res.status(500).json({ message: "Error fetching templates" });
@@ -383,6 +378,7 @@ router.put("/cafe-settings", async (req, res) => {
       maxDuration,
       openingTime,
       closingTime,
+      weekDays,
     } = req.body;
 
     const settings = await CafeSettings.findOneAndUpdate(
@@ -393,6 +389,7 @@ router.put("/cafe-settings", async (req, res) => {
         maxDuration,
         openingTime,
         closingTime,
+        weekDays,
         updatedBy: req.userId,
       },
       {

@@ -231,6 +231,7 @@ const N64RoomEditAdmin = () => {
   });
   const [featuresArr, setFeaturesArr] = useState([]);
   const [timeSlotsArr, setTimeSlotsArr] = useState([]);
+  const [weekDaysArr, setWeekDaysArr] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -256,6 +257,7 @@ const N64RoomEditAdmin = () => {
         });
         setFeaturesArr(room.inclusions?.features || []);
         setTimeSlotsArr(room.timeSlots || []);
+        setWeekDaysArr(room.weekDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]);
       } catch (err) {
         setError("Failed to fetch room data");
       } finally {
@@ -281,6 +283,7 @@ const N64RoomEditAdmin = () => {
           features: featuresArr.filter((f) => f.trim()),
         },
         timeSlots: timeSlotsArr,
+        weekDays: weekDaysArr,
       });
       navigate("/admin/n64-rooms");
     } catch (err) {
@@ -414,6 +417,17 @@ const N64RoomEditAdmin = () => {
                 Availability & Images
               </h3>
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                <div className="sm:col-span-6">
+                  <MultiSelect
+                    options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+                    selected={weekDaysArr}
+                    onChange={setWeekDaysArr}
+                    label="Available Week Days"
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Selected {weekDaysArr.length} day(s) - Customers can only book on selected days
+                  </p>
+                </div>
                 <div className="sm:col-span-6">
                   <MultiSelect
                     options={ALLOWED_TIMES}

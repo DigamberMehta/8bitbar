@@ -33,6 +33,11 @@ const n64RoomSchema = new mongoose.Schema(
         "10:00 PM",
       ],
     },
+    weekDays: {
+      type: [String],
+      default: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    },
     inclusions: {
       controllers: { type: Number, default: 4 },
       features: {

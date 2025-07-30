@@ -42,6 +42,27 @@ const cafeSettingsSchema = new mongoose.Schema(
       default: "23:00",
       required: true,
     },
+    weekDays: {
+      type: [String],
+      default: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+      enum: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+    },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

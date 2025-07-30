@@ -126,6 +126,7 @@ router.post("/karaoke-rooms", async (req, res) => {
       maxPeople,
       pricePerHour,
       timeSlots,
+      weekDays,
       inclusions,
       imageUrl,
       images,
@@ -148,6 +149,7 @@ router.post("/karaoke-rooms", async (req, res) => {
         "9:00 PM",
         "10:00 PM",
       ],
+      weekDays: weekDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
       inclusions: {
         microphones: inclusions?.microphones || 4,
         features: inclusions?.features || [

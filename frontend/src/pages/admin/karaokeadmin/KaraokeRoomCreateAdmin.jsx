@@ -244,6 +244,15 @@ const KaraokeRoomCreateAdmin = () => {
     "9:00 PM",
     "10:00 PM",
   ]);
+  const [weekDaysArr, setWeekDaysArr] = useState([
+    "Monday",
+    "Tuesday", 
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -268,6 +277,7 @@ const KaraokeRoomCreateAdmin = () => {
         maxPeople: parseInt(formData.maxPeople),
         pricePerHour: parseFloat(formData.pricePerHour),
         timeSlots: timeSlotsArr,
+        weekDays: weekDaysArr,
         inclusions: {
           microphones: parseInt(formData.microphones) || 4,
           features: featuresArr.filter((f) => f.trim() !== ""),
@@ -394,21 +404,34 @@ const KaraokeRoomCreateAdmin = () => {
 
             <hr className="border-gray-200" />
 
-            {/* --- TIME SLOTS SECTION --- */}
+            {/* --- AVAILABILITY SECTION --- */}
             <div>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
-                Available Time Slots
+                Availability Settings
               </h3>
-              <div className="mt-6">
-                <MultiSelect
-                  options={EXTENDED_TIME_SLOTS}
-                  selected={timeSlotsArr}
-                  onChange={setTimeSlotsArr}
-                  label="Select Available Time Slots"
-                />
-                <p className="mt-2 text-sm text-gray-500">
-                  Selected {timeSlotsArr.length} time slot(s)
-                </p>
+              <div className="mt-6 space-y-6">
+                <div>
+                  <MultiSelect
+                    options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+                    selected={weekDaysArr}
+                    onChange={setWeekDaysArr}
+                    label="Available Week Days"
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Selected {weekDaysArr.length} day(s) - Customers can only book on selected days
+                  </p>
+                </div>
+                <div>
+                  <MultiSelect
+                    options={EXTENDED_TIME_SLOTS}
+                    selected={timeSlotsArr}
+                    onChange={setTimeSlotsArr}
+                    label="Available Time Slots"
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Selected {timeSlotsArr.length} time slot(s)
+                  </p>
+                </div>
               </div>
             </div>
 

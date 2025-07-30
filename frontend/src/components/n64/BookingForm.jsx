@@ -24,6 +24,24 @@ const BookingForm = ({ booths, bookings }) => {
   const pricePerHour = selectedBooth ? selectedBooth.pricePerHour : null;
   const totalCost = selectedBooth ? pricePerHour * duration : null;
 
+  // Helper: check if a date falls on an available week day
+  const isDateAvailable = (dateStr) => {
+    if (!selectedBooth?.weekDays || selectedBooth.weekDays.length === 0)
+      return true; // If no week days specified, allow all
+    const date = new Date(dateStr);
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const dayName = dayNames[date.getDay()];
+    return selectedBooth.weekDays.includes(dayName);
+  };
+
   // Helper: get the Date object for a slot on a given date
   const getSlotDate = (dateStr, slot) => {
     const match = slot.match(/(\d+):(\d+) (AM|PM)/);
@@ -76,7 +94,11 @@ const BookingForm = ({ booths, bookings }) => {
         title: "N64 Booth",
         boothName: selectedBooth.name,
         roomId: selectedBooth._id, // Store roomId for easier checkout
-        roomType: selectedBooth.roomType || (selectedBooth.name?.toLowerCase().includes("mickey") ? "mickey" : "minnie"),
+        roomType:
+          selectedBooth.roomType ||
+          (selectedBooth.name?.toLowerCase().includes("mickey")
+            ? "mickey"
+            : "minnie"),
         imageUrl:
           "https://8bitbar.com.au/wp-content/uploads/2025/03/20250419_212301-scaled.jpg",
         date: selectedDate,
@@ -99,7 +121,7 @@ const BookingForm = ({ booths, bookings }) => {
       <h3 className="font-['Orbitron'] text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
         BOOK YOUR N64 EXPERIENCE
       </h3>
-      <div className="space-y-6">
+            <div className="space-y-6">
         {/* Number of People */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -118,48 +140,75 @@ const BookingForm = ({ booths, bookings }) => {
           </select>
         </div>
 
-        {/* Date Selection */}
+        {/* Booth Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Select Date *
+            Select Booth *
           </label>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => {
-              setSelectedDate(e.target.value);
-              setSelectedTime("");
-            }}
-            min={new Date().toISOString().split("T")[0]}
-            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
-          />
+          <div className="grid grid-cols-2 gap-4">
+            {booths.map((booth) => (
+              <button
+                key={booth._id}
+                onClick={() => {
+                  setSelectedBoothId(booth._id);
+                  setSelectedTime("");
+                  setSelectedDate(""); // Reset date when booth changes
+                }}
+                className={`p-4 border rounded-lg text-center transition-all duration-300 flex flex-col items-center justify-center ${
+                  selectedBoothId === booth._id
+                    ? "border-pink-500 bg-pink-500/20 text-pink-400"
+                    : "border-gray-700 hover:border-pink-500"
+                }`}
+              >
+                <Gamepad2 className="h-6 w-6 mb-2" />
+                <span className="font-medium">{booth.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Booth Selection */}
-        {selectedDate && (
+        {/* Date Selection */}
+        {selectedBooth && (
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Select Booth *
+              Select Date *
             </label>
-            <div className="grid grid-cols-2 gap-4">
-              {booths.map((booth) => (
-                <button
-                  key={booth._id}
-                  onClick={() => {
-                    setSelectedBoothId(booth._id);
-                    setSelectedTime("");
-                  }}
-                  className={`p-4 border rounded-lg text-center transition-all duration-300 flex flex-col items-center justify-center ${
-                    selectedBoothId === booth._id
-                      ? "border-pink-500 bg-pink-500/20 text-pink-400"
-                      : "border-gray-700 hover:border-pink-500"
-                  }`}
-                >
-                  <Gamepad2 className="h-6 w-6 mb-2" />
-                  <span className="font-medium">{booth.name}</span>
-                </button>
-              ))}
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                setSelectedTime("");
+              }}
+              min={new Date().toISOString().split("T")[0]}
+              className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
+            />
+            
+            {/* Available Days Information */}
+            <div className="mt-2 text-sm text-gray-400">
+              <span className="font-medium text-green-400">Available on: </span>
+              {selectedBooth.weekDays && selectedBooth.weekDays.length > 0 ? (
+                selectedBooth.weekDays.length === 7 ? (
+                  <span className="text-gray-300">All days</span>
+                ) : (
+                  <span className="text-gray-300">
+                    {selectedBooth.weekDays.join(", ")}
+                  </span>
+                )
+              ) : (
+                <span className="text-gray-300">All days</span>
+              )}
             </div>
+            
+            {selectedDate && !isDateAvailable(selectedDate) && (
+              <div className="text-red-400 text-sm mt-2">
+                This booth is not available on{" "}
+                {new Date(selectedDate).toLocaleDateString("en-US", {
+                  weekday: "long",
+                })}
+                . Please select another date.
+              </div>
+            )}
           </div>
         )}
 
@@ -171,7 +220,12 @@ const BookingForm = ({ booths, bookings }) => {
           <select
             value={duration}
             onChange={(e) => setDuration(parseInt(e.target.value))}
-            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
+            disabled={selectedDate && !isDateAvailable(selectedDate)}
+            className={`w-full border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors ${
+              selectedDate && !isDateAvailable(selectedDate) 
+                ? "bg-gray-700 opacity-50 cursor-not-allowed" 
+                : "bg-gray-800"
+            }`}
           >
             {Array.from({ length: 4 }, (_, i) => i + 1).map((num) => (
               <option key={num} value={num}>
@@ -182,7 +236,7 @@ const BookingForm = ({ booths, bookings }) => {
         </div>
 
         {/* Time Selection */}
-        {selectedBooth && (
+        {selectedBooth && selectedDate && isDateAvailable(selectedDate) && (
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Select Start Time *
@@ -225,7 +279,12 @@ const BookingForm = ({ booths, bookings }) => {
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          disabled={!selectedDate || !selectedTime || !selectedBooth}
+          disabled={
+            !selectedBooth ||
+            !selectedDate ||
+            !selectedTime ||
+            (selectedDate && !isDateAvailable(selectedDate))
+          }
           className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           🛒 ADD TO CART

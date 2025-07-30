@@ -238,6 +238,7 @@ const KaraokeRoomEditAdmin = () => {
   });
   const [featuresArr, setFeaturesArr] = useState([]);
   const [timeSlotsArr, setTimeSlotsArr] = useState([]);
+  const [weekDaysArr, setWeekDaysArr] = useState([]);
   const [error, setError] = useState("");
 
   // Core logic for fetching and submitting data remains unchanged
@@ -270,6 +271,7 @@ const KaraokeRoomEditAdmin = () => {
         });
         setFeaturesArr(room.inclusions?.features || []);
         setTimeSlotsArr(room.timeSlots || []);
+        setWeekDaysArr(room.weekDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]);
       } catch (err) {
         console.error("Error fetching room:", err);
         setError("Failed to fetch room data");
@@ -301,6 +303,7 @@ const KaraokeRoomEditAdmin = () => {
           features: featuresArr,
         },
         timeSlots: timeSlotsArr,
+        weekDays: weekDaysArr,
       });
 
       navigate("/admin/karaoke/karaoke-rooms");
@@ -437,6 +440,17 @@ const KaraokeRoomEditAdmin = () => {
                 Availability & Image
               </h3>
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                <div className="sm:col-span-6">
+                  <MultiSelect
+                    options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+                    selected={weekDaysArr}
+                    onChange={setWeekDaysArr}
+                    label="Available Week Days"
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Selected {weekDaysArr.length} day(s) - Customers can only book on selected days
+                  </p>
+                </div>
                 <div className="sm:col-span-6">
                   <MultiSelect
                     options={EXTENDED_TIME_SLOTS}
