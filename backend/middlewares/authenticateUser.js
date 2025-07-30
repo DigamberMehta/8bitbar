@@ -7,14 +7,6 @@ const authenticateUser = async (req, res, next) => {
     const headerToken = req.header("Authorization")?.replace("Bearer ", "");
     const token = cookieToken || headerToken;
 
-    // Debug logging for production issues
-    console.log("User auth debug:", {
-      hasCookieToken: !!cookieToken,
-      hasHeaderToken: !!headerToken,
-      userAgent: req.get("User-Agent"),
-      origin: req.get("Origin"),
-    });
-
     if (!token) {
       return res
         .status(401)

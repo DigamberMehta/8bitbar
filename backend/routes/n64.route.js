@@ -2,6 +2,7 @@ import express from "express";
 import N64Room from "../models/N64Room.js";
 import N64Booking from "../models/N64Booking.js";
 import authenticateUser from "../middlewares/authenticateUser.js";
+import { sendBookingConfirmation } from "../services/emailService.js";
 
 const router = express.Router();
 
@@ -22,12 +23,12 @@ router.get("/bookings", async (req, res) => {
   try {
     const { roomId } = req.query;
     let filter = {};
-    
+
     // If roomId is provided, filter bookings by that room
     if (roomId) {
       filter.roomId = roomId;
     }
-    
+
     // Populate booth info for each booking
     const bookings = await N64Booking.find(filter).populate("roomId");
     res.status(200).json({ success: true, bookings });
@@ -126,6 +127,18 @@ router.post("/bookings", authenticateUser, async (req, res) => {
     });
 
     await newBooking.save();
+
+    // Get room name for email
+    const room = await N64Room.findById(roomId);
+    const roomName = room ? room.name : "N64 Gaming Booth";
+
+    // Send confirmation email
+    try {
+      await sendBookingConfirmation("n64", newBooking, { roomName });
+    } catch (emailError) {
+      console.error("Failed to send confirmation email:", emailError);
+      // Don't fail the booking if email fails
+    }
 
     res.status(201).json({
       success: true,
