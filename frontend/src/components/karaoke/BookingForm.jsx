@@ -350,6 +350,42 @@ const BookingForm = ({ room }) => {
             </div>
           )}
 
+        {/* Booking Time Info */}
+        {selectedTime && numberOfHours && (
+          <div className="text-xs text-blue-400 px-3 py-2 bg-blue-900/20 rounded-lg border border-blue-500/30">
+            ℹ️ <strong>Actual karaoke time:</strong> {selectedTime} -{" "}
+            {(() => {
+              const match = selectedTime.match(/(\d+):(\d+) (AM|PM)/);
+              if (!match) return selectedTime;
+              const [_, hour, minute, period] = match;
+              let endHour = parseInt(hour);
+              if (period === "PM" && endHour !== 12) endHour += 12;
+              if (period === "AM" && endHour === 12) endHour = 0;
+              endHour += numberOfHours;
+              let endMinute = parseInt(minute) - 5;
+              if (endMinute < 0) {
+                endMinute += 60;
+                endHour -= 1;
+              }
+
+              // Handle day rollover (24+ hours)
+              endHour = endHour % 24;
+
+              let displayHour = endHour;
+              let displayPeriod = "AM";
+              if (endHour >= 12) {
+                displayPeriod = "PM";
+                if (endHour > 12) displayHour = endHour - 12;
+              }
+              if (endHour === 0) displayHour = 12;
+              return `${displayHour}:${endMinute
+                .toString()
+                .padStart(2, "0")} ${displayPeriod}`;
+            })()}{" "}
+            (5 min reserved for cleaning)
+          </div>
+        )}
+
         {/* Total Cost */}
         <div className="border-t border-gray-700 pt-6">
           <div className="flex justify-between items-center text-lg mb-4">

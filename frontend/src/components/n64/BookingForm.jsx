@@ -121,7 +121,7 @@ const BookingForm = ({ booths, bookings }) => {
       <h3 className="font-['Orbitron'] text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
         BOOK YOUR N64 EXPERIENCE
       </h3>
-            <div className="space-y-6">
+      <div className="space-y-6">
         {/* Number of People */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -183,7 +183,7 @@ const BookingForm = ({ booths, bookings }) => {
               min={new Date().toISOString().split("T")[0]}
               className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
             />
-            
+
             {/* Available Days Information */}
             <div className="mt-2 text-sm text-gray-400">
               <span className="font-medium text-green-400">Available on: </span>
@@ -199,7 +199,7 @@ const BookingForm = ({ booths, bookings }) => {
                 <span className="text-gray-300">All days</span>
               )}
             </div>
-            
+
             {selectedDate && !isDateAvailable(selectedDate) && (
               <div className="text-red-400 text-sm mt-2">
                 This booth is not available on{" "}
@@ -222,8 +222,8 @@ const BookingForm = ({ booths, bookings }) => {
             onChange={(e) => setDuration(parseInt(e.target.value))}
             disabled={selectedDate && !isDateAvailable(selectedDate)}
             className={`w-full border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors ${
-              selectedDate && !isDateAvailable(selectedDate) 
-                ? "bg-gray-700 opacity-50 cursor-not-allowed" 
+              selectedDate && !isDateAvailable(selectedDate)
+                ? "bg-gray-700 opacity-50 cursor-not-allowed"
                 : "bg-gray-800"
             }`}
           >
@@ -260,6 +260,42 @@ const BookingForm = ({ booths, bookings }) => {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Booking Time Info */}
+        {selectedTime && duration && (
+          <div className="text-xs text-blue-400 px-3 py-2 bg-blue-900/20 rounded-lg border border-blue-500/30">
+            ℹ️ <strong>Actual N64 time:</strong> {selectedTime} -{" "}
+            {(() => {
+              const match = selectedTime.match(/(\d+):(\d+) (AM|PM)/);
+              if (!match) return selectedTime;
+              const [_, hour, minute, period] = match;
+              let endHour = parseInt(hour);
+              if (period === "PM" && endHour !== 12) endHour += 12;
+              if (period === "AM" && endHour === 12) endHour = 0;
+              endHour += duration;
+              let endMinute = parseInt(minute) - 5;
+              if (endMinute < 0) {
+                endMinute += 60;
+                endHour -= 1;
+              }
+
+              // Handle day rollover (24+ hours)
+              endHour = endHour % 24;
+
+              let displayHour = endHour;
+              let displayPeriod = "AM";
+              if (endHour >= 12) {
+                displayPeriod = "PM";
+                if (endHour > 12) displayHour = endHour - 12;
+              }
+              if (endHour === 0) displayHour = 12;
+              return `${displayHour}:${endMinute
+                .toString()
+                .padStart(2, "0")} ${displayPeriod}`;
+            })()}{" "}
+            (5 min reserved for cleaning)
           </div>
         )}
 

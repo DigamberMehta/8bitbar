@@ -45,6 +45,56 @@ const Cart = () => {
     }
   };
 
+  // Helper: calculate end time with 5 min cleaning time
+  const calculateEndTime = (startTime, duration, isHourFormat = false) => {
+    // Handle 24-hour format (cafe)
+    if (isHourFormat) {
+      const [hour, minute] = startTime.split(":");
+      let endHour = parseInt(hour) + duration;
+      let endMinute = parseInt(minute) - 5;
+
+      if (endMinute < 0) {
+        endMinute += 60;
+        endHour -= 1;
+      }
+
+      // Handle day rollover
+      endHour = endHour % 24;
+
+      return `${endHour.toString().padStart(2, "0")}:${endMinute
+        .toString()
+        .padStart(2, "0")}`;
+    }
+
+    // Handle AM/PM format (karaoke, n64)
+    const match = startTime.match(/(\d+):(\d+) (AM|PM)/);
+    if (!match) return startTime;
+    const [_, hour, minute, period] = match;
+    let endHour = parseInt(hour);
+    if (period === "PM" && endHour !== 12) endHour += 12;
+    if (period === "AM" && endHour === 12) endHour = 0;
+    endHour += duration;
+    let endMinute = parseInt(minute) - 5;
+    if (endMinute < 0) {
+      endMinute += 60;
+      endHour -= 1;
+    }
+
+    // Handle day rollover
+    endHour = endHour % 24;
+
+    let displayHour = endHour;
+    let displayPeriod = "AM";
+    if (endHour >= 12) {
+      displayPeriod = "PM";
+      if (endHour > 12) displayHour = endHour - 12;
+    }
+    if (endHour === 0) displayHour = 12;
+    return `${displayHour}:${endMinute
+      .toString()
+      .padStart(2, "0")} ${displayPeriod}`;
+  };
+
   // Calculate the total cost
   const estimatedTotal = cart.reduce(
     (total, item) => total + (item.totalCost || 0),
@@ -148,6 +198,15 @@ const Cart = () => {
                           <span className="font-semibold">Duration:</span>{" "}
                           {item.duration} {item.duration > 1 ? "hours" : "hour"}
                         </p>
+                        <div className="text-xs text-blue-400 mt-1 px-2 py-1 bg-blue-900/20 rounded border border-blue-500/30">
+                          ℹ️ <strong>Actual time:</strong> {item.time} -{" "}
+                          {calculateEndTime(
+                            item.time,
+                            item.duration,
+                            item.type === "cafe"
+                          )}{" "}
+                          (5 min reserved for cleaning)
+                        </div>
                         {item.people && (
                           <p>
                             <span className="font-semibold">Person:</span>{" "}
