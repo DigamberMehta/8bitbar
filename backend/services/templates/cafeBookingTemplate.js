@@ -39,61 +39,100 @@ export const getCafeBookingTemplate = (booking) => {
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Orbitron', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
-            color: #333333;
-            background-color: #f8f9fa;
+            color: #ffffff;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
           }
           .container { 
             max-width: 600px; 
             margin: 0 auto; 
-            background: #ffffff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #e91e63;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(233, 30, 99, 0.3);
           }
           .header { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #00bcd4 100%);
             padding: 40px 30px;
             text-align: center;
-            color: white;
+            position: relative;
+            overflow: hidden;
+          }
+          .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
           }
           .logo { 
-            font-size: 32px; 
-            font-weight: 700; 
+            font-size: 36px; 
+            font-weight: 900; 
             margin-bottom: 10px;
-            letter-spacing: 2px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            position: relative;
+            z-index: 1;
           }
           .header-subtitle {
-            font-size: 18px;
+            font-size: 16px;
             opacity: 0.9;
             font-weight: 300;
+            position: relative;
+            z-index: 1;
           }
           .content { 
             padding: 40px 30px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
           }
           .greeting {
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 20px;
-            color: #2c3e50;
+            color: #ffffff;
+            font-weight: 600;
           }
           .intro-text {
             font-size: 16px;
-            color: #5a6c7d;
+            color: #b0b0b0;
             margin-bottom: 30px;
-            line-height: 1.5;
+            line-height: 1.6;
           }
           .booking-card { 
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
+            border: 2px solid #e91e63;
+            border-radius: 16px;
             padding: 30px;
             margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+          }
+          .booking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #e91e63, #9c27b0, #00bcd4);
           }
           .booking-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #2c3e50;
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
             margin-bottom: 25px;
             text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #e91e63, #00bcd4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
           }
           .detail-grid {
             display: grid;
@@ -104,21 +143,35 @@ export const getCafeBookingTemplate = (booking) => {
             justify-content: space-between;
             align-items: center;
             padding: 15px 0;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #333;
+            position: relative;
           }
           .detail-item:last-child {
             border-bottom: none;
           }
+          .detail-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #e91e63, #00bcd4);
+            transition: width 0.3s ease;
+          }
+          .detail-item:hover::after {
+            width: 100%;
+          }
           .detail-label {
             font-weight: 600;
-            color: #495057;
-            font-size: 14px;
+            color: #e91e63;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
           }
           .detail-value {
             font-size: 16px;
-            color: #2c3e50;
+            color: #ffffff;
             font-weight: 500;
           }
           .chairs-container {
@@ -128,79 +181,109 @@ export const getCafeBookingTemplate = (booking) => {
             margin-top: 5px;
           }
           .chair-tag {
-            background: #667eea;
+            background: linear-gradient(135deg, #e91e63, #9c27b0);
             color: white;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
             letter-spacing: 0.5px;
+            box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3);
           }
           .time-notice {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
+            border: 2px solid #00bcd4;
+            border-radius: 12px;
             padding: 20px;
             margin: 25px 0;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+          }
+          .time-notice::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00bcd4, #e91e63);
           }
           .time-notice-title {
             font-weight: 600;
-            color: #856404;
+            color: #00bcd4;
             margin-bottom: 8px;
             font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
           }
           .time-notice-text {
-            color: #856404;
+            color: #b0b0b0;
             font-size: 14px;
             line-height: 1.4;
           }
           .actual-time {
             font-weight: 700;
-            color: #d63031;
+            color: #e91e63;
           }
-
           .status-badge {
             display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
+            padding: 8px 20px;
+            border-radius: 25px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
           }
           .status-confirmed {
-            background: #d4edda;
-            color: #155724;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: #ffffff;
           }
           .status-pending {
-            background: #fff3cd;
-            color: #856404;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: #ffffff;
           }
           .footer {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
             padding: 30px;
             text-align: center;
-            color: #bdc3c7;
+            color: #b0b0b0;
+            border-top: 2px solid #e91e63;
           }
           .footer-logo {
             font-size: 24px;
             font-weight: 700;
-            color: #ecf0f1;
+            color: #ffffff;
             margin-bottom: 15px;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #e91e63, #00bcd4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
           }
           .footer-text {
             font-size: 14px;
             line-height: 1.5;
+            margin-bottom: 15px;
           }
           .footer-contact {
-            margin-top: 15px;
             font-size: 14px;
           }
           .footer-contact a {
-            color: #74b9ff;
+            color: #00bcd4;
             text-decoration: none;
+            transition: color 0.3s ease;
+          }
+          .footer-contact a:hover {
+            color: #e91e63;
+          }
+          .icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            vertical-align: middle;
           }
           @media (max-width: 600px) {
             .content { padding: 30px 20px; }
@@ -213,7 +296,7 @@ export const getCafeBookingTemplate = (booking) => {
               padding: 12px 0;
             }
             .detail-label {
-              font-size: 12px;
+              font-size: 11px;
             }
             .detail-value {
               font-size: 14px;
@@ -227,6 +310,9 @@ export const getCafeBookingTemplate = (booking) => {
             }
             .time-notice-text {
               font-size: 13px;
+            }
+            .logo {
+              font-size: 28px;
             }
           }
         </style>
@@ -249,7 +335,7 @@ export const getCafeBookingTemplate = (booking) => {
               
               <div class="detail-grid">
                 <div class="detail-item">
-                  <span class="detail-label">Date</span>
+                  <span class="detail-label">📅 Date</span>
                   <span class="detail-value">${new Date(
                     booking.date
                   ).toLocaleDateString("en-AU", {
@@ -261,21 +347,21 @@ export const getCafeBookingTemplate = (booking) => {
                 </div>
                 
                 <div class="detail-item">
-                  <span class="detail-label">Reserved Time</span>
-                  <span class="detail-value">${booking.time} - ${
-      booking.time.split(":")[0] + booking.duration
-    }:${booking.time.split(":")[1]}</span>
+                  <span class="detail-label">⏰ Reserved Time</span>
+                  <span class="detail-value">${
+                    booking.time
+                  } - ${actualEndTime}</span>
                 </div>
                 
                 <div class="detail-item">
-                  <span class="detail-label">Duration</span>
+                  <span class="detail-label">⏱️ Duration</span>
                   <span class="detail-value">${booking.duration} hour${
       booking.duration > 1 ? "s" : ""
     }</span>
                 </div>
                 
                 <div class="detail-item">
-                  <span class="detail-label">Gaming Chairs</span>
+                  <span class="detail-label">🎮 Gaming Chairs</span>
                   <div class="chairs-container">
                     ${booking.chairIds
                       .map(
@@ -286,7 +372,7 @@ export const getCafeBookingTemplate = (booking) => {
                 </div>
                 
                 <div class="detail-item">
-                  <span class="detail-label">Total Amount</span>
+                  <span class="detail-label">💰 Total Amount</span>
                   <span class="detail-value">${
                     booking.totalCost === 0
                       ? "FREE SESSION"
@@ -295,7 +381,7 @@ export const getCafeBookingTemplate = (booking) => {
                 </div>
                 
                 <div class="detail-item">
-                  <span class="detail-label">Status</span>
+                  <span class="detail-label">📊 Status</span>
                   <span class="status-badge status-${booking.status}">${
       booking.status
     }</span>
@@ -306,6 +392,13 @@ export const getCafeBookingTemplate = (booking) => {
             <div class="intro-text">
               If you need to make any changes to your booking, please contact us as soon as possible. We look forward to providing you with an amazing gaming experience!
             </div>
+            
+            <div class="time-notice">
+              <div class="time-notice-title">⏰ Important Time Notice</div>
+              <div class="time-notice-text">
+                Please note that your session ends 5 minutes before the displayed end time to allow for cleaning and preparation for the next booking. Thank you for your understanding!
+              </div>
+            </div>
           </div>
           
           <div class="footer">
@@ -314,7 +407,7 @@ export const getCafeBookingTemplate = (booking) => {
               Where Gaming Meets Great Times
             </div>
             <div class="footer-contact">
-              📧 <a href="mailto:orders@8bitbar.com.au">orders@8bitbar.com.au</a><br>
+              📧 <a href="mailto:info@8bitbar.com.au">info@8bitbar.com.au</a><br>
               🌐 <a href="https://www.8bitbar.com.au">www.8bitbar.com.au</a>
             </div>
           </div>

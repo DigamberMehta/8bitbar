@@ -8,6 +8,7 @@ import n64Routes from "./routes/n64.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import cafeRoutes from "./routes/cafe.route.js";
 import paymentRoutes from "./routes/payment.route.js";
+import contactRoutes from "./routes/contact.route.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -24,7 +25,7 @@ const getConfig = () => {
       ? [
           "https://8bitbar.com.au",
           "https://www.8bitbar.com.au",
-          "https://8bitbar.vercel.app"
+          "https://8bitbar.vercel.app",
         ]
       : ["http://localhost:5173", "http://192.168.31.163:5173"],
     port: process.env.PORT || 3000,
@@ -50,6 +51,7 @@ app.use("/api/v1/n64-rooms", n64Routes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/cafe", cafeRoutes);
 app.use("/api/v1/payments", paymentRoutes);
+app.use("/api/v1", contactRoutes);
 
 // ✅ Health check route
 app.get("/api/v1/health", (req, res) => {

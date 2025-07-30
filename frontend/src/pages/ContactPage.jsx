@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   MapPin,
-  Clock,
   Phone,
   Mail,
   Send,
@@ -9,6 +8,7 @@ import {
   Instagram,
   Twitter,
 } from "lucide-react";
+import axios from "../utils/axios.js";
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -27,18 +27,42 @@ const ContactPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(
-      `Message sent!\n\nWe'll get back to you within 24 hours, ${formData.name}!\n\nSubject: ${formData.subject}\nMessage: ${formData.message}`
-    );
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: "",
-    });
+    setIsSubmitting(true);
+    setSubmitMessage("");
+
+    try {
+      const response = await axios.post("/contact", formData);
+
+      if (response.data.success) {
+        setSubmitMessage(
+          "Thank you for your message! We'll get back to you within 24 hours."
+        );
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        setSubmitMessage(
+          "Sorry, there was an error sending your message. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error sending contact form:", error);
+      setSubmitMessage(
+        error.response?.data?.message ||
+          "Sorry, there was an error sending your message. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -308,11 +332,33 @@ const ContactPage = () => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink flex items-center justify-center"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Send className="mr-2 h-5 w-5" />
-                Send Message
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-5 w-5" />
+                    Send Message
+                  </>
+                )}
               </button>
+
+              {submitMessage && (
+                <div
+                  className={`mt-4 p-4 rounded-lg text-center ${
+                    submitMessage.includes("Thank you")
+                      ? "bg-green-900/50 border border-green-500/30 text-green-400"
+                      : "bg-red-900/50 border border-red-500/30 text-red-400"
+                  }`}
+                >
+                  {submitMessage}
+                </div>
+              )}
             </form>
 
             <div className="mt-6 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
