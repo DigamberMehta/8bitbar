@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Send,
-  Facebook,
-  Instagram,
-  Twitter,
-} from "lucide-react";
+import { MapPin, Phone, Mail, Send, Facebook, Instagram } from "lucide-react";
 import axios from "../utils/axios.js";
 
 const ContactPage = () => {
@@ -177,22 +169,20 @@ const ContactPage = () => {
 
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href="https://www.facebook.com/8bitbarHB"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg"
                 >
                   <Facebook className="h-6 w-6" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/8bitbarhb/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg"
                 >
                   <Instagram className="h-6 w-6" />
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg"
-                >
-                  <Twitter className="h-6 w-6" />
                 </a>
               </div>
 
