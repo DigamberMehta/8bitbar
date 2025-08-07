@@ -4,9 +4,9 @@ import { Camera } from "lucide-react";
 
 const CtaSection = () => {
   return (
-    <section className="py-12 bg-gradient-to-r from-purple-900/20 to-pink-900/20">
+    <section className="bg-gradient-to-r from-purple-900/20 to-pink-900/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="font-['Orbitron'] text-3xl md:text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
+        <h2 className="font-['Orbitron'] text-3xl md:text-4xl font-bold mb-6 pt-8 pb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
           READY PLAYER ONE?
         </h2>
         <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">

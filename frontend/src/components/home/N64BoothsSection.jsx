@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 
 const N64BoothsSection = () => {
   return (
-    <section className="py-12 bg-gray-900">
+    <section className="bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="font-['Orbitron'] text-3xl md:text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">
+            <h2 className="font-['Orbitron'] text-3xl md:text-4xl font-bold mb-6 pt-8 pb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">
               N64 booths for hire!
             </h2>
             <p className="text-gray-300 text-lg mb-8 leading-relaxed">
