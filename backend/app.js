@@ -26,6 +26,7 @@ const getConfig = () => {
           "https://8bitbar.com.au",
           "https://www.8bitbar.com.au",
           "https://8bitbar.vercel.app",
+          "https://8bitbar-gilt.vercel.app",
         ]
       : ["http://localhost:5173", "http://192.168.31.163:5173"],
     port: process.env.PORT || 3000,
@@ -42,6 +43,10 @@ app.use(
     credentials: true,
   })
 );
+app.options('*', cors({
+  origin: config.corsOrigins,
+  credentials: true
+}));
 app.use(cookieParser());
 
 // API routes
