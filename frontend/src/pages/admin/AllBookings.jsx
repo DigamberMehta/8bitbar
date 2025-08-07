@@ -226,13 +226,7 @@ const AllBookings = () => {
                       Service
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date & Time
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Details
+                      Booking Details
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
@@ -253,32 +247,30 @@ const AllBookings = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {booking.customerName}
+                      <td className="px-6 py-4">
+                        <div className="space-y-1">
+                          <div className="text-sm font-medium text-gray-900">
+                            {booking.customerName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {booking.customerEmail}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {formatDate(booking.bookingDate)} at{" "}
+                            {formatTime(booking.bookingDate)}
+                          </div>
+                          <div className="text-sm text-gray-700">
+                            {booking.serviceType === "karaoke" && (
+                              <span>Room: {booking.roomName}</span>
+                            )}
+                            {booking.serviceType === "n64" && (
+                              <span>Booth: {booking.boothName}</span>
+                            )}
+                            {booking.serviceType === "cafe" && (
+                              <span>Table: {booking.tableName}</span>
+                            )}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {booking.customerEmail}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {formatDate(booking.bookingDate)}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {formatTime(booking.bookingDate)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {booking.serviceType === "karaoke" && (
-                          <span>Room: {booking.roomName}</span>
-                        )}
-                        {booking.serviceType === "n64" && (
-                          <span>Booth: {booking.boothName}</span>
-                        )}
-                        {booking.serviceType === "cafe" && (
-                          <span>Table: {booking.tableName}</span>
-                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span

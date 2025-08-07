@@ -66,7 +66,7 @@ const FinanceCalendar = ({ events, onEventClick }) => {
           </div>
         </div>
       </div>
-      <div className="h-96">
+      <div className="h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px]">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           headerToolbar={{
@@ -88,6 +88,19 @@ const FinanceCalendar = ({ events, onEventClick }) => {
             hour: "2-digit",
             minute: "2-digit",
             hour12: true,
+          }}
+          // Responsive settings
+          aspectRatio={1.35}
+          dayCellContent={(arg) => (
+            <div className="text-xs sm:text-sm md:text-base">
+              {arg.dayNumberText}
+            </div>
+          )}
+          // Mobile-friendly toolbar
+          headerToolbar={{
+            left: "prev,next",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek",
           }}
         />
       </div>
