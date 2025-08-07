@@ -13,6 +13,7 @@ import {
   MdPeople,
   MdAdd,
   MdAttachMoney,
+  MdEvent,
 } from "react-icons/md";
 
 const AdminLayout = () => {
@@ -32,6 +33,13 @@ const AdminLayout = () => {
       path: "/admin/finance",
       label: "Finance",
       icon: <MdAttachMoney size={20} />,
+    },
+
+    // All Bookings
+    {
+      path: "/admin/all-bookings",
+      label: "All Bookings",
+      icon: <MdEvent size={20} />,
     },
 
     // Manual Booking
