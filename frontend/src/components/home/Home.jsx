@@ -4,7 +4,6 @@ import AboutSection from "./AboutSection";
 import N64BoothsSection from "./N64BoothsSection";
 import KaraokeSection from "./KaraokeSection";
 import PoolSection from "./PoolSection";
-import FeaturesSection from "./FeaturesSection";
 import CtaSection from "./CtaSection";
 
 const Home = () => {
@@ -15,7 +14,6 @@ const Home = () => {
       <N64BoothsSection />
       <KaraokeSection />
       <PoolSection />
-      <FeaturesSection />
       <CtaSection />
     </div>
   );

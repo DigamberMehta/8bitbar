@@ -19,15 +19,13 @@ const BookingForm = ({ booths, bookings }) => {
 
   // Find selected booth object
   const selectedBooth = booths.find((b) => b._id === selectedBoothId);
-  const timeSlots = selectedBooth ? selectedBooth.timeSlots : [];
   const maxPeople = selectedBooth ? selectedBooth.maxPeople : 4;
   const pricePerHour = selectedBooth ? selectedBooth.pricePerHour : null;
   const totalCost = selectedBooth ? pricePerHour * duration : null;
 
-  // Helper: check if a date falls on an available week day
-  const isDateAvailable = (dateStr) => {
-    if (!selectedBooth?.weekDays || selectedBooth.weekDays.length === 0)
-      return true; // If no week days specified, allow all
+  // Helper: check if a date falls on an available week day for a booth
+  const isDateAvailable = (dateStr, booth) => {
+    if (!booth?.weekDays || booth.weekDays.length === 0) return true; // If no week days specified, allow all
     const date = new Date(dateStr);
     const dayNames = [
       "Sunday",
@@ -39,7 +37,7 @@ const BookingForm = ({ booths, bookings }) => {
       "Saturday",
     ];
     const dayName = dayNames[date.getDay()];
-    return selectedBooth.weekDays.includes(dayName);
+    return booth.weekDays.includes(dayName);
   };
 
   // Helper: get the Date object for a slot on a given date
@@ -55,9 +53,12 @@ const BookingForm = ({ booths, bookings }) => {
     return slotDate;
   };
 
-  // Get all slots that would be blocked by the selected duration
-  const getBlockedSlots = (dateStr) => {
-    return timeSlots.filter((slot, idx) => {
+  // Get all slots that would be blocked by the selected duration for a specific booth
+  const getBlockedSlots = (dateStr, boothId) => {
+    const booth = booths.find((b) => b._id === boothId);
+    if (!booth) return [];
+
+    return booth.timeSlots.filter((slot) => {
       const slotStart = getSlotDate(dateStr, slot);
       if (!slotStart) return false;
       // Calculate the end time for this booking if started at this slot
@@ -73,7 +74,7 @@ const BookingForm = ({ booths, bookings }) => {
         const overlap = bookings.some((b) => {
           const bookingBoothId =
             b.roomId && b.roomId._id ? b.roomId._id : b.roomId;
-          if (bookingBoothId !== selectedBoothId) return false;
+          if (bookingBoothId !== boothId) return false;
           const bookingStart = new Date(b.startDateTime);
           const bookingEnd = new Date(b.endDateTime);
           // Overlap if checkStart < bookingEnd && checkEnd > bookingStart
@@ -84,8 +85,6 @@ const BookingForm = ({ booths, bookings }) => {
       return false;
     });
   };
-  const blockedSlots =
-    selectedDate && selectedBoothId ? getBlockedSlots(selectedDate) : [];
 
   const handleAddToCart = () => {
     if (selectedDate && selectedTime && selectedBooth) {
@@ -140,77 +139,23 @@ const BookingForm = ({ booths, bookings }) => {
           </select>
         </div>
 
-        {/* Booth Selection */}
+        {/* Date Selection - Now First */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Select Booth *
+            Select Date *
           </label>
-          <div className="grid grid-cols-2 gap-4">
-            {booths.map((booth) => (
-              <button
-                key={booth._id}
-                onClick={() => {
-                  setSelectedBoothId(booth._id);
-                  setSelectedTime("");
-                  setSelectedDate(""); // Reset date when booth changes
-                }}
-                className={`p-4 border rounded-lg text-center transition-all duration-300 flex flex-col items-center justify-center ${
-                  selectedBoothId === booth._id
-                    ? "border-pink-500 bg-pink-500/20 text-pink-400"
-                    : "border-gray-700 hover:border-pink-500"
-                }`}
-              >
-                <Gamepad2 className="h-6 w-6 mb-2" />
-                <span className="font-medium">{booth.name}</span>
-              </button>
-            ))}
-          </div>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => {
+              setSelectedDate(e.target.value);
+              setSelectedTime("");
+              setSelectedBoothId("");
+            }}
+            min={new Date().toISOString().split("T")[0]}
+            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
+          />
         </div>
-
-        {/* Date Selection */}
-        {selectedBooth && (
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Select Date *
-            </label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => {
-                setSelectedDate(e.target.value);
-                setSelectedTime("");
-              }}
-              min={new Date().toISOString().split("T")[0]}
-              className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
-            />
-
-            {/* Available Days Information */}
-            <div className="mt-2 text-sm text-gray-400">
-              <span className="font-medium text-green-400">Available on: </span>
-              {selectedBooth.weekDays && selectedBooth.weekDays.length > 0 ? (
-                selectedBooth.weekDays.length === 7 ? (
-                  <span className="text-gray-300">All days</span>
-                ) : (
-                  <span className="text-gray-300">
-                    {selectedBooth.weekDays.join(", ")}
-                  </span>
-                )
-              ) : (
-                <span className="text-gray-300">All days</span>
-              )}
-            </div>
-
-            {selectedDate && !isDateAvailable(selectedDate) && (
-              <div className="text-red-400 text-sm mt-2">
-                This booth is not available on{" "}
-                {new Date(selectedDate).toLocaleDateString("en-US", {
-                  weekday: "long",
-                })}
-                . Please select another date.
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Duration Selection */}
         <div>
@@ -220,12 +165,7 @@ const BookingForm = ({ booths, bookings }) => {
           <select
             value={duration}
             onChange={(e) => setDuration(parseInt(e.target.value))}
-            disabled={selectedDate && !isDateAvailable(selectedDate)}
-            className={`w-full border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors ${
-              selectedDate && !isDateAvailable(selectedDate)
-                ? "bg-gray-700 opacity-50 cursor-not-allowed"
-                : "bg-gray-800"
-            }`}
+            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
           >
             {Array.from({ length: 4 }, (_, i) => i + 1).map((num) => (
               <option key={num} value={num}>
@@ -235,30 +175,83 @@ const BookingForm = ({ booths, bookings }) => {
           </select>
         </div>
 
-        {/* Time Selection */}
-        {selectedBooth && selectedDate && isDateAvailable(selectedDate) && (
+        {/* Booth and Time Selection - Show after date is selected */}
+        {selectedDate && (
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Select Start Time *
+              Select Booth and Time *
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {timeSlots.map((time) => (
-                <button
-                  key={time}
-                  onClick={() => setSelectedTime(time)}
-                  disabled={blockedSlots.includes(time)}
-                  className={`p-3 border rounded-lg text-center transition-all duration-300 ${
-                    blockedSlots.includes(time)
-                      ? "opacity-50 cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500"
-                      : selectedTime === time
-                      ? "border-pink-500 bg-pink-500/20 text-pink-400"
-                      : "border-gray-700 hover:border-green-500 hover:bg-green-500/20 hover:text-green-400"
-                  }`}
-                >
-                  <Clock className="h-4 w-4 mx-auto mb-1" />
-                  <span className="text-sm font-mono">{time}</span>
-                </button>
-              ))}
+            <div className="space-y-4">
+              {booths.map((booth) => {
+                const isAvailable = isDateAvailable(selectedDate, booth);
+                const blockedSlots = isAvailable
+                  ? getBlockedSlots(selectedDate, booth._id)
+                  : [];
+                const availableSlots = booth.timeSlots.filter(
+                  (slot) => !blockedSlots.includes(slot)
+                );
+
+                return (
+                  <div
+                    key={booth._id}
+                    className="border border-gray-700 rounded-lg p-4"
+                  >
+                    <div className="flex items-center mb-3">
+                      <Gamepad2 className="h-5 w-5 text-pink-500 mr-2" />
+                      <span className="font-medium text-white">
+                        {booth.name}
+                      </span>
+                      {!isAvailable && (
+                        <span className="ml-2 text-red-400 text-sm">
+                          (Not available on{" "}
+                          {new Date(selectedDate).toLocaleDateString("en-US", {
+                            weekday: "long",
+                          })}
+                          )
+                        </span>
+                      )}
+                    </div>
+
+                    {isAvailable && availableSlots.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {booth.timeSlots.map((time) => {
+                          const isBlocked = blockedSlots.includes(time);
+                          const isSelected =
+                            selectedBoothId === booth._id &&
+                            selectedTime === time;
+
+                          return (
+                            <button
+                              key={time}
+                              onClick={() => {
+                                if (!isBlocked) {
+                                  setSelectedBoothId(booth._id);
+                                  setSelectedTime(time);
+                                }
+                              }}
+                              disabled={isBlocked}
+                              className={`p-2 border rounded text-center transition-all duration-300 text-sm ${
+                                isBlocked
+                                  ? "opacity-50 cursor-not-allowed border-gray-700 bg-gray-800 text-gray-500"
+                                  : isSelected
+                                  ? "border-pink-500 bg-pink-500/20 text-pink-400"
+                                  : "border-gray-700 hover:border-green-500 hover:bg-green-500/20 hover:text-green-400"
+                              }`}
+                            >
+                              <Clock className="h-3 w-3 mx-auto mb-1" />
+                              <span className="text-xs font-mono">{time}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : isAvailable ? (
+                      <div className="text-gray-500 text-sm">
+                        No available times for this booth
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -315,12 +308,7 @@ const BookingForm = ({ booths, bookings }) => {
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          disabled={
-            !selectedBooth ||
-            !selectedDate ||
-            !selectedTime ||
-            (selectedDate && !isDateAvailable(selectedDate))
-          }
+          disabled={!selectedBooth || !selectedDate || !selectedTime}
           className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           🛒 ADD TO CART

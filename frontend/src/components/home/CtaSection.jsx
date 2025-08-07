@@ -13,19 +13,7 @@ const CtaSection = () => {
           Join us for an unforgettable night of gaming, drinks, and nostalgia.
           Book your Alice in Wonderland karaoke experience now!
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/karaoke-booking"
-            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink"
-          >
-            🎤 KARAOKE ROOM
-          </Link>
-          <Link
-            to="/n64-booth-booking"
-            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-cyan-600 text-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-green"
-          >
-            🎮 N64 BOOTH
-          </Link>
+        <div className="flex justify-center">
           <Link
             to="/gallery"
             className="inline-flex items-center px-8 py-4 border-2 border-pink-500 text-pink-500 font-bold rounded-lg text-lg transition-all duration-300 hover:bg-pink-500 hover:text-white hover:scale-105 neon-glow-pink"

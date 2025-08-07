@@ -59,7 +59,7 @@ const KaraokeBookingsAdmin = () => {
     const start = new Date(startDateTime);
     const end = new Date(start);
     end.setHours(end.getHours() + durationHours);
-    
+
     const startTime = start.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -70,7 +70,7 @@ const KaraokeBookingsAdmin = () => {
       minute: "2-digit",
       hour12: true,
     });
-    
+
     return `${startTime} - ${endTime}`;
   };
 
@@ -117,18 +117,18 @@ const KaraokeBookingsAdmin = () => {
 
   // A reusable component for action buttons
   const ActionButtons = ({ booking }) => (
-    <div className="flex items-center gap-4 mt-4 md:mt-0">
+    <div className="flex items-center gap-2 lg:gap-4 mt-4 lg:mt-0">
       {booking.status === "pending" && (
         <>
           <button
             onClick={() => updateBookingStatus(booking._id, "confirmed")}
-            className="text-sm font-medium text-green-600 hover:text-green-800"
+            className="text-xs lg:text-sm font-medium text-green-600 hover:text-green-800 px-2 py-1 rounded"
           >
             Confirm
           </button>
           <button
             onClick={() => updateBookingStatus(booking._id, "cancelled")}
-            className="text-sm font-medium text-red-600 hover:text-red-800"
+            className="text-xs lg:text-sm font-medium text-red-600 hover:text-red-800 px-2 py-1 rounded"
           >
             Cancel
           </button>
@@ -138,13 +138,13 @@ const KaraokeBookingsAdmin = () => {
         <>
           <button
             onClick={() => updateBookingStatus(booking._id, "completed")}
-            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+            className="text-xs lg:text-sm font-medium text-blue-600 hover:text-blue-800 px-2 py-1 rounded"
           >
             Complete
           </button>
           <button
             onClick={() => updateBookingStatus(booking._id, "cancelled")}
-            className="text-sm font-medium text-red-600 hover:text-red-800"
+            className="text-xs lg:text-sm font-medium text-red-600 hover:text-red-800 px-2 py-1 rounded"
           >
             Cancel
           </button>
@@ -164,7 +164,7 @@ const KaraokeBookingsAdmin = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Karaoke Bookings
           </h1>
@@ -199,8 +199,8 @@ const KaraokeBookingsAdmin = () => {
           </div>
         </div>
 
-        {/* Desktop Table View */}
-        <div className="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
+        {/* Desktop Table View (Large screens) */}
+        <div className="hidden xl:block bg-white shadow-md rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -248,7 +248,12 @@ const KaraokeBookingsAdmin = () => {
                         Room: {booking.roomId?.name || "Karaoke Room"}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {formatDate(booking.startDateTime)} ({formatTimeRange(booking.startDateTime, booking.durationHours)})
+                        {formatDate(booking.startDateTime)} (
+                        {formatTimeRange(
+                          booking.startDateTime,
+                          booking.durationHours
+                        )}
+                        )
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
                         Payment:{" "}
@@ -303,8 +308,110 @@ const KaraokeBookingsAdmin = () => {
           </div>
         </div>
 
+        {/* Tablet Compact Table View (iPad screens) */}
+        <div className="hidden lg:block xl:hidden bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Booking Info
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Payment
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {processedBookings.map((booking) => (
+                  <tr key={booking._id}>
+                    <td className="px-3 py-3">
+                      <div className="text-sm font-medium text-gray-900">
+                        {booking.customerName || "N/A"}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {booking.customerEmail || "N/A"}
+                      </div>
+                      {booking.customerPhone && (
+                        <div className="text-xs text-gray-500">
+                          {booking.customerPhone}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="text-sm text-gray-900">
+                        {booking.roomId?.name || "Karaoke Room"}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {formatDate(booking.startDateTime)}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {formatTimeRange(
+                          booking.startDateTime,
+                          booking.durationHours
+                        )}
+                      </div>
+                      <div className="text-sm font-medium text-green-600">
+                        $
+                        {booking.totalPrice
+                          ? booking.totalPrice.toFixed(2)
+                          : "0.00"}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="text-xs text-gray-500">
+                        {booking.paymentId ? (
+                          <span className="text-green-600 font-mono break-all">
+                            {booking.paymentId.substring(0, 12)}...
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">No payment ID</span>
+                        )}
+                      </div>
+                      <span
+                        className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
+                          booking.paymentStatus === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : booking.paymentStatus === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : booking.paymentStatus === "failed"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {booking.paymentStatus || "pending"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                          booking.status
+                        )}`}
+                      >
+                        {booking.status}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3">
+                      <ActionButtons booking={booking} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* Mobile Card View */}
-        <div className="md:hidden space-y-4">
+        <div className="lg:hidden space-y-4">
           {processedBookings.map((booking) => (
             <div
               key={booking._id}
@@ -344,9 +451,14 @@ const KaraokeBookingsAdmin = () => {
                     {formatDate(booking.startDateTime)}
                   </dd>
 
-                  <dt className="text-sm font-medium text-gray-500">Time Range</dt>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Time Range
+                  </dt>
                   <dd className="text-sm text-gray-900">
-                    {formatTimeRange(booking.startDateTime, booking.durationHours)}
+                    {formatTimeRange(
+                      booking.startDateTime,
+                      booking.durationHours
+                    )}
                   </dd>
 
                   <dt className="text-sm font-medium text-gray-500">
@@ -408,7 +520,7 @@ const KaraokeBookingsAdmin = () => {
         )}
 
         {/* Summary Stats */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="text-2xl font-bold text-blue-600">
               {bookings.filter((b) => b.status === "pending").length}

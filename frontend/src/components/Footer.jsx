@@ -1,5 +1,12 @@
 import React from "react";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  MapPin,
+  Phone,
+  Mail,
+  ExternalLink,
+} from "lucide-react";
 
 const Footer = () => {
   return (
@@ -22,22 +29,20 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <a
-                href="#"
+                href="https://www.facebook.com/8bitbarHB"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-400 hover:text-pink-400 transition-colors"
               >
                 <Facebook className="h-6 w-6" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/8bitbarhb/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-400 hover:text-pink-400 transition-colors"
               >
                 <Instagram className="h-6 w-6" />
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-pink-400 transition-colors"
-              >
-                <Twitter className="h-6 w-6" />
               </a>
             </div>
           </div>
@@ -88,14 +93,39 @@ const Footer = () => {
             <h3 className="font-['Orbitron'] text-lg font-bold text-cyan-400 mb-4">
               Contact
             </h3>
-            <div className="space-y-2 text-gray-400">
-              <p>
-                123 Gaming Street
-                <br />
-                Sydney, NSW 2000
-              </p>
-              <p>Phone: (02) 8888-8888</p>
-              <p>Email: play@8bitbar.com.au</p>
+            <div className="space-y-3 text-gray-400">
+              <a
+                href="https://maps.google.com/?q=-25.2846586,152.8551759"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start space-x-2 hover:text-white transition-colors group"
+              >
+                <MapPin className="h-4 w-4 text-pink-400 mt-1 flex-shrink-0 group-hover:text-pink-300" />
+                <div>
+                  <p className="text-white font-semibold">
+                    8-Bit Bar Australia
+                  </p>
+                  <p>Shop 1/352 Esplanade, Scarness</p>
+                  <p>QLD 4655, Australia</p>
+                </div>
+                <ExternalLink className="h-3 w-3 text-gray-500 group-hover:text-gray-300" />
+              </a>
+
+              <a
+                href="tel:+61493091188"
+                className="flex items-center space-x-2 hover:text-white transition-colors group"
+              >
+                <Phone className="h-4 w-4 text-green-400 group-hover:text-green-300" />
+                <span>+61 493 091 188</span>
+              </a>
+
+              <a
+                href="mailto:info@8bitbar.com.au"
+                className="flex items-center space-x-2 hover:text-white transition-colors group"
+              >
+                <Mail className="h-4 w-4 text-cyan-400 group-hover:text-cyan-300" />
+                <span>info@8bitbar.com.au</span>
+              </a>
             </div>
           </div>
         </div>

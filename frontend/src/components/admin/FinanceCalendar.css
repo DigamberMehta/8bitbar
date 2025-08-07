@@ -1,0 +1,69 @@
+/* FullCalendar Custom Styles */
+.fc {
+  color: #111827 !important;
+}
+
+.fc .fc-toolbar-title {
+  color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+.fc .fc-button {
+  color: #111827 !important;
+  background-color: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+}
+
+.fc .fc-button:hover {
+  background-color: #e5e7eb !important;
+}
+
+.fc .fc-button-primary {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.fc .fc-button-primary:hover {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+.fc .fc-daygrid-day-number {
+  color: #111827 !important;
+}
+
+.fc .fc-col-header-cell {
+  color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: #eff6ff !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+  color: #1d4ed8 !important;
+  font-weight: 700 !important;
+}
+
+.fc .fc-daygrid-day.fc-day-past {
+  color: #6b7280 !important;
+}
+
+.fc .fc-daygrid-day.fc-day-future {
+  color: #111827 !important;
+}
+
+.fc .fc-event {
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.fc .fc-event-title {
+  color: white !important;
+}
+
+.fc .fc-event-time {
+  color: white !important;
+}

@@ -53,6 +53,11 @@ body {
   font-family: "Orbitron", "Courier New", monospace;
 }
 
+/* Retro gaming font */
+.font-press-start {
+  font-family: "Press Start 2P", "Courier New", monospace;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

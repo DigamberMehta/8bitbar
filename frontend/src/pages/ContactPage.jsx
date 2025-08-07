@@ -80,19 +80,28 @@ const ContactPage = () => {
               </h3>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <MapPin className="h-6 w-6 text-pink-400 mt-1 flex-shrink-0" />
+                <a
+                  href="https://maps.google.com/?q=-25.2846586,152.8551759"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-800/50 transition-all duration-300 group"
+                >
+                  <MapPin className="h-6 w-6 text-pink-400 mt-1 flex-shrink-0 group-hover:text-pink-300" />
                   <div>
-                    <p className="text-white font-semibold">
+                    <p className="text-white font-semibold group-hover:text-pink-300 transition-colors">
                       8-Bit Bar Australia
                     </p>
-                    <p className="text-gray-300">
+                    <p className="text-gray-300 group-hover:text-gray-200 transition-colors">
                       Shop 1/352 Esplanade, Scarness
                     </p>
-                    <p className="text-gray-300">QLD 4655</p>
-                    <p className="text-gray-300">Australia</p>
+                    <p className="text-gray-300 group-hover:text-gray-200 transition-colors">
+                      QLD 4655
+                    </p>
+                    <p className="text-gray-300 group-hover:text-gray-200 transition-colors">
+                      Australia
+                    </p>
                   </div>
-                </div>
+                </a>
               </div>
             </div>
 
@@ -103,37 +112,42 @@ const ContactPage = () => {
               </h3>
 
               <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-5 w-5 text-green-400" />
+                <a
+                  href="tel:+61493091188"
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800/50 transition-all duration-300 group"
+                >
+                  <Phone className="h-5 w-5 text-green-400 group-hover:text-green-300" />
                   <div>
                     <p className="text-white font-semibold">Phone</p>
-                    <a
-                      href="tel:+61493091188"
-                      className="text-gray-300 hover:text-green-400 transition-colors"
-                    >
+                    <p className="text-gray-300 group-hover:text-green-300 transition-colors">
                       +61 493 091 188
-                    </a>
+                    </p>
                   </div>
-                </div>
+                </a>
 
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-5 w-5 text-cyan-400" />
+                <a
+                  href="mailto:info@8bitbar.com.au"
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800/50 transition-all duration-300 group"
+                >
+                  <Mail className="h-5 w-5 text-cyan-400 group-hover:text-cyan-300" />
                   <div>
                     <p className="text-white font-semibold">Email</p>
-                    <a
-                      href="mailto:info@8bitbar.com.au"
-                      className="text-gray-300 hover:text-cyan-400 transition-colors"
-                    >
+                    <p className="text-gray-300 group-hover:text-cyan-300 transition-colors">
                       info@8bitbar.com.au
-                    </a>
+                    </p>
                   </div>
-                </div>
+                </a>
 
                 {/* Website */}
-                <div className="flex items-center space-x-3">
+                <a
+                  href="https://8bitbar.com.au"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800/50 transition-all duration-300 group"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-purple-400"
+                    className="h-5 w-5 text-purple-400 group-hover:text-purple-300"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -148,16 +162,11 @@ const ContactPage = () => {
                   </svg>
                   <div>
                     <p className="text-white font-semibold">Website</p>
-                    <a
-                      href="https://8bitbar.com.au"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-300 hover:text-purple-400 transition-colors"
-                    >
+                    <p className="text-gray-300 group-hover:text-purple-300 transition-colors">
                       8bitbar.com.au
-                    </a>
+                    </p>
                   </div>
-                </div>
+                </a>
               </div>
             </div>
 
