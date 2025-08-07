@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { CreditCard, Globe, Calendar, Clock, Users, Home } from "lucide-react";
 import axios from "../utils/axios";
 import SquarePaymentForm from "../components/payments/SquarePaymentForm";
+import PaymentConfirmationModal from "../components/payments/PaymentConfirmationModal";
 
 const CheckoutPage = () => {
   const { user } = useAuth(); // Get user details from AuthContext
@@ -10,6 +11,11 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    status: "loading", // 'loading', 'success', 'error'
+    message: "",
+  });
   const [billingDetails, setBillingDetails] = useState({
     firstName: "",
     lastName: "",
@@ -105,6 +111,13 @@ const CheckoutPage = () => {
     setPaymentCompleted(true);
     setPaymentData(payment);
 
+    // Show loading modal immediately
+    setModalState({
+      isOpen: true,
+      status: "loading",
+      message: "Processing your payment and creating bookings...",
+    });
+
     setLoading(true);
     try {
       // Convert Square payment status to lowercase for database compatibility
@@ -170,15 +183,19 @@ const CheckoutPage = () => {
       localStorage.removeItem("cart");
       setCart([]);
 
-      alert(
-        "Payment successful! Your booking has been confirmed. Check your bookings in your account."
-      );
+      // Show success modal
+      setModalState({
+        isOpen: true,
+        status: "success",
+        message: "Your booking has been confirmed successfully!",
+      });
     } catch (error) {
       console.error("Booking creation failed after payment:", error);
-      alert(
-        "Payment was successful, but there was an issue creating your booking. Please contact support with payment ID: " +
-          payment.id
-      );
+      setModalState({
+        isOpen: true,
+        status: "error",
+        message: `Payment was successful, but there was an issue creating your booking. Please contact support with payment ID: ${payment.id}`,
+      });
     } finally {
       setLoading(false);
     }
@@ -186,7 +203,19 @@ const CheckoutPage = () => {
 
   const handlePaymentError = (error) => {
     console.error("Payment failed:", error);
-    alert("Payment failed: " + error);
+    setModalState({
+      isOpen: true,
+      status: "error",
+      message: `Payment failed: ${error}`,
+    });
+  };
+
+  const handleModalClose = () => {
+    setModalState({
+      isOpen: false,
+      status: "loading",
+      message: "",
+    });
   };
 
   const renderInputField = (
@@ -388,36 +417,26 @@ const CheckoutPage = () => {
                   </div>
                 </div>
 
-                {paymentCompleted ? (
-                  <div className="bg-green-800 border border-green-600 rounded-lg p-6">
-                    <div className="text-center">
-                      <div className="text-green-400 text-2xl mb-2">✓</div>
-                      <h3 className="text-white font-bold mb-2">
-                        Payment Successful!
-                      </h3>
-                      <p className="text-green-300 text-sm">
-                        Payment ID: {paymentData?.id}
-                      </p>
-                      <p className="text-green-300 text-sm">
-                        Amount: $
-                        {(paymentData?.amountMoney?.amount / 100).toFixed(2)}{" "}
-                        {paymentData?.amountMoney?.currency}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <SquarePaymentForm
-                    amount={estimatedTotal}
-                    onPaymentSuccess={handlePaymentSuccess}
-                    onPaymentError={handlePaymentError}
-                    disabled={loading || cart.length === 0}
-                  />
-                )}
+                <SquarePaymentForm
+                  amount={estimatedTotal}
+                  onPaymentSuccess={handlePaymentSuccess}
+                  onPaymentError={handlePaymentError}
+                  disabled={loading || cart.length === 0}
+                />
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Payment Confirmation Modal */}
+      <PaymentConfirmationModal
+        isOpen={modalState.isOpen}
+        onClose={handleModalClose}
+        status={modalState.status}
+        message={modalState.message}
+        paymentData={paymentData}
+      />
     </div>
   );
 };

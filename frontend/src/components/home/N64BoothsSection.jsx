@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const N64BoothsSection = () => {
   return (
-    <section className="py-20 bg-gray-900">
+    <section className="py-12 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -20,9 +20,7 @@ const N64BoothsSection = () => {
             <div className="space-y-4 mb-8">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span className="text-gray-300">
-                  Booth booked 1hr sessions
-                </span>
+                <span className="text-gray-300">Booth booked 1hr sessions</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
@@ -59,19 +57,31 @@ const N64BoothsSection = () => {
               src="https://8bitbar.com.au/wp-content/uploads/2025/03/20250419_212301-scaled.jpg"
               alt="N64 Gaming Booth"
               className="w-full h-48 object-cover rounded-lg"
-              onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1a202c/9f7aea?text=N64+Booth'; }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://placehold.co/600x400/1a202c/9f7aea?text=N64+Booth";
+              }}
             />
             <img
               src="https://8bitbar.com.au/wp-content/uploads/2025/05/20250419_225434-1153x2048.jpg"
               alt="N64 Booth Interior"
               className="w-full h-48 object-cover rounded-lg"
-              onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1a202c/9f7aea?text=N64+Interior'; }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://placehold.co/600x400/1a202c/9f7aea?text=N64+Interior";
+              }}
             />
             <img
               src="https://8bitbar.com.au/wp-content/uploads/2025/03/mario-kart.jpeg"
               alt="Mario Kart N64"
               className="w-full h-48 object-cover rounded-lg col-span-2"
-              onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/1a202c/9f7aea?text=Mario+Kart'; }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://placehold.co/600x400/1a202c/9f7aea?text=Mario+Kart";
+              }}
             />
           </div>
         </div>
