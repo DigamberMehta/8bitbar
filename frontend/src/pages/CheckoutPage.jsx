@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Globe, Calendar, Clock, Users, Home } from "lucide-react";
 import axios from "../utils/axios";
 import SquarePaymentForm from "../components/payments/SquarePaymentForm";
 
@@ -224,17 +224,25 @@ const CheckoutPage = () => {
         </h1>
 
         <div className="flex flex-col lg:flex-row gap-16">
-          {/* Left Column: Billing Details */}
+          {/* Left Column: Your Details */}
           <div className="lg:w-2/3 bg-black/60 border border-pink-500/30 rounded-lg p-8 shadow-lg">
             <h2 className="font-['Orbitron'] text-2xl font-bold text-white mb-6">
-              Billing Details
+              Your Details
             </h2>
             <form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {renderInputField("firstName", "First Name", "Alice", true)}
                 {renderInputField("lastName", "Last Name", "Wonderland", true)}
               </div>
-              {renderInputField("country", "Country/Region", "", true)}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Country/Region <span className="text-pink-500">*</span>
+                </label>
+                <div className="flex items-center bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white">
+                  <Globe className="h-5 w-5 text-pink-500 mr-3" />
+                  <span>Australia</span>
+                </div>
+              </div>
               {renderInputField(
                 "street",
                 "Street Address",
@@ -255,7 +263,13 @@ const CheckoutPage = () => {
                 )}
                 {renderInputField("postcode", "Postcode", "e.g., 4006", true)}
               </div>
-              {renderInputField("phone", "Phone", "Optional", false, "tel")}
+              {renderInputField(
+                "phone",
+                "Phone",
+                "Your phone number",
+                true,
+                "tel"
+              )}
               {renderInputField(
                 "email",
                 "Email Address",
@@ -282,6 +296,35 @@ const CheckoutPage = () => {
                       <span className="font-medium">
                         ${item.totalCost.toFixed(2)}
                       </span>
+                    </div>
+                    <div className="text-sm text-gray-400 mb-2">
+                      <div className="flex items-center mb-1">
+                        <Calendar className="h-4 w-4 text-pink-500 mr-2" />
+                        <span>Date: {item.date}</span>
+                      </div>
+                      <div className="flex items-center mb-1">
+                        <Clock className="h-4 w-4 text-pink-500 mr-2" />
+                        <span>
+                          Time: {item.time} -{" "}
+                          {calculateEndTime(
+                            item.time,
+                            item.duration,
+                            item.type === "cafe"
+                          )}
+                        </span>
+                      </div>
+                      {item.people && (
+                        <div className="flex items-center mb-1">
+                          <Users className="h-4 w-4 text-pink-500 mr-2" />
+                          <span>People: {item.people}</span>
+                        </div>
+                      )}
+                      {item.roomName && (
+                        <div className="flex items-center mb-1">
+                          <Home className="h-4 w-4 text-pink-500 mr-2" />
+                          <span>Room: {item.roomName}</span>
+                        </div>
+                      )}
                     </div>
                     <div className="text-sm text-red-300 px-3 py-2 bg-red-900/30 rounded-lg border border-red-500/50">
                       ⚠️ <strong>Actual time:</strong> {item.time} -{" "}
@@ -312,6 +355,39 @@ const CheckoutPage = () => {
                 <h3 className="font-['Orbitron'] text-xl font-bold text-white mb-4">
                   Payment Details
                 </h3>
+
+                {/* Payment Method Logos */}
+                <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
+                        <img
+                          src="https://www.svgrepo.com/show/449176/payment-square.svg"
+                          alt="Square Payment"
+                          className="w-6 h-6"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-6 bg-blue-600 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">VISA</span>
+                    </div>
+                    <div className="w-8 h-6 bg-red-600 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">MC</span>
+                    </div>
+                    <div className="w-8 h-6 bg-green-600 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">AMEX</span>
+                    </div>
+                    <div className="w-8 h-6 bg-gray-600 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">DISC</span>
+                    </div>
+                    <div className="w-8 h-6 bg-yellow-600 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">JCB</span>
+                    </div>
+                  </div>
+                </div>
+
                 {paymentCompleted ? (
                   <div className="bg-green-800 border border-green-600 rounded-lg p-6">
                     <div className="text-center">

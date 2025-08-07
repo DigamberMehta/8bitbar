@@ -12,6 +12,7 @@ import {
   MdLocalCafe,
   MdPeople,
   MdAdd,
+  MdAttachMoney,
 } from "react-icons/md";
 
 const AdminLayout = () => {
@@ -24,6 +25,13 @@ const AdminLayout = () => {
       path: "/admin/dashboard",
       label: "Dashboard",
       icon: <MdDashboard size={20} />,
+    },
+
+    // Finance Section
+    {
+      path: "/admin/finance",
+      label: "Finance",
+      icon: <MdAttachMoney size={20} />,
     },
 
     // Manual Booking
@@ -81,11 +89,11 @@ const AdminLayout = () => {
     },
   ];
 
-  // Overlay for mobile sidebar
+  // Overlay for screens < 1200px
   const SidebarOverlay = ({ open, onClose }) =>
     open ? (
       <div
-        className="fixed inset-0 z-30 bg-black bg-opacity-40 md:hidden"
+        className="fixed inset-0 z-30 bg-black bg-opacity-40 xl:hidden"
         onClick={onClose}
         aria-label="Close sidebar overlay"
       />
@@ -95,9 +103,9 @@ const AdminLayout = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex">
-        {/* Hamburger for mobile */}
+        {/* Hamburger for screens < 1200px */}
         <button
-          className="md:hidden fixed top-20 left-4 z-50 bg-gray-800 text-white p-2 rounded-lg shadow-lg focus:outline-none"
+          className="xl:hidden fixed top-20 left-4 z-50 bg-gray-800 text-white p-2 rounded-lg shadow-lg focus:outline-none"
           onClick={() => setSidebarOpen(true)}
           aria-label="Open sidebar"
           style={{ top: "72px" }} // visually a bit below header
@@ -111,19 +119,19 @@ const AdminLayout = () => {
         />
         {/* Overlay offset for header */}
         <style>{`
-          .fixed.inset-0.z-30.bg-black.bg-opacity-40.md\:hidden {
+          .fixed.inset-0.z-30.bg-black.bg-opacity-40.xl\:hidden {
             top: 64px !important;
           }
         `}</style>
         {/* Sidebar */}
         <div
-          className={`fixed left-0 z-40 md:static md:inset-auto md:z-auto transition-transform duration-300 ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-          } w-64 bg-gray-800 text-white min-h-screen md:relative md:block top-16 md:top-0`}
+          className={`fixed left-0 z-40 xl:static xl:inset-auto xl:z-auto transition-transform duration-300 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full xl:translate-x-0"
+          } w-64 bg-gray-800 text-white min-h-screen xl:relative xl:block top-16 xl:top-0`}
           style={{ minHeight: "100vh" }}
         >
-          {/* Close button for mobile */}
-          <div className="md:hidden flex justify-end p-2">
+          {/* Close button for screens < 1200px */}
+          <div className="xl:hidden flex justify-end p-2">
             <button
               className="text-white p-2 focus:outline-none"
               onClick={() => setSidebarOpen(false)}
@@ -132,7 +140,7 @@ const AdminLayout = () => {
               <MdClose size={28} />
             </button>
           </div>
-          <div className="p-4 pt-0 md:pt-4">
+          <div className="p-4 pt-0 xl:pt-4">
             <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
             <nav>
               <ul className="space-y-2">

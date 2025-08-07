@@ -7,6 +7,7 @@ import adminN64Routes from "./admin/n64.route.js";
 import adminCafeRoutes from "./admin/cafe.route.js";
 import adminUserRoutes from "./admin/user.route.js";
 import adminBookingRoutes from "./admin/booking.route.js";
+import adminFinanceRoutes from "./admin/finance.route.js";
 
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.use("/n64", adminN64Routes);
 router.use("/cafe", adminCafeRoutes);
 router.use("/users", adminUserRoutes);
 router.use("/bookings", adminBookingRoutes);
+router.use("/finance", adminFinanceRoutes);
 
 export default router;

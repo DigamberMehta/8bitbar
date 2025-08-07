@@ -24,7 +24,7 @@ const HeroSection = () => {
       </div>
 
       <div className="relative z-40 text-center max-w-4xl mx-auto px-4">
-        <h1 className="font-['Orbitron'] text-4xl md:text-7xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-green-400 to-cyan-400 neon-text-multicolor">
+        <h1 className="font-press-start text-3xl md:text-6xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-green-400 to-cyan-400 neon-text-multicolor">
           8-BIT BAR
         </h1>
         <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-2xl mx-auto leading-relaxed">
@@ -36,12 +36,18 @@ const HeroSection = () => {
         <p className="text-sm text-yellow-400 mb-8">
           Under 18's welcome Fri & Sat till 6pm and all day Sunday
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             to="/karaoke-booking"
-            className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-lg text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink"
+            className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-lg text-base transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink"
           >
             🎤 BOOK KARAOKE
+          </Link>
+          <Link
+            to="/n64-booth-booking"
+            className="px-6 py-3 bg-gradient-to-r from-green-500 to-cyan-600 text-white font-bold rounded-lg text-base transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-green"
+          >
+            🎮 BOOK N64 BOOTH
           </Link>
         </div>
       </div>
