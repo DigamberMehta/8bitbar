@@ -32,6 +32,7 @@ import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmi
 import KaraokeRoomCreateAdmin from "./pages/admin/karaokeadmin/KaraokeRoomCreateAdmin";
 import ManualBooking from "./pages/admin/manualbooking";
 import FinancePage from "./pages/admin/FinancePage";
+import AllBookings from "./pages/admin/AllBookings";
 
 import BarMapEditor from "./components/cafe/BarMapEditor";
 
@@ -80,6 +81,7 @@ function App() {
                 <Route index element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="finance" element={<FinancePage />} />
+                <Route path="all-bookings" element={<AllBookings />} />
                 <Route path="manual-booking" element={<ManualBooking />} />
                 <Route
                   path="karaoke-bookings"
