@@ -2,10 +2,10 @@ import React from "react";
 
 const AboutSection = () => {
   return (
-    <section className="py-12 bg-black">
+    <section className="bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="font-['Orbitron'] text-3xl md:text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
+          <h2 className="font-['Orbitron'] text-3xl md:text-4xl font-bold mb-6 pt-8 pb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-cyan-400">
             Welcome to 8 Bit Bar – Your Retro Playground!
           </h2>
           <div className="max-w-4xl mx-auto space-y-6 text-gray-300 text-lg leading-relaxed">
@@ -25,7 +25,7 @@ const AboutSection = () => {
               your go-to spot for good vibes, games, and great food.
             </p>
             <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">
-              Eat, Drink, Play – Only at 8 Bit Bar.
+              eat, drink, play and repeat
             </p>
           </div>
         </div>
