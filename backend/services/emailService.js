@@ -60,7 +60,7 @@ export const sendBookingConfirmation = async (
     }
 
     const mailOptions = {
-      from: '"8BitBar Gaming Lounge" <orders@8bitbar.com.au>',
+      from: '"8-Bit Bar" <orders@8bitbar.com.au>',
       to: booking.customerEmail,
       subject: emailTemplate.subject,
       html: emailTemplate.html,
