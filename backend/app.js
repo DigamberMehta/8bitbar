@@ -29,7 +29,7 @@ const getConfig = () => {
           "https://8bitbar.vercel.app",
           "https://8bitbar-gilt.vercel.app",
         ]
-      : ["http://localhost:5173", "http://192.168.31.163:5173"],
+      : ["http://localhost:5173", "http://192.168.31.163:5173", "https://test.8bitbar.com.au"],
     port: process.env.PORT || 3000,
   };
 };
