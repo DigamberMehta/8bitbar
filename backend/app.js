@@ -24,7 +24,7 @@ const getConfig = () => {
     corsOrigins: isProduction
       ? [
           "https://8bitbar.com.au",
-          "https://tst.8bitbar.com.au",
+          "https://test.8bitbar.com.au",
           "https://www.8bitbar.com.au",
           "https://8bitbar.vercel.app",
           "https://8bitbar-gilt.vercel.app",
