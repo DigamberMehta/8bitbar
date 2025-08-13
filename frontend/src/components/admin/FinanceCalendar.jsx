@@ -5,7 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import "./FinanceCalendar.css";
 
-const FinanceCalendar = ({ events, onEventClick }) => {
+const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
   const getEventColor = (serviceType) => {
     switch (serviceType) {
       case "karaoke":
@@ -45,6 +45,28 @@ const FinanceCalendar = ({ events, onEventClick }) => {
     }
   };
 
+  const handleDatesSet = (dateInfo) => {
+    console.log("Calendar dates changed:", dateInfo);
+    if (onMonthChange && dateInfo.view.type === "dayGridMonth") {
+      // Get the first and last day of the month being displayed
+      const startDate = new Date(dateInfo.start);
+      const endDate = new Date(dateInfo.end);
+
+      // Adjust end date to be the last day of the month (not first day of next month)
+      endDate.setDate(endDate.getDate() - 1);
+
+      const monthInfo = {
+        startDate: startDate.toISOString().split("T")[0],
+        endDate: endDate.toISOString().split("T")[0],
+        month: startDate.getMonth(),
+        year: startDate.getFullYear(),
+      };
+
+      console.log("Month changed to:", monthInfo);
+      onMonthChange(monthInfo);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4">
       <div className="mb-4">
@@ -69,11 +91,6 @@ const FinanceCalendar = ({ events, onEventClick }) => {
       <div className="h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px]">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
-          }}
           initialView="dayGridMonth"
           editable={false}
           selectable={true}
@@ -102,6 +119,7 @@ const FinanceCalendar = ({ events, onEventClick }) => {
             center: "title",
             right: "dayGridMonth,timeGridWeek",
           }}
+          datesSet={handleDatesSet}
         />
       </div>
     </div>
