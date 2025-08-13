@@ -38,6 +38,7 @@ const ManualBooking = () => {
       numberOfPeople: 1,
       startDateTime: "",
       durationHours: 1,
+      status: "pending", // Add status field
     },
     n64: {
       roomId: "",
@@ -45,6 +46,7 @@ const ManualBooking = () => {
       numberOfPeople: 1,
       startDateTime: "",
       durationHours: 1,
+      status: "pending", // Add status field
     },
     cafe: {
       chairIds: [],
@@ -52,6 +54,7 @@ const ManualBooking = () => {
       time: "",
       duration: 1,
       specialRequests: "",
+      status: "pending", // Add status field
     },
   });
   const [result, setResult] = useState(null);
@@ -295,6 +298,7 @@ const ManualBooking = () => {
                 numberOfPeople: 1,
                 startDateTime: "",
                 durationHours: 1,
+                status: "pending",
               }
             : activeService === "n64"
             ? {
@@ -303,6 +307,7 @@ const ManualBooking = () => {
                 numberOfPeople: 1,
                 startDateTime: "",
                 durationHours: 1,
+                status: "pending",
               }
             : {
                 chairIds: [],
@@ -310,6 +315,7 @@ const ManualBooking = () => {
                 time: "",
                 duration: 1,
                 specialRequests: "",
+                status: "pending",
               },
       }));
     } catch (error) {
@@ -335,7 +341,9 @@ const ManualBooking = () => {
 
   return (
     <div className="p-2 sm:p-4 md:p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">Manual Booking</h1>
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">
+        Manual Booking
+      </h1>
 
       {/* Service Selection */}
       <div className="mb-4 sm:mb-6 md:mb-8">
@@ -367,7 +375,47 @@ const ManualBooking = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 md:space-y-8">
+      {/* Status Selection */}
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">
+          Payment Status
+        </h2>
+        <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="radio"
+              name="status"
+              value="pending"
+              checked={bookingData[activeService].status === "pending"}
+              onChange={(e) =>
+                handleBookingDataChange(activeService, "status", e.target.value)
+              }
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
+            />
+            <span className="text-sm sm:text-base text-gray-700">Pending</span>
+          </label>
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="radio"
+              name="status"
+              value="confirmed"
+              checked={bookingData[activeService].status === "confirmed"}
+              onChange={(e) =>
+                handleBookingDataChange(activeService, "status", e.target.value)
+              }
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
+            />
+            <span className="text-sm sm:text-base text-gray-700">
+              Confirmed
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 sm:space-y-6 md:space-y-8"
+      >
         {/* Customer Information */}
         <CustomerInfoForm
           formData={formData}
@@ -419,7 +467,10 @@ const ManualBooking = () => {
           <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base md:text-lg font-semibold text-gray-700">
-                <MdAttachMoney size={16} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                <MdAttachMoney
+                  size={16}
+                  className="sm:w-5 sm:h-5 md:w-6 md:h-6"
+                />
                 <span>Total Price:</span>
               </span>
               <span className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
@@ -467,7 +518,9 @@ const ManualBooking = () => {
 
           {result.success && result.userInfo?.isNewUser && (
             <div className="mt-3 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <p className="text-yellow-800 text-xs sm:text-sm font-medium">New User Created!</p>
+              <p className="text-yellow-800 text-xs sm:text-sm font-medium">
+                New User Created!
+              </p>
               <p className="text-yellow-700 text-xs sm:text-sm">
                 Temporary Password:{" "}
                 <code className="bg-yellow-100 px-1 rounded text-xs">

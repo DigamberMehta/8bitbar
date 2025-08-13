@@ -59,7 +59,7 @@ router.post("/karaoke", async (req, res) => {
       startDateTime,
       durationHours,
       paymentStatus = "completed", // Admin bookings are typically paid
-      status = "confirmed",
+      status,
     } = req.body;
 
     // Validate required fields
@@ -69,11 +69,20 @@ router.post("/karaoke", async (req, res) => {
       !roomId ||
       !numberOfPeople ||
       !startDateTime ||
-      !durationHours
+      !durationHours ||
+      !status
     ) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
+      });
+    }
+
+    // Validate status
+    if (!["pending", "confirmed"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Must be 'pending' or 'confirmed'",
       });
     }
 
@@ -173,7 +182,7 @@ router.post("/n64", async (req, res) => {
       startDateTime,
       durationHours,
       paymentStatus = "completed",
-      status = "confirmed",
+      status,
     } = req.body;
 
     // Validate required fields
@@ -184,11 +193,20 @@ router.post("/n64", async (req, res) => {
       !roomType ||
       !numberOfPeople ||
       !startDateTime ||
-      !durationHours
+      !durationHours ||
+      !status
     ) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
+      });
+    }
+
+    // Validate status
+    if (!["pending", "confirmed"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Must be 'pending' or 'confirmed'",
       });
     }
 
@@ -290,7 +308,7 @@ router.post("/cafe", async (req, res) => {
       specialRequests,
       deviceType = "desktop",
       paymentStatus = "completed",
-      status = "confirmed",
+      status,
     } = req.body;
 
     // Validate required fields
@@ -302,11 +320,20 @@ router.post("/cafe", async (req, res) => {
       chairIds.length === 0 ||
       !date ||
       !time ||
-      !duration
+      !duration ||
+      !status
     ) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
+      });
+    }
+
+    // Validate status
+    if (!["pending", "confirmed"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Must be 'pending' or 'confirmed'",
       });
     }
 

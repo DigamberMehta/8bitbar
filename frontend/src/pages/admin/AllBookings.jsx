@@ -22,11 +22,15 @@ const AllBookings = () => {
     startDate: "",
     endDate: "",
   });
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-      .toISOString()
-      .split("T")[0],
-    endDate: new Date().toISOString().split("T")[0],
+  const [dateRange, setDateRange] = useState(() => {
+    const now = new Date();
+    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of current month
+
+    return {
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
+    };
   });
 
   useEffect(() => {
@@ -34,6 +38,7 @@ const AllBookings = () => {
   }, [filters, dateRange.startDate, dateRange.endDate]);
 
   const fetchData = async () => {
+    console.log("Fetching data with date range:", dateRange);
     setLoading(true);
     try {
       // Fetch all bookings
@@ -53,6 +58,9 @@ const AllBookings = () => {
         },
       });
 
+      console.log("Bookings response:", bookingsResponse.data);
+      console.log("Calendar response:", calendarResponse.data);
+
       setBookings(bookingsResponse.data.bookings || []);
       setCalendarData(calendarResponse.data.calendarData || []);
     } catch (error) {
@@ -69,6 +77,15 @@ const AllBookings = () => {
 
   const handleDateRangeChange = (key, value) => {
     setDateRange((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleMonthChange = (monthInfo) => {
+    console.log("Month change detected in AllBookings:", monthInfo);
+    // Update the date range to cover the entire month being displayed
+    setDateRange({
+      startDate: monthInfo.startDate,
+      endDate: monthInfo.endDate,
+    });
   };
 
   const getServiceIcon = (serviceType) => {
@@ -192,15 +209,25 @@ const AllBookings = () => {
 
         {/* Calendar View */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <MdCalendarToday className="text-blue-500" />
-            <h2 className="text-xl font-semibold text-gray-900">
-              Booking Calendar
-            </h2>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <MdCalendarToday className="text-blue-500" />
+              <h2 className="text-xl font-semibold text-gray-900">
+                Booking Calendar
+              </h2>
+            </div>
+            <div className="text-sm text-gray-600">
+              Showing:{" "}
+              {new Date(dateRange.startDate).toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              })}
+            </div>
           </div>
           <FinanceCalendar
             events={calendarData}
             onEventClick={handleEventClick}
+            onMonthChange={handleMonthChange}
           />
         </div>
 
