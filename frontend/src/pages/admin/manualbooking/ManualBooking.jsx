@@ -392,7 +392,7 @@ const ManualBooking = () => {
               }
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
-            <span className="text-sm sm:text-base text-gray-700">Pending</span>
+            <span className="text-sm sm:text-base text-gray-700">Not Paid</span>
           </label>
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
@@ -405,9 +405,7 @@ const ManualBooking = () => {
               }
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
-            <span className="text-sm sm:text-base text-gray-700">
-              Confirmed
-            </span>
+            <span className="text-sm sm:text-base text-gray-700">Paid</span>
           </label>
         </div>
       </div>
