@@ -3,23 +3,12 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import { generateToken } from "../utils/generateToken.js";
 import authenticateUser from "../middlewares/authenticateUser.js";
-import rateLimit from "express-rate-limit";
 
 const router = express.Router();
 
-// Rate limiter for auth routes
-const authLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5, // limit each IP to 5 requests per windowMs
-  message: {
-    success: false,
-    message: "Too many requests, please try again later.",
-  },
-});
-
 // --- Registration Route ---
 // Logic from the 'register' controller is now directly inside the route handler.
-router.post("/register", authLimiter, async (req, res) => {
+router.post("/register", async (req, res) => {
   const { name, email, password, dob } = req.body;
   try {
     // 1. Validate input
@@ -66,7 +55,7 @@ router.post("/register", authLimiter, async (req, res) => {
 
 // --- Login Route ---
 // Logic from the 'login' controller is now directly inside the route handler.
-router.post("/login", authLimiter, async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     // 1. Validate input
@@ -111,7 +100,7 @@ router.post("/login", authLimiter, async (req, res) => {
 // --- Logout Route ---
 router.post("/logout", (req, res) => {
   const isProduction = process.env.SQUARE_ENVIRONMENT === "production";
-  
+
   res.clearCookie("token", {
     httpOnly: true,
     sameSite: isProduction ? "none" : "strict",
