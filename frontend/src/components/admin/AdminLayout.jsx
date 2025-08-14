@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Music,
-  Gamepad2,
-  Building2,
-  Trophy,
-  Menu,
-  X,
-  UtensilsCrossed,
-  Coffee,
-  Users,
-  Plus,
-  DollarSign,
-  Calendar,
-  Lock,
-} from "lucide-react";
+  MdDashboard,
+  MdMusicNote,
+  MdVideogameAsset,
+  MdMeetingRoom,
+  MdSportsEsports,
+  MdMenu,
+  MdClose,
+  MdRestaurant,
+  MdLocalCafe,
+  MdPeople,
+  MdAdd,
+  MdAttachMoney,
+  MdEvent,
+  MdLock,
+} from "react-icons/md";
 import { useAuth } from "../../contexts/AuthContext";
 
 const AdminLayout = () => {
@@ -40,7 +40,7 @@ const AdminLayout = () => {
     {
       path: "/admin/dashboard",
       label: "Dashboard",
-      icon: <LayoutDashboard size={22} />,
+      icon: <MdDashboard size={20} />,
       roles: ["superadmin"],
     },
 
@@ -48,7 +48,7 @@ const AdminLayout = () => {
     {
       path: "/admin/finance",
       label: "Finance",
-      icon: <DollarSign size={22} />,
+      icon: <MdAttachMoney size={20} />,
       roles: ["superadmin"],
     },
 
@@ -56,7 +56,7 @@ const AdminLayout = () => {
     {
       path: "/admin/all-bookings",
       label: "All Bookings",
-      icon: <Calendar size={22} />,
+      icon: <MdEvent size={20} />,
       roles: ["admin", "superadmin"],
     },
 
@@ -64,7 +64,7 @@ const AdminLayout = () => {
     {
       path: "/admin/manual-booking",
       label: "Manual Booking",
-      icon: <Plus size={22} />,
+      icon: <MdAdd size={20} />,
       roles: ["admin", "superadmin"],
     },
 
@@ -72,13 +72,13 @@ const AdminLayout = () => {
     {
       path: "/admin/karaoke-bookings",
       label: "Karaoke Bookings",
-      icon: <Music size={22} />,
+      icon: <MdMusicNote size={20} />,
       roles: ["admin", "superadmin"],
     },
     {
       path: "/admin/karaoke/karaoke-rooms",
       label: "Karaoke Rooms",
-      icon: <Building2 size={22} />,
+      icon: <MdMeetingRoom size={20} />,
       roles: ["superadmin"],
     },
 
@@ -86,13 +86,13 @@ const AdminLayout = () => {
     {
       path: "/admin/n64-bookings",
       label: "N64 Bookings",
-      icon: <Gamepad2 size={22} />,
+      icon: <MdVideogameAsset size={20} />,
       roles: ["admin", "superadmin"],
     },
     {
       path: "/admin/n64-rooms",
       label: "N64 Rooms",
-      icon: <Trophy size={22} />,
+      icon: <MdSportsEsports size={20} />,
       roles: ["superadmin"],
     },
 
@@ -100,19 +100,19 @@ const AdminLayout = () => {
     {
       path: "/admin/cafe-bookings",
       label: "Cafe Bookings",
-      icon: <Coffee size={22} />,
+      icon: <MdLocalCafe size={20} />,
       roles: ["admin", "superadmin"],
     },
     {
       path: "/admin/cafe-layout",
       label: "Cafe Layout",
-      icon: <UtensilsCrossed size={22} />,
+      icon: <MdRestaurant size={20} />,
       roles: ["superadmin"],
     },
     {
       path: "/admin/cafe-settings",
       label: "Cafe Settings",
-      icon: <Coffee size={22} />,
+      icon: <MdLocalCafe size={20} />,
       roles: ["superadmin"],
     },
 
@@ -120,7 +120,7 @@ const AdminLayout = () => {
     {
       path: "/admin/users",
       label: "Users",
-      icon: <Users size={22} />,
+      icon: <MdPeople size={20} />,
       roles: ["superadmin"],
     },
 
@@ -128,7 +128,7 @@ const AdminLayout = () => {
     {
       path: "/admin/pin-management",
       label: "PIN Management",
-      icon: <Lock size={22} />,
+      icon: <MdLock size={20} />,
       roles: ["superadmin"],
     },
   ];
@@ -161,18 +161,12 @@ const AdminLayout = () => {
       <div className="flex">
         {/* Hamburger for screens < 1200px */}
         <button
-          className="xl:hidden fixed top-20 left-4 z-50 bg-gray-800 text-white p-1 rounded-lg shadow-lg focus:outline-none"
+          className="xl:hidden fixed top-20 left-4 z-50 bg-gray-800 text-white p-2 rounded-lg shadow-lg focus:outline-none"
           onClick={() => setSidebarOpen(true)}
           aria-label="Open sidebar"
           style={{ top: "72px" }} // visually a bit below header
         >
-          {/* Larger icon on mobile, smaller on iPad/Desktop */}
-          <span className="block md:hidden">
-            <Menu size={28} />
-          </span>
-          <span className="hidden md:block">
-            <Menu size={22} />
-          </span>
+          <MdMenu size={28} />
         </button>
         {/* Sidebar overlay for mobile */}
         <SidebarOverlay
@@ -195,12 +189,10 @@ const AdminLayout = () => {
           style={{ minHeight: "100vh" }}
         >
           {/* Header with collapse toggle and close button */}
-          <div className="flex items-center justify-between p-4 md:p-3 border-b border-gray-700">
+          <div className="flex items-center justify-between p-4 border-b border-gray-700">
             {/* Title - hidden when collapsed */}
             {!sidebarCollapsed && (
-              <h2 className="text-xl md:text-lg font-bold text-white">
-                Admin Panel
-              </h2>
+              <h2 className="text-xl font-bold text-white">Admin Panel</h2>
             )}
 
             {/* Collapse toggle button - only visible on xl+ screens */}
@@ -211,7 +203,7 @@ const AdminLayout = () => {
                 sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
               }
             >
-              {sidebarCollapsed ? <Menu size={20} /> : <X size={20} />}
+              {sidebarCollapsed ? <MdMenu size={20} /> : <MdClose size={20} />}
             </button>
 
             {/* Close button for mobile */}
@@ -220,22 +212,20 @@ const AdminLayout = () => {
               onClick={() => setSidebarOpen(false)}
               aria-label="Close sidebar"
             >
-              <X size={20} />
+              <MdClose size={20} />
             </button>
           </div>
 
-          <div className="p-4 md:p-3 pt-3">
+          <div className="p-4 pt-2">
             <nav>
-              <ul className="space-y-2 md:space-y-2">
+              <ul className="space-y-2">
                 {navItems.map((item) => (
                   <li key={item.path} className="relative">
                     <Link
                       to={item.path}
                       className={`group flex items-center ${
-                        sidebarCollapsed
-                          ? "justify-center"
-                          : "space-x-3 md:space-x-3"
-                      } p-3 md:p-3 rounded-lg transition-colors ${
+                        sidebarCollapsed ? "justify-center" : "space-x-3"
+                      } p-3 rounded-lg transition-colors ${
                         location.pathname === item.path
                           ? "bg-blue-600 text-white"
                           : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -250,9 +240,7 @@ const AdminLayout = () => {
                       )}
                       <span className="text-gray-400">{item.icon}</span>
                       {!sidebarCollapsed && (
-                        <span className="text-base md:text-sm font-medium">
-                          {item.label}
-                        </span>
+                        <span className="text-sm">{item.label}</span>
                       )}
                     </Link>
                   </li>

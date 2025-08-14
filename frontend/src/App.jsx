@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
 // Import Layout Components
 import Header from "./components/Header";
@@ -28,6 +33,7 @@ import CafeSettingsAdmin from "./pages/admin/cafeadmin/CafeSettingsAdmin";
 import UserManagement from "./pages/admin/UserManagement";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedClientRoute from "./components/ProtectedClientRoute";
 import N64RoomEditAdmin from "./pages/admin/n64admin/N64RoomEditAdmin";
 import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmin";
 import KaraokeRoomCreateAdmin from "./pages/admin/karaokeadmin/KaraokeRoomCreateAdmin";
@@ -35,6 +41,13 @@ import ManualBooking from "./pages/admin/manualbooking";
 import FinancePage from "./pages/admin/FinancePage";
 import AllBookings from "./pages/admin/AllBookings";
 import PinManagement from "./pages/admin/PinManagement";
+import StaffLoginPage from "./pages/staff/StaffLoginPage";
+import StaffDashboard from "./pages/staff/StaffDashboard";
+
+// Import Client Components
+import ClientLayout from "./components/ClientLayout";
+import ClientLogin from "./pages/client/ClientLogin";
+import ClientDashboard from "./pages/client/ClientDashboard";
 
 import BarMapEditor from "./components/cafe/BarMapEditor";
 
@@ -52,24 +65,126 @@ function App() {
           {/* ScrollToTop ensures navigation to a new page starts at the top. */}
           <ScrollToTop />
 
-          {/* Header is outside Routes to be persistent across all pages. */}
-          <Header />
-
           {/* The main content area where page components will be rendered. */}
           <main className="flex-grow">
             <Routes>
               {/* Define all the application routes here */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/karaoke-booking" element={<KaraokeBookingPage />} />
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Header />
+                    <HomePage />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/karaoke-booking"
+                element={
+                  <>
+                    <Header />
+                    <KaraokeBookingPage />
+                    <Footer />
+                  </>
+                }
+              />
               <Route
                 path="/n64-booth-booking"
-                element={<N64BoothBookingPage />}
+                element={
+                  <>
+                    <Header />
+                    <N64BoothBookingPage />
+                    <Footer />
+                  </>
+                }
               />
-              <Route path="/cafe-booking" element={<CafeBookingPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/bar-map-editor" element={<BarMapEditor />} />
+              <Route
+                path="/cafe-booking"
+                element={
+                  <>
+                    <Header />
+                    <CafeBookingPage />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/contact"
+                element={
+                  <>
+                    <Header />
+                    <ContactPage />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/cart"
+                element={
+                  <>
+                    <Header />
+                    <Cart />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/checkout"
+                element={
+                  <>
+                    <Header />
+                    <CheckoutPage />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/bar-map-editor"
+                element={
+                  <>
+                    <Header />
+                    <BarMapEditor />
+                    <Footer />
+                  </>
+                }
+              />
+
+              {/* Staff Routes */}
+              <Route
+                path="/staff-login"
+                element={
+                  <>
+                    <Header />
+                    <StaffLoginPage />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/staff"
+                element={
+                  <>
+                    <Header />
+                    <StaffDashboard />
+                    <Footer />
+                  </>
+                }
+              />
+
+              {/* Staff Routes - No Header/Footer */}
+              <Route path="/staff" element={<ClientLayout />}>
+                <Route index element={<Navigate to="/staff/login" replace />} />
+                <Route path="login" element={<ClientLogin />} />
+                <Route
+                  path="dashboard"
+                  element={
+                    <ProtectedClientRoute>
+                      <ClientDashboard />
+                    </ProtectedClientRoute>
+                  }
+                />
+              </Route>
 
               {/* Admin Routes */}
               <Route
@@ -174,9 +289,6 @@ function App() {
               </Route>
             </Routes>
           </main>
-
-          {/* Footer is also outside Routes for persistence. */}
-          <Footer />
         </div>
       </ModalProvider>
     </Router>

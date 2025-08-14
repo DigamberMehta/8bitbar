@@ -27,9 +27,17 @@ api.interceptors.request.use(
   (config) => {
     // Cookies are automatically sent with requests, but add Authorization header as fallback
     // This helps with mobile browsers and incognito mode that may have cookie issues
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+
+    // Check for client token first (for client pages)
+    const clientToken = localStorage.getItem("clientToken");
+    if (clientToken) {
+      config.headers.Authorization = `Bearer ${clientToken}`;
+    } else {
+      // Fallback to admin token
+      const token = localStorage.getItem("token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -47,11 +55,18 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle unauthorized access - clear stored auth data
       console.error("Unauthorized access");
+
+      // Clear both admin and client auth data
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-      // Redirect to home page if not already there
+      localStorage.removeItem("clientUser");
+      localStorage.removeItem("clientToken");
+
+      // Redirect based on current path
       if (window.location.pathname.startsWith("/admin")) {
         window.location.href = "/";
+      } else if (window.location.pathname.startsWith("/staff")) {
+        window.location.href = "/staff/login";
       }
     }
     return Promise.reject(error);

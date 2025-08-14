@@ -39,15 +39,14 @@ const ManualBooking = () => {
       numberOfPeople: 1,
       startDateTime: "",
       durationHours: 1,
-      status: "pending", // Add status field
+      status: "pending",
     },
     n64: {
       roomId: "",
-      roomType: "mickey",
       numberOfPeople: 1,
       startDateTime: "",
       durationHours: 1,
-      status: "pending", // Add status field
+      status: "pending",
     },
     cafe: {
       chairIds: [],
@@ -55,7 +54,7 @@ const ManualBooking = () => {
       time: "",
       duration: 1,
       specialRequests: "",
-      status: "pending", // Add status field
+      status: "pending",
     },
   });
   const [result, setResult] = useState(null);
@@ -64,16 +63,6 @@ const ManualBooking = () => {
   const [showPinModal, setShowPinModal] = useState(false);
   const [staffInfo, setStaffInfo] = useState(null);
   const [bookingInProgress, setBookingInProgress] = useState(false);
-
-  // Debug staff info changes
-  useEffect(() => {
-    console.log("🔄 staffInfo state changed:", staffInfo);
-  }, [staffInfo]);
-
-  // Debug activeService changes
-  useEffect(() => {
-    console.log("🔄 activeService changed:", activeService);
-  }, [activeService]);
 
   useEffect(() => {
     fetchResources();
@@ -126,12 +115,19 @@ const ManualBooking = () => {
 
     try {
       setLoadingRoomAvailability(true);
+      console.log(
+        `Fetching ${service} availability for date: ${date}, roomId: ${roomId}`
+      );
+
       const response = await api.get(
         `/admin/bookings/${service}/availability`,
         {
           params: { date, roomId },
         }
       );
+
+      console.log(`${service} availability response:`, response.data);
+
       setRoomAvailability((prev) => ({
         ...prev,
         [service]: {
@@ -142,6 +138,7 @@ const ManualBooking = () => {
       }));
     } catch (error) {
       console.error(`Error fetching ${service} availability:`, error);
+      console.error(`Error details:`, error.response?.data || error.message);
       setRoomAvailability((prev) => ({
         ...prev,
         [service]: { room: null, bookings: [], timeSlots: [] },
@@ -273,15 +270,8 @@ const ManualBooking = () => {
     }
   };
 
-  // Function to create booking (extracted from handleSubmit)
+  // Function to create booking
   const createBooking = async (staffInfo) => {
-    console.log("🔍 createBooking called");
-    console.log("📋 Form Data:", formData);
-    console.log("📅 Booking Data:", bookingData[activeService]);
-    console.log("👤 Staff:", staffInfo?.staffName || "None");
-    console.log("🎯 Active Service:", activeService);
-
-    // Set loading state
     setLoading(true);
     setResult(null);
 
@@ -304,8 +294,6 @@ const ManualBooking = () => {
       }),
     };
 
-    console.log("🔍 Required fields check:", requiredFields);
-
     // Check for missing required fields
     const missingFields = Object.entries(requiredFields).filter(
       ([key, value]) => {
@@ -317,7 +305,6 @@ const ManualBooking = () => {
     );
 
     if (missingFields.length > 0) {
-      console.log("❌ Missing required fields:", missingFields);
       setResult({
         success: false,
         message: `Missing required fields: ${missingFields
@@ -327,24 +314,17 @@ const ManualBooking = () => {
       return;
     }
 
-    console.log("✅ All required fields are filled");
-
     try {
       const payload = {
         ...formData,
         ...bookingData[activeService],
-        staffPin: staffInfo.pin, // Include staff PIN
+        staffPin: staffInfo.pin,
       };
-
-      console.log("📤 Sending payload:", payload);
-      console.log("🌐 API endpoint:", `/admin/bookings/${activeService}`);
 
       const response = await api.post(
         `/admin/bookings/${activeService}`,
         payload
       );
-
-      console.log("✅ API response:", response.data);
 
       setResult({
         success: true,
@@ -376,7 +356,6 @@ const ManualBooking = () => {
             : activeService === "n64"
             ? {
                 roomId: "",
-                roomType: "mickey",
                 numberOfPeople: 1,
                 startDateTime: "",
                 durationHours: 1,
@@ -408,49 +387,29 @@ const ManualBooking = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("🔍 handleSubmit called");
-    console.log("📋 Form Data:", formData);
-    console.log("📅 Booking Data:", bookingData[activeService]);
-    console.log("👤 Staff:", staffInfo?.staffName || "None");
-
     // PIN is required for manual bookings
     if (!staffInfo) {
-      console.log("❌ No staff info, showing PIN modal");
       setShowPinModal(true);
       return;
     }
 
-    console.log("✅ Staff info found, proceeding with booking creation");
     await createBooking(staffInfo);
   };
 
   const handlePinVerified = async (verifiedStaffInfo) => {
-    console.log(
-      "🎯 handlePinVerified called with staff:",
-      verifiedStaffInfo.staffName
-    );
     setStaffInfo(verifiedStaffInfo);
     setBookingInProgress(true);
-    console.log("✅ Staff info set, booking in progress");
-
-    // Automatically create the booking after PIN verification
-    console.log("� Aurto-creating booking...");
-    console.log("� Currennt form data:", formData);
-    console.log("📅 Current booking data:", bookingData[activeService]);
 
     try {
       await createBooking(verifiedStaffInfo);
-      console.log("✅ createBooking completed successfully");
-      // Close modal after successful booking creation
       setShowPinModal(false);
       setBookingInProgress(false);
     } catch (error) {
-      console.error("❌ Error in createBooking:", error);
+      console.error("Error in createBooking:", error);
       setResult({
         success: false,
         message: `Error creating booking: ${error.message}`,
       });
-      // Close modal even on error so user can see the error message
       setShowPinModal(false);
       setBookingInProgress(false);
     }

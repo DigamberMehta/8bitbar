@@ -10,6 +10,7 @@ import superadminPinRoutes from "./routes/superadmin/pin.route.js";
 import cafeRoutes from "./routes/cafe.route.js";
 import paymentRoutes from "./routes/payment.route.js";
 import contactRoutes from "./routes/contact.route.js";
+import clientRoutes from "./routes/client.route.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -67,6 +68,7 @@ app.use("/api/v1/superadmin", superadminPinRoutes);
 app.use("/api/v1/cafe", cafeRoutes);
 app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1", contactRoutes);
+app.use("/api/v1/client", clientRoutes);
 
 // ✅ Health check route
 app.get("/api/v1/health", (req, res) => {
