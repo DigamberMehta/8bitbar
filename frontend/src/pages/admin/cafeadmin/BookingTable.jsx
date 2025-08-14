@@ -1,18 +1,18 @@
 import React from "react";
 
 const BookingTable = ({ bookings, onUpdateStatus }) => {
-  const getStatusColor = (status) => {
+  const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
-        return "bg-green-100 text-green-800";
+        return { color: "bg-green-100 text-green-800", text: "Paid" };
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return { color: "bg-yellow-100 text-yellow-800", text: "Not Paid" };
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return { color: "bg-red-100 text-red-800", text: "Cancelled" };
       case "completed":
-        return "bg-blue-100 text-blue-800";
+        return { color: "bg-blue-100 text-blue-800", text: "Completed" };
       default:
-        return "bg-gray-100 text-gray-800";
+        return { color: "bg-gray-100 text-gray-800", text: status };
     }
   };
 
@@ -77,6 +77,11 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                         User ID: {booking.userId._id}
                       </div>
                     )}
+                    {booking.isManualBooking && booking.staffName && (
+                      <div className="text-xs text-blue-600 mt-1">
+                        Staff: {booking.staffName}
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900">
@@ -130,14 +135,16 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                        booking.status
-                      )}`}
-                    >
-                      {booking.status.charAt(0).toUpperCase() +
-                        booking.status.slice(1)}
-                    </span>
+                    {(() => {
+                      const statusInfo = getStatusInfo(booking.status);
+                      return (
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}
+                        >
+                          {statusInfo.text}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
@@ -260,12 +267,11 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                   </td>
                   <td className="px-3 py-3">
                     <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                        booking.status
-                      )}`}
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        getStatusInfo(booking.status).color
+                      }`}
                     >
-                      {booking.status.charAt(0).toUpperCase() +
-                        booking.status.slice(1)}
+                      {getStatusInfo(booking.status).text}
                     </span>
                   </td>
                   <td className="px-3 py-3">

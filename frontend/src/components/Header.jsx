@@ -18,9 +18,9 @@ const Header = () => {
     { path: "/contact", label: "Contact" },
   ];
 
-  // Add admin panel to nav items if user is admin
+  // Add admin panel to nav items if user is admin or superadmin
   const adminNavItems =
-    user?.role === "admin"
+    user?.role === "admin" || user?.role === "superadmin"
       ? [...navItems, { path: "/admin", label: "Admin Panel" }]
       : navItems;
 

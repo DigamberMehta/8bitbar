@@ -95,8 +95,7 @@ const BookingCards = ({ bookings, onUpdateStatus }) => {
                   </span>
                 ) : (
                   <span className="text-gray-400 text-xs">No payment ID</span>
-                )}
-                {" "}
+                )}{" "}
                 <span
                   className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
                     booking.paymentStatus === "completed"

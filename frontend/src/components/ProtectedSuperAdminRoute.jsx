@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-const ProtectedAdminRoute = ({ children }) => {
+const ProtectedSuperAdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -17,8 +17,8 @@ const ProtectedAdminRoute = ({ children }) => {
     return <Navigate to="/" replace />;
   }
 
-  // Allow both admin and superadmin roles
-  if (user.role !== "admin" && user.role !== "superadmin") {
+  // Only allow superadmin role
+  if (user.role !== "superadmin") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
@@ -26,7 +26,7 @@ const ProtectedAdminRoute = ({ children }) => {
             Access Denied
           </h1>
           <p className="text-gray-600 mb-4">
-            You don't have permission to access this page.
+            This page is restricted to Superadmin users only.
           </p>
           <button
             onClick={() => window.history.back()}
@@ -42,4 +42,5 @@ const ProtectedAdminRoute = ({ children }) => {
   return children;
 };
 
-export default ProtectedAdminRoute;
+export default ProtectedSuperAdminRoute;
+

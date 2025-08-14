@@ -10,6 +10,7 @@ import { ServiceTab, CustomerInfoForm } from "./FormComponents";
 import KaraokeBookingForm from "./KaraokeBookingForm";
 import N64BookingForm from "./N64BookingForm";
 import CafeBookingForm from "./CafeBookingForm";
+import PinInputModal from "../../../components/admin/PinInputModal";
 
 const ManualBooking = () => {
   const [activeService, setActiveService] = useState("karaoke");
@@ -58,6 +59,21 @@ const ManualBooking = () => {
     },
   });
   const [result, setResult] = useState(null);
+
+  // PIN-related state
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [staffInfo, setStaffInfo] = useState(null);
+  const [bookingInProgress, setBookingInProgress] = useState(false);
+
+  // Debug staff info changes
+  useEffect(() => {
+    console.log("🔄 staffInfo state changed:", staffInfo);
+  }, [staffInfo]);
+
+  // Debug activeService changes
+  useEffect(() => {
+    console.log("🔄 activeService changed:", activeService);
+  }, [activeService]);
 
   useEffect(() => {
     fetchResources();
@@ -257,28 +273,85 @@ const ManualBooking = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Function to create booking (extracted from handleSubmit)
+  const createBooking = async (staffInfo) => {
+    console.log("🔍 createBooking called");
+    console.log("📋 Form Data:", formData);
+    console.log("📅 Booking Data:", bookingData[activeService]);
+    console.log("👤 Staff:", staffInfo?.staffName || "None");
+    console.log("🎯 Active Service:", activeService);
+
+    // Set loading state
+    setLoading(true);
+    setResult(null);
+
+    // Check if all required fields are filled
+    const requiredFields = {
+      customerName: formData.customerName,
+      customerEmail: formData.customerEmail,
+      ...(activeService === "karaoke" && {
+        roomId: bookingData.karaoke.roomId,
+        startDateTime: bookingData.karaoke.startDateTime,
+      }),
+      ...(activeService === "n64" && {
+        roomId: bookingData.n64.roomId,
+        startDateTime: bookingData.n64.startDateTime,
+      }),
+      ...(activeService === "cafe" && {
+        chairIds: bookingData.cafe.chairIds,
+        date: bookingData.cafe.date,
+        time: bookingData.cafe.time,
+      }),
+    };
+
+    console.log("🔍 Required fields check:", requiredFields);
+
+    // Check for missing required fields
+    const missingFields = Object.entries(requiredFields).filter(
+      ([key, value]) => {
+        if (Array.isArray(value)) {
+          return value.length === 0;
+        }
+        return !value || value.trim() === "";
+      }
+    );
+
+    if (missingFields.length > 0) {
+      console.log("❌ Missing required fields:", missingFields);
+      setResult({
+        success: false,
+        message: `Missing required fields: ${missingFields
+          .map(([key]) => key)
+          .join(", ")}`,
+      });
+      return;
+    }
+
+    console.log("✅ All required fields are filled");
 
     try {
-      setLoading(true);
-      setResult(null);
-
       const payload = {
         ...formData,
         ...bookingData[activeService],
+        staffPin: staffInfo.pin, // Include staff PIN
       };
+
+      console.log("📤 Sending payload:", payload);
+      console.log("🌐 API endpoint:", `/admin/bookings/${activeService}`);
 
       const response = await api.post(
         `/admin/bookings/${activeService}`,
         payload
       );
 
+      console.log("✅ API response:", response.data);
+
       setResult({
         success: true,
         message: response.data.message,
         booking: response.data.booking,
         userInfo: response.data.userInfo,
+        staffInfo: response.data.staffInfo,
       });
 
       // Reset form
@@ -318,6 +391,9 @@ const ManualBooking = () => {
                 status: "pending",
               },
       }));
+
+      // Reset staff info after successful booking
+      setStaffInfo(null);
     } catch (error) {
       console.error("Error creating booking:", error);
       setResult({
@@ -326,6 +402,57 @@ const ManualBooking = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log("🔍 handleSubmit called");
+    console.log("📋 Form Data:", formData);
+    console.log("📅 Booking Data:", bookingData[activeService]);
+    console.log("👤 Staff:", staffInfo?.staffName || "None");
+
+    // PIN is required for manual bookings
+    if (!staffInfo) {
+      console.log("❌ No staff info, showing PIN modal");
+      setShowPinModal(true);
+      return;
+    }
+
+    console.log("✅ Staff info found, proceeding with booking creation");
+    await createBooking(staffInfo);
+  };
+
+  const handlePinVerified = async (verifiedStaffInfo) => {
+    console.log(
+      "🎯 handlePinVerified called with staff:",
+      verifiedStaffInfo.staffName
+    );
+    setStaffInfo(verifiedStaffInfo);
+    setBookingInProgress(true);
+    console.log("✅ Staff info set, booking in progress");
+
+    // Automatically create the booking after PIN verification
+    console.log("� Aurto-creating booking...");
+    console.log("� Currennt form data:", formData);
+    console.log("📅 Current booking data:", bookingData[activeService]);
+
+    try {
+      await createBooking(verifiedStaffInfo);
+      console.log("✅ createBooking completed successfully");
+      // Close modal after successful booking creation
+      setShowPinModal(false);
+      setBookingInProgress(false);
+    } catch (error) {
+      console.error("❌ Error in createBooking:", error);
+      setResult({
+        success: false,
+        message: `Error creating booking: ${error.message}`,
+      });
+      // Close modal even on error so user can see the error message
+      setShowPinModal(false);
+      setBookingInProgress(false);
     }
   };
 
@@ -344,6 +471,59 @@ const ManualBooking = () => {
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">
         Manual Booking
       </h1>
+
+      {/* Staff Information Display */}
+      {staffInfo && (
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <svg
+                className="w-5 h-5 text-blue-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-blue-800 font-medium">
+                Staff: {staffInfo.staffName}
+              </span>
+            </div>
+            <button
+              onClick={() => setStaffInfo(null)}
+              className="text-blue-600 hover:text-blue-800 text-sm underline"
+            >
+              Change Staff
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* PIN Requirement Notice */}
+      {!staffInfo && (
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <svg
+              className="w-5 h-5 text-yellow-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="text-yellow-800">
+              Staff PIN required. Please enter your PIN before creating a
+              booking.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Service Selection */}
       <div className="mb-4 sm:mb-6 md:mb-8">
@@ -482,10 +662,16 @@ const ManualBooking = () => {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || showPinModal}
             className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 bg-blue-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating Booking..." : "Create Booking"}
+            {loading
+              ? "Creating Booking..."
+              : showPinModal
+              ? "Enter PIN Required"
+              : staffInfo
+              ? "Create Booking"
+              : "Enter PIN & Create Booking"}
           </button>
         </div>
       </form>
@@ -530,8 +716,27 @@ const ManualBooking = () => {
               </p>
             </div>
           )}
+
+          {result.success && result.staffInfo && (
+            <div className="mt-3 p-2 sm:p-3 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-blue-800 text-xs sm:text-sm font-medium">
+                Booking Created by Staff
+              </p>
+              <p className="text-blue-700 text-xs sm:text-sm">
+                Staff Member: {result.staffInfo.staffName}
+              </p>
+            </div>
+          )}
         </div>
       )}
+
+      {/* PIN Input Modal */}
+      <PinInputModal
+        isOpen={showPinModal}
+        onClose={() => !bookingInProgress && setShowPinModal(false)}
+        onPinVerified={handlePinVerified}
+        bookingInProgress={bookingInProgress}
+      />
     </div>
   );
 };

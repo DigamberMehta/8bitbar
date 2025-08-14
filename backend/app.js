@@ -6,11 +6,12 @@ import userRoutes from "./routes/user.route.js";
 import karaokeRoutes from "./routes/karaoke.route.js";
 import n64Routes from "./routes/n64.route.js";
 import adminRoutes from "./routes/admin.route.js";
+import superadminPinRoutes from "./routes/superadmin/pin.route.js";
 import cafeRoutes from "./routes/cafe.route.js";
 import paymentRoutes from "./routes/payment.route.js";
 import contactRoutes from "./routes/contact.route.js";
 import cookieParser from "cookie-parser";
- 
+
 dotenv.config();
 
 const app = express();
@@ -29,7 +30,11 @@ const getConfig = () => {
           "https://8bitbar.vercel.app",
           "https://8bitbar-gilt.vercel.app",
         ]
-      : ["http://localhost:5173", "http://192.168.31.163:5173", "https://test.8bitbar.com.au"],
+      : [
+          "http://localhost:5173",
+          "http://192.168.31.163:5173",
+          "https://test.8bitbar.com.au",
+        ],
     port: process.env.PORT || 3000,
   };
 };
@@ -44,10 +49,13 @@ app.use(
     credentials: true,
   })
 );
-app.options('*', cors({
-  origin: config.corsOrigins,
-  credentials: true
-}));
+app.options(
+  "*",
+  cors({
+    origin: config.corsOrigins,
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
 // API routes
@@ -55,6 +63,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/karaoke-rooms", karaokeRoutes);
 app.use("/api/v1/n64-rooms", n64Routes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/superadmin", superadminPinRoutes);
 app.use("/api/v1/cafe", cafeRoutes);
 app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1", contactRoutes);

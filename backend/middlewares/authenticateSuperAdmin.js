@@ -1,19 +1,11 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 
-const authenticateAdmin = async (req, res, next) => {
+const authenticateSuperAdmin = async (req, res, next) => {
   try {
     const cookieToken = req.cookies.token;
     const headerToken = req.header("Authorization")?.replace("Bearer ", "");
     const token = cookieToken || headerToken;
-
-    // Debug logging for production issues
-    // console.log("Admin auth debug:", {
-    //   hasCookieToken: !!cookieToken,
-    //   hasHeaderToken: !!headerToken,
-    //   userAgent: req.get("User-Agent"),
-    //   origin: req.get("Origin"),
-    // });
 
     if (!token) {
       return res.status(401).json({
@@ -28,15 +20,14 @@ const authenticateAdmin = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid token. User not found.",
+        message: "Access denied. User not found.",
       });
     }
 
-    // Allow both admin and superadmin roles
-    if (user.role !== "admin" && user.role !== "superadmin") {
+    if (user.role !== "superadmin") {
       return res.status(403).json({
         success: false,
-        message: "Access denied. Admin or Superadmin privileges required.",
+        message: "Access denied. Superadmin privileges required.",
       });
     }
 
@@ -44,12 +35,12 @@ const authenticateAdmin = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error("Admin authentication error:", error);
-    return res.status(401).json({
+    console.error("Superadmin authentication error:", error);
+    res.status(401).json({
       success: false,
-      message: "Invalid token.",
+      message: "Access denied. Invalid token.",
     });
   }
 };
 
-export default authenticateAdmin;
+export default authenticateSuperAdmin;

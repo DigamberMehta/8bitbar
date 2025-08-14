@@ -14,11 +14,14 @@ import {
   MdAdd,
   MdAttachMoney,
   MdEvent,
+  MdLock,
 } from "react-icons/md";
+import { useAuth } from "../../contexts/AuthContext";
 
 const AdminLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user } = useAuth();
 
   const navItems = [
     // Dashboard
@@ -97,6 +100,15 @@ const AdminLayout = () => {
     },
   ];
 
+  // Add PIN Management only for superadmin users
+  const allNavItems = user?.role === "superadmin" 
+    ? [...navItems, {
+        path: "/admin/pin-management",
+        label: "PIN Management",
+        icon: <MdLock size={20} />,
+      }]
+    : navItems;
+
   // Overlay for screens < 1200px
   const SidebarOverlay = ({ open, onClose }) =>
     open ? (
@@ -141,7 +153,7 @@ const AdminLayout = () => {
           {/* Close button for screens < 1200px */}
           <div className="xl:hidden flex justify-end p-2">
             <button
-              className="text-white p-2 focus:outline-none"
+              className="text-gray-400 hover:text-gray-600 transition-colors"
               onClick={() => setSidebarOpen(false)}
               aria-label="Close sidebar"
             >
@@ -152,7 +164,7 @@ const AdminLayout = () => {
             <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
             <nav>
               <ul className="space-y-2">
-                {navItems.map((item) => (
+                {allNavItems.map((item) => (
                   <li key={item.path}>
                     <Link
                       to={item.path}

@@ -27,12 +27,14 @@ import CafeBookingsAdmin from "./pages/admin/cafeadmin/CafeBookingsAdmin";
 import CafeSettingsAdmin from "./pages/admin/cafeadmin/CafeSettingsAdmin";
 import UserManagement from "./pages/admin/UserManagement";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import ProtectedSuperAdminRoute from "./components/ProtectedSuperAdminRoute";
 import N64RoomEditAdmin from "./pages/admin/n64admin/N64RoomEditAdmin";
 import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmin";
 import KaraokeRoomCreateAdmin from "./pages/admin/karaokeadmin/KaraokeRoomCreateAdmin";
 import ManualBooking from "./pages/admin/manualbooking";
 import FinancePage from "./pages/admin/FinancePage";
 import AllBookings from "./pages/admin/AllBookings";
+import PinManagement from "./pages/admin/PinManagement";
 
 import BarMapEditor from "./components/cafe/BarMapEditor";
 
@@ -110,6 +112,14 @@ function App() {
                 <Route path="cafe-settings" element={<CafeSettingsAdmin />} />
                 <Route path="cafe-layout" element={<BarMapEditor />} />
                 <Route path="users" element={<UserManagement />} />
+                <Route 
+                  path="pin-management" 
+                  element={
+                    <ProtectedSuperAdminRoute>
+                      <PinManagement />
+                    </ProtectedSuperAdminRoute>
+                  } 
+                />
               </Route>
             </Routes>
           </main>

@@ -74,19 +74,19 @@ const KaraokeBookingsAdmin = () => {
     return `${startTime} - ${endTime}`;
   };
 
-  // Helper function to get status badge colors
-  const getStatusColor = (status) => {
+  // Helper function to get status badge colors and display text
+  const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
-        return "bg-green-100 text-green-800";
+        return { color: "bg-green-100 text-green-800", text: "Paid" };
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return { color: "bg-yellow-100 text-yellow-800", text: "Not Paid" };
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return { color: "bg-red-100 text-red-800", text: "Cancelled" };
       case "completed":
-        return "bg-blue-100 text-blue-800";
+        return { color: "bg-blue-100 text-blue-800", text: "Completed" };
       default:
-        return "bg-gray-100 text-gray-800";
+        return { color: "bg-gray-100 text-gray-800", text: status };
     }
   };
 
@@ -232,6 +232,11 @@ const KaraokeBookingsAdmin = () => {
                       <div className="text-sm font-medium text-gray-900">
                         {booking.customerName || "N/A"}
                       </div>
+                      {booking.isManualBooking && booking.staffName && (
+                        <div className="text-xs text-blue-600 mt-1">
+                          Staff: {booking.staffName}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
@@ -290,13 +295,16 @@ const KaraokeBookingsAdmin = () => {
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                          booking.status
-                        )}`}
-                      >
-                        {booking.status}
-                      </span>
+                      {(() => {
+                        const statusInfo = getStatusInfo(booking.status);
+                        return (
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}
+                          >
+                            {statusInfo.text}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                       <ActionButtons booking={booking} />
@@ -346,6 +354,11 @@ const KaraokeBookingsAdmin = () => {
                           {booking.customerPhone}
                         </div>
                       )}
+                      {booking.isManualBooking && booking.staffName && (
+                        <div className="text-xs text-blue-600 mt-1">
+                          Staff: {booking.staffName}
+                        </div>
+                      )}
                     </td>
                     <td className="px-3 py-3">
                       <div className="text-sm text-gray-900">
@@ -392,13 +405,16 @@ const KaraokeBookingsAdmin = () => {
                       </span>
                     </td>
                     <td className="px-3 py-3">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                          booking.status
-                        )}`}
-                      >
-                        {booking.status}
-                      </span>
+                      {(() => {
+                        const statusInfo = getStatusInfo(booking.status);
+                        return (
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}
+                          >
+                            {statusInfo.text}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-3 py-3">
                       <ActionButtons booking={booking} />
@@ -432,11 +448,11 @@ const KaraokeBookingsAdmin = () => {
                   )}
                 </div>
                 <span
-                  className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                    booking.status
-                  )}`}
+                  className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
+                    getStatusInfo(booking.status).color
+                  }`}
                 >
-                  {booking.status}
+                  {getStatusInfo(booking.status).text}
                 </span>
               </div>
               <div className="mt-4 border-t border-gray-200 pt-4">
