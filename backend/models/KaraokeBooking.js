@@ -62,6 +62,26 @@ const karaokeBookingSchema = new mongoose.Schema(
       enum: ["pending", "completed", "failed", "refunded"],
       default: "pending",
     },
+    // Staff PIN tracking fields
+    staffPin: {
+      type: String,
+      required: false, // Not required for regular user bookings
+      validate: {
+        validator: function (v) {
+          // If provided, must be exactly 4 digits
+          return !v || /^\d{4}$/.test(v);
+        },
+        message: "Staff PIN must be exactly 4 digits",
+      },
+    },
+    staffName: {
+      type: String,
+      required: false, // Not required for regular user bookings
+    },
+    isManualBooking: {
+      type: Boolean,
+      default: false, // Indicates if this was created via admin manual booking
+    },
   },
   {
     timestamps: true,

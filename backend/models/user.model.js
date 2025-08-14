@@ -7,9 +7,10 @@ const userSchema = new mongoose.Schema({
   dob: { type: Date }, // Added date of birth
   role: {
     type: String,
-    enum: ["customer", "admin"],
+    enum: ["customer", "admin", "superadmin"],
     default: "customer",
   },
+  hasPin: { type: Boolean, default: false }, // Indicates if user has associated PIN codes
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

@@ -8,6 +8,7 @@ import N64Room from "../../models/N64Room.js";
 import CafeBooking from "../../models/CafeBooking.js";
 import CafeSettings from "../../models/CafeSettings.js";
 import CafeLayout from "../../models/CafeLayout.js";
+import StaffPin from "../../models/StaffPin.js";
 
 const router = express.Router();
 
@@ -46,6 +47,33 @@ const findOrCreateUser = async (userData) => {
   return { user, isNewUser: false };
 };
 
+// Helper function to verify PIN and get staff info
+const verifyStaffPin = async (pin) => {
+  if (!pin) {
+    return { isValid: false, message: "PIN is required for manual bookings" };
+  }
+
+  const staffPin = await StaffPin.findOne({
+    pin,
+    isActive: true,
+  }).populate("adminUserId", "name email");
+
+  if (!staffPin) {
+    return { isValid: false, message: "Invalid PIN" };
+  }
+
+  return {
+    isValid: true,
+    staffInfo: {
+      pin: staffPin.pin,
+      staffName: staffPin.staffName,
+      adminUserId: staffPin.adminUserId._id,
+      adminName: staffPin.adminUserId.name,
+      adminEmail: staffPin.adminUserId.email,
+    },
+  };
+};
+
 // Manual Karaoke Booking
 router.post("/karaoke", async (req, res) => {
   try {
@@ -60,6 +88,7 @@ router.post("/karaoke", async (req, res) => {
       durationHours,
       paymentStatus = "completed", // Admin bookings are typically paid
       status,
+      staffPin, // New field for staff identification
     } = req.body;
 
     // Validate required fields
@@ -70,11 +99,12 @@ router.post("/karaoke", async (req, res) => {
       !numberOfPeople ||
       !startDateTime ||
       !durationHours ||
-      !status
+      !status ||
+      !staffPin // PIN is now required for manual bookings
     ) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields",
+        message: "Missing required fields including staff PIN",
       });
     }
 
@@ -85,6 +115,17 @@ router.post("/karaoke", async (req, res) => {
         message: "Invalid status. Must be 'pending' or 'confirmed'",
       });
     }
+
+    // Verify staff PIN
+    const pinVerification = await verifyStaffPin(staffPin);
+    if (!pinVerification.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: pinVerification.message,
+      });
+    }
+
+    const { staffInfo } = pinVerification;
 
     // Find or create user
     const { user, isNewUser, tempPassword } = await findOrCreateUser({
@@ -129,7 +170,7 @@ router.post("/karaoke", async (req, res) => {
       });
     }
 
-    // Create booking
+    // Create booking with staff information
     const booking = await KaraokeBooking.create({
       userId: user._id,
       roomId,
@@ -144,6 +185,9 @@ router.post("/karaoke", async (req, res) => {
       status,
       paymentStatus,
       paymentId: `admin-${Date.now()}`, // Admin booking identifier
+      staffPin: staffInfo.pin,
+      staffName: staffInfo.staffName,
+      isManualBooking: true,
     });
 
     const populatedBooking = await KaraokeBooking.findById(booking._id)
@@ -157,6 +201,10 @@ router.post("/karaoke", async (req, res) => {
       userInfo: {
         isNewUser,
         ...(isNewUser && { tempPassword }),
+      },
+      staffInfo: {
+        staffName: staffInfo.staffName,
+        pin: staffInfo.pin,
       },
     });
   } catch (error) {
@@ -183,6 +231,7 @@ router.post("/n64", async (req, res) => {
       durationHours,
       paymentStatus = "completed",
       status,
+      staffPin, // New field for staff identification
     } = req.body;
 
     // Validate required fields
@@ -194,11 +243,12 @@ router.post("/n64", async (req, res) => {
       !numberOfPeople ||
       !startDateTime ||
       !durationHours ||
-      !status
+      !status ||
+      !staffPin // PIN is now required for manual bookings
     ) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields",
+        message: "Missing required fields including staff PIN",
       });
     }
 
@@ -209,6 +259,17 @@ router.post("/n64", async (req, res) => {
         message: "Invalid status. Must be 'pending' or 'confirmed'",
       });
     }
+
+    // Verify staff PIN
+    const pinVerification = await verifyStaffPin(staffPin);
+    if (!pinVerification.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: pinVerification.message,
+      });
+    }
+
+    const { staffInfo } = pinVerification;
 
     // Find or create user
     const { user, isNewUser, tempPassword } = await findOrCreateUser({
@@ -253,7 +314,7 @@ router.post("/n64", async (req, res) => {
       });
     }
 
-    // Create booking
+    // Create booking with staff information
     const booking = await N64Booking.create({
       userId: user._id,
       roomId,
@@ -269,6 +330,9 @@ router.post("/n64", async (req, res) => {
       status,
       paymentStatus,
       paymentId: `admin-${Date.now()}`,
+      staffPin: staffInfo.pin,
+      staffName: staffInfo.staffName,
+      isManualBooking: true,
     });
 
     const populatedBooking = await N64Booking.findById(booking._id)
@@ -282,6 +346,10 @@ router.post("/n64", async (req, res) => {
       userInfo: {
         isNewUser,
         ...(isNewUser && { tempPassword }),
+      },
+      staffInfo: {
+        staffName: staffInfo.staffName,
+        pin: staffInfo.pin,
       },
     });
   } catch (error) {
@@ -309,6 +377,7 @@ router.post("/cafe", async (req, res) => {
       deviceType = "desktop",
       paymentStatus = "completed",
       status,
+      staffPin, // New field for staff identification
     } = req.body;
 
     // Validate required fields
@@ -321,11 +390,12 @@ router.post("/cafe", async (req, res) => {
       !date ||
       !time ||
       !duration ||
-      !status
+      !status ||
+      !staffPin // PIN is now required for manual bookings
     ) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields",
+        message: "Missing required fields including staff PIN",
       });
     }
 
@@ -336,6 +406,17 @@ router.post("/cafe", async (req, res) => {
         message: "Invalid status. Must be 'pending' or 'confirmed'",
       });
     }
+
+    // Verify staff PIN
+    const pinVerification = await verifyStaffPin(staffPin);
+    if (!pinVerification.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: pinVerification.message,
+      });
+    }
+
+    const { staffInfo } = pinVerification;
 
     // Find or create user
     const { user, isNewUser, tempPassword } = await findOrCreateUser({
@@ -373,7 +454,7 @@ router.post("/cafe", async (req, res) => {
       });
     }
 
-    // Create booking
+    // Create booking with staff information
     const booking = await CafeBooking.create({
       userId: user._id,
       chairIds,
@@ -389,6 +470,9 @@ router.post("/cafe", async (req, res) => {
       status,
       paymentStatus,
       paymentId: `admin-${Date.now()}`,
+      staffPin: staffInfo.pin,
+      staffName: staffInfo.staffName,
+      isManualBooking: true,
     });
 
     const populatedBooking = await CafeBooking.findById(booking._id).populate(
@@ -403,6 +487,10 @@ router.post("/cafe", async (req, res) => {
       userInfo: {
         isNewUser,
         ...(isNewUser && { tempPassword }),
+      },
+      staffInfo: {
+        staffName: staffInfo.staffName,
+        pin: staffInfo.pin,
       },
     });
   } catch (error) {

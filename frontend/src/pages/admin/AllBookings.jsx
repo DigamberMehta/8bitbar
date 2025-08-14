@@ -101,16 +101,16 @@ const AllBookings = () => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
-        return "bg-green-100 text-green-800";
+        return { color: "bg-green-100 text-green-800", text: "Paid" };
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return { color: "bg-yellow-100 text-yellow-800", text: "Not Paid" };
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return { color: "bg-red-100 text-red-800", text: "Cancelled" };
       default:
-        return "bg-gray-100 text-gray-800";
+        return { color: "bg-gray-100 text-gray-800", text: status };
     }
   };
 
@@ -297,16 +297,24 @@ const AllBookings = () => {
                               <span>Table: {booking.tableName}</span>
                             )}
                           </div>
+                          {booking.isManualBooking && booking.staffName && (
+                            <div className="text-xs text-blue-600 mt-1">
+                              Staff: {booking.staffName}
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                            booking.status
-                          )}`}
-                        >
-                          {booking.status}
-                        </span>
+                        {(() => {
+                          const statusInfo = getStatusInfo(booking.status);
+                          return (
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}
+                            >
+                              {statusInfo.text}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         ${booking.amount || 0}

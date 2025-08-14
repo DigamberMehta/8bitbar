@@ -9,10 +9,11 @@ import adminUserRoutes from "./admin/user.route.js";
 import adminBookingRoutes from "./admin/booking.route.js";
 import adminFinanceRoutes from "./admin/finance.route.js";
 import adminAllBookingsRoutes from "./admin/all-bookings.route.js";
+import adminPinVerifyRoutes from "./admin/pin-verify.route.js";
 
 const router = express.Router();
 
-// Apply admin authentication to all routes
+// Apply admin authentication to all routes (both admin and superadmin can access)
 router.use(authenticateAdmin);
 
 // Mount service-specific admin routes at unique paths
@@ -23,5 +24,9 @@ router.use("/users", adminUserRoutes);
 router.use("/bookings", adminBookingRoutes);
 router.use("/finance", adminFinanceRoutes);
 router.use("/all-bookings", adminAllBookingsRoutes);
+router.use("/pin-verify", adminPinVerifyRoutes);
+
+// PIN management routes are mounted separately with superadmin-only access
+// This will be handled in the main app.js or server.js file
 
 export default router;

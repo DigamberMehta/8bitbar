@@ -3,6 +3,17 @@ import User from "../../models/user.model.js";
 
 const router = express.Router();
 
+// Get all users (for PIN management and general admin use)
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    res.json({ users });
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    res.status(500).json({ message: "Error fetching users" });
+  }
+});
+
 // Get all users (non-admin)
 router.get("/users", async (req, res) => {
   try {
