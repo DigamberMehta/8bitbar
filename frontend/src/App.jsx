@@ -27,7 +27,7 @@ import CafeBookingsAdmin from "./pages/admin/cafeadmin/CafeBookingsAdmin";
 import CafeSettingsAdmin from "./pages/admin/cafeadmin/CafeSettingsAdmin";
 import UserManagement from "./pages/admin/UserManagement";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
-import ProtectedSuperAdminRoute from "./components/ProtectedSuperAdminRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import N64RoomEditAdmin from "./pages/admin/n64admin/N64RoomEditAdmin";
 import KaraokeRoomEditAdmin from "./pages/admin/karaokeadmin/KaraokeRoomEditAdmin";
 import KaraokeRoomCreateAdmin from "./pages/admin/karaokeadmin/KaraokeRoomCreateAdmin";
@@ -82,7 +82,14 @@ function App() {
               >
                 <Route index element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="finance" element={<FinancePage />} />
+                <Route
+                  path="finance"
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <FinancePage />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="all-bookings" element={<AllBookings />} />
                 <Route path="manual-booking" element={<ManualBooking />} />
                 <Route
@@ -91,34 +98,78 @@ function App() {
                 />
                 <Route
                   path="karaoke/karaoke-room/edit"
-                  element={<KaraokeRoomEditAdmin />}
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <KaraokeRoomEditAdmin />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="karaoke/karaoke-room/create"
-                  element={<KaraokeRoomCreateAdmin />}
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <KaraokeRoomCreateAdmin />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="karaoke/karaoke-rooms"
-                  element={<KaraokeRoomsAdmin />}
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <KaraokeRoomsAdmin />
+                    </ProtectedRoute>
+                  }
                 />
 
                 <Route path="n64-bookings" element={<N64BookingsAdmin />} />
                 <Route
                   path="n64-rooms/:id/edit"
-                  element={<N64RoomEditAdmin />}
-                />
-                <Route path="n64-rooms" element={<N64RoomsAdmin />} />
-                <Route path="cafe-bookings" element={<CafeBookingsAdmin />} />
-                <Route path="cafe-settings" element={<CafeSettingsAdmin />} />
-                <Route path="cafe-layout" element={<BarMapEditor />} />
-                <Route path="users" element={<UserManagement />} />
-                <Route 
-                  path="pin-management" 
                   element={
-                    <ProtectedSuperAdminRoute>
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <N64RoomEditAdmin />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="n64-rooms"
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <N64RoomsAdmin />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="cafe-bookings" element={<CafeBookingsAdmin />} />
+                <Route
+                  path="cafe-settings"
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <CafeSettingsAdmin />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="cafe-layout"
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <BarMapEditor />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="users"
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <UserManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="pin-management"
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
                       <PinManagement />
-                    </ProtectedSuperAdminRoute>
-                  } 
+                    </ProtectedRoute>
+                  }
                 />
               </Route>
             </Routes>

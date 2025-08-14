@@ -51,7 +51,8 @@ const KaraokeBooking = () => {
             🎤 KARAOKE ROOM BOOKING
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Choose your perfect karaoke room and book your unforgettable experience!
+            Choose your perfect karaoke room and book your unforgettable
+            experience!
           </p>
         </div>
 
