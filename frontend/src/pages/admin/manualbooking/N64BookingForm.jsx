@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  MdVideogameAsset,
-  MdGroup,
-  MdCalendarToday,
-  MdAccessTime,
-} from "react-icons/md";
+import { Gamepad2, Users, Calendar, Clock } from "lucide-react";
 import { InputField, SelectField } from "./FormComponents";
 import TimeSlotSelector from "./TimeSlotSelector";
 
@@ -23,7 +18,7 @@ const N64BookingForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <SelectField
           label="Room"
-          icon={<MdVideogameAsset size={16} />}
+          icon={<Gamepad2 size={16} />}
           value={bookingData.n64.roomId}
           onChange={(e) => {
             const selectedRoom = resources.n64.find(
@@ -47,7 +42,7 @@ const N64BookingForm = ({
 
         <InputField
           label="Number of People"
-          icon={<MdGroup size={16} />}
+          icon={<Users size={16} />}
           type="number"
           min="1"
           max="4"
@@ -67,7 +62,7 @@ const N64BookingForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <InputField
           label="Date"
-          icon={<MdCalendarToday size={16} />}
+          icon={<Calendar size={16} />}
           type="date"
           value={
             bookingData.n64.startDateTime
@@ -88,7 +83,7 @@ const N64BookingForm = ({
 
         <SelectField
           label="Duration"
-          icon={<MdAccessTime size={16} />}
+          icon={<Clock size={16} />}
           value={bookingData.n64.durationHours}
           onChange={(e) =>
             handleBookingDataChange(
@@ -111,7 +106,7 @@ const N64BookingForm = ({
       {bookingData.n64.roomId && bookingData.n64.startDateTime && (
         <div className="space-y-2 sm:space-y-3">
           <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
-            <MdAccessTime size={14} className="sm:w-4 sm:h-4" />
+            <Clock size={14} className="sm:w-4 sm:h-4" />
             <span>Select Start Time</span>
           </label>
 

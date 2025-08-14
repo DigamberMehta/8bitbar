@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Clock } from "lucide-react";
+import { Clock, Users, Calendar, Music, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "../../utils/axios";
@@ -236,7 +236,8 @@ const BookingForm = ({ room }) => {
       <div className="space-y-6">
         {/* Number of People */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+            <Users className="h-4 w-4 text-pink-400" />
             Number of People (Max {maxPeople})
           </label>
           <select
@@ -254,7 +255,8 @@ const BookingForm = ({ room }) => {
 
         {/* Duration Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+            <Clock className="h-4 w-4 text-pink-400" />
             Select Duration
           </label>
           <select
@@ -277,7 +279,8 @@ const BookingForm = ({ room }) => {
 
         {/* Date Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-pink-400" />
             Select Date *
           </label>
           <input
@@ -331,7 +334,8 @@ const BookingForm = ({ room }) => {
           isDateAvailable(selectedDate) &&
           !isDateFullyBooked(selectedDate) && (
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                <Clock className="h-4 w-4 text-pink-400" />
                 Select Start Time *
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

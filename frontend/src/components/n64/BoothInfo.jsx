@@ -46,10 +46,9 @@ const BoothInfo = () => {
 
   // Combine all images from all booths
   const allImages = booths.reduce((acc, booth) => {
-    const boothImages = [
-      booth.imageUrl,
-      ...(booth.images || [])
-    ].filter(Boolean);
+    const boothImages = [booth.imageUrl, ...(booth.images || [])].filter(
+      Boolean
+    );
     return [...acc, ...boothImages];
   }, []);
 
@@ -123,7 +122,8 @@ const BoothInfo = () => {
             N64 Gaming Booths
           </h2>
           <p className="text-gray-300 mb-4">
-            Experience classic Nintendo 64 gaming in our themed booths - Mickey Mouse and Minnie Mouse rooms available!
+            Experience classic Nintendo 64 gaming in our themed booths - Mickey
+            Mouse and Minnie Mouse rooms available!
           </p>
         </div>
       </div>
@@ -136,7 +136,9 @@ const BoothInfo = () => {
         <div className="space-y-4">
           {booths.map((booth, boothIdx) => (
             <div key={booth._id} className="mb-6">
-              <h4 className="text-lg font-semibold text-white mb-3">{booth.name}</h4>
+              <h4 className="text-lg font-semibold text-white mb-3">
+                {booth.name}
+              </h4>
               {booth.inclusions?.features?.map((feature, idx) => (
                 <div className="flex items-center space-x-3 ml-4" key={idx}>
                   {idx === 0 && <Gamepad2 className="h-5 w-5 text-pink-400" />}
@@ -158,7 +160,10 @@ const BoothInfo = () => {
         </h3>
         <div className="space-y-4">
           {booths.map((booth) => (
-            <div key={booth._id} className="flex justify-between items-center p-4 bg-gray-800/50 rounded-lg">
+            <div
+              key={booth._id}
+              className="flex justify-between items-center p-4 bg-gray-800/50 rounded-lg"
+            >
               <div>
                 <span className="text-white font-semibold">{booth.name}</span>
                 <p className="text-gray-400 text-sm">

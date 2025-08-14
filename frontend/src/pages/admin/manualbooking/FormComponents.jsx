@@ -1,4 +1,5 @@
 import React from "react";
+import { User, Mail, Phone, Calendar } from "lucide-react";
 
 // Shared form components
 export const ServiceTab = ({ service, icon, label, isActive, onClick }) => (
@@ -52,7 +53,7 @@ export const CustomerInfoForm = ({ formData, handleInputChange }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <InputField
           label="Full Name"
-          icon={<span className="text-gray-500">👤</span>}
+          icon={<User size={16} className="text-gray-500" />}
           type="text"
           name="customerName"
           value={formData.customerName}
@@ -61,7 +62,7 @@ export const CustomerInfoForm = ({ formData, handleInputChange }) => {
         />
         <InputField
           label="Email"
-          icon={<span className="text-gray-500">📧</span>}
+          icon={<Mail size={16} className="text-gray-500" />}
           type="email"
           name="customerEmail"
           value={formData.customerEmail}
@@ -70,7 +71,7 @@ export const CustomerInfoForm = ({ formData, handleInputChange }) => {
         />
         <InputField
           label="Phone"
-          icon={<span className="text-gray-500">📱</span>}
+          icon={<Phone size={16} className="text-gray-500" />}
           type="tel"
           name="customerPhone"
           value={formData.customerPhone}
@@ -78,7 +79,7 @@ export const CustomerInfoForm = ({ formData, handleInputChange }) => {
         />
         <InputField
           label="Date of Birth"
-          icon={<span className="text-gray-500">📅</span>}
+          icon={<Calendar size={16} className="text-gray-500" />}
           type="date"
           name="customerDob"
           value={formData.customerDob}

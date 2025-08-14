@@ -1,5 +1,5 @@
 import React from "react";
-import { MdLocalCafe, MdCalendarToday, MdAccessTime } from "react-icons/md";
+import { Coffee, Calendar, Clock } from "lucide-react";
 import { InputField, SelectField } from "./FormComponents";
 
 const CafeBookingForm = ({
@@ -15,7 +15,7 @@ const CafeBookingForm = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
         <InputField
           label="Date"
-          icon={<MdCalendarToday size={16} />}
+          icon={<Calendar size={16} />}
           type="date"
           value={bookingData.cafe.date}
           onChange={(e) =>
@@ -26,7 +26,7 @@ const CafeBookingForm = ({
 
         <SelectField
           label="Time"
-          icon={<MdAccessTime size={16} />}
+          icon={<Clock size={16} />}
           value={bookingData.cafe.time}
           onChange={(e) =>
             handleBookingDataChange("cafe", "time", e.target.value)
@@ -43,7 +43,7 @@ const CafeBookingForm = ({
 
         <InputField
           label="Duration (Hours)"
-          icon={<MdAccessTime size={16} />}
+          icon={<Clock size={16} />}
           type="number"
           min="1"
           max={resources.cafe.maxDuration || 8}
@@ -62,7 +62,7 @@ const CafeBookingForm = ({
       {/* Chair Selection */}
       <div className="space-y-2 sm:space-y-3">
         <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
-          <MdLocalCafe size={14} className="sm:w-4 sm:h-4" />
+          <Coffee size={14} className="sm:w-4 sm:h-4" />
           <span>Select Chairs</span>
           {bookingData.cafe.chairIds.length > 0 && (
             <span className="text-blue-600 text-xs sm:text-sm">
@@ -105,7 +105,7 @@ const CafeBookingForm = ({
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-0.5 sm:space-y-1">
-                    <MdLocalCafe size={16} className="sm:w-5 sm:h-5" />
+                    <Coffee size={16} className="sm:w-5 sm:h-5" />
                     <span>{chair.id}</span>
                     <span className="text-xs">
                       {!isAvailable
@@ -123,12 +123,12 @@ const CafeBookingForm = ({
           bookingData.cafe.time &&
           bookingData.cafe.duration ? (
           <div className="text-center py-8 text-gray-500">
-            <MdLocalCafe size={48} className="mx-auto mb-2 text-gray-300" />
+            <Coffee size={48} className="mx-auto mb-2 text-gray-300" />
             <p>No chairs found for the selected time slot</p>
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
-            <MdCalendarToday size={48} className="mx-auto mb-2 text-gray-300" />
+            <Calendar size={48} className="mx-auto mb-2 text-gray-300" />
             <p>
               Please select date, time, and duration to see available chairs
             </p>
@@ -139,7 +139,7 @@ const CafeBookingForm = ({
       {/* Special Requests */}
       <div className="space-y-1">
         <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
-          <MdLocalCafe size={14} className="sm:w-4 sm:h-4" />
+          <Coffee size={14} className="sm:w-4 sm:h-4" />
           <span>Special Requests</span>
         </label>
         <textarea

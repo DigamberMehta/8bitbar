@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  MdMusicNote,
-  MdGroup,
-  MdCalendarToday,
-  MdAccessTime,
-} from "react-icons/md";
+import { Music, Users, Calendar, Clock } from "lucide-react";
 import { InputField, SelectField } from "./FormComponents";
 import TimeSlotSelector from "./TimeSlotSelector";
 
@@ -23,7 +18,7 @@ const KaraokeBookingForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <SelectField
           label="Room"
-          icon={<MdMusicNote size={16} />}
+          icon={<Music size={16} />}
           value={bookingData.karaoke.roomId}
           onChange={(e) => {
             handleBookingDataChange("karaoke", "roomId", e.target.value);
@@ -41,7 +36,7 @@ const KaraokeBookingForm = ({
 
         <InputField
           label="Number of People"
-          icon={<MdGroup size={16} />}
+          icon={<Users size={16} />}
           type="number"
           min="1"
           value={bookingData.karaoke.numberOfPeople}
@@ -60,7 +55,7 @@ const KaraokeBookingForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <InputField
           label="Date"
-          icon={<MdCalendarToday size={16} />}
+          icon={<Calendar size={16} />}
           type="date"
           value={
             bookingData.karaoke.startDateTime
@@ -81,7 +76,7 @@ const KaraokeBookingForm = ({
 
         <SelectField
           label="Duration"
-          icon={<MdAccessTime size={16} />}
+          icon={<Clock size={16} />}
           value={bookingData.karaoke.durationHours}
           onChange={(e) =>
             handleBookingDataChange(
@@ -104,7 +99,7 @@ const KaraokeBookingForm = ({
       {bookingData.karaoke.roomId && bookingData.karaoke.startDateTime && (
         <div className="space-y-2 sm:space-y-3">
           <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
-            <MdAccessTime size={14} className="sm:w-4 sm:h-4" />
+            <Clock size={14} className="sm:w-4 sm:h-4" />
             <span>Select Start Time</span>
           </label>
 
