@@ -2,22 +2,11 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import { generateToken } from "../utils/generateToken.js";
-import rateLimit from "express-rate-limit";
 
 const router = express.Router();
 
-// Rate limiter for client auth routes
-const clientAuthLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5, // limit each IP to 5 requests per windowMs
-  message: {
-    success: false,
-    message: "Too many requests, please try again later.",
-  },
-});
-
 // --- Client Login Route (Admin Only) ---
-router.post("/login", clientAuthLimiter, async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
