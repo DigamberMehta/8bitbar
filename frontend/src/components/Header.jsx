@@ -18,11 +18,17 @@ const Header = () => {
     { path: "/contact", label: "Contact" },
   ];
 
-  // Add admin panel to nav items if user is admin or superadmin
-  const adminNavItems =
-    user?.role === "admin" || user?.role === "superadmin"
-      ? [...navItems, { path: "/admin", label: "Admin Panel" }]
-      : navItems;
+  // Add admin panel to nav items if user is superadmin, staff panel if admin
+  const getAdminNavItems = () => {
+    if (user?.role === "superadmin") {
+      return [...navItems, { path: "/admin", label: "Admin Panel" }];
+    } else if (user?.role === "admin") {
+      return [...navItems, { path: "/staff/login", label: "Staff Panel" }];
+    }
+    return navItems;
+  };
+
+  const adminNavItems = getAdminNavItems();
 
   const isActive = (path) => location.pathname === path;
 
@@ -46,7 +52,7 @@ const Header = () => {
                 key={item.path}
                 to={item.path}
                 className={`relative px-3 py-2 text-sm font-medium transition-all duration-300 ${
-                  item.label === "Admin Panel"
+                  item.label === "Admin Panel" || item.label === "Staff Panel"
                     ? isActive(item.path)
                       ? "text-orange-400 neon-text-orange"
                       : "text-orange-300 hover:text-orange-400"
@@ -59,7 +65,8 @@ const Header = () => {
                 {isActive(item.path) && (
                   <div
                     className={`absolute bottom-0 left-0 w-full h-0.5 ${
-                      item.label === "Admin Panel"
+                      item.label === "Admin Panel" ||
+                      item.label === "Staff Panel"
                         ? "bg-gradient-to-r from-orange-500 to-red-400 neon-glow-orange"
                         : "bg-gradient-to-r from-pink-500 to-cyan-400 neon-glow-cyan"
                     }`}
@@ -126,7 +133,7 @@ const Header = () => {
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={`block px-3 py-2 text-base font-medium transition-colors ${
-                    item.label === "Admin Panel"
+                    item.label === "Admin Panel" || item.label === "Staff Panel"
                       ? isActive(item.path)
                         ? "text-orange-400 bg-gray-800"
                         : "text-orange-300 hover:text-orange-400 hover:bg-gray-800"
