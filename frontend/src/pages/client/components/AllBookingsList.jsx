@@ -24,11 +24,10 @@ const AllBookingsList = () => {
   });
   const [dateRange, setDateRange] = useState(() => {
     const now = new Date();
-    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const currentDate = now.toISOString().split("T")[0];
     return {
-      startDate: startDate.toISOString().split("T")[0],
-      endDate: endDate.toISOString().split("T")[0],
+      startDate: currentDate,
+      endDate: currentDate,
     };
   });
 
