@@ -94,26 +94,33 @@ router.get("/karaoke-bookings", async (req, res) => {
 router.patch("/karaoke-bookings/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
+
     
     // Determine payment status based on booking status
     let paymentStatus;
     switch (status) {
       case "pending":
         paymentStatus = "pending";
+       
         break;
       case "confirmed":
         paymentStatus = "completed";
+       
         break;
       case "cancelled":
       case "completed":
         // Keep existing payment status for cancelled/completed bookings
         const existingBooking = await KaraokeBooking.findById(req.params.id);
         paymentStatus = existingBooking.paymentStatus;
+      
         break;
       default:
         paymentStatus = "pending";
+      
     }
-    
+
+  
+
     const booking = await KaraokeBooking.findByIdAndUpdate(
       req.params.id,
       { status, paymentStatus },
@@ -121,8 +128,11 @@ router.patch("/karaoke-bookings/:id/status", async (req, res) => {
     )
       .populate("userId", "name email")
       .populate("roomId", "name");
+
+ 
     res.json({ booking });
   } catch (error) {
+    console.error("❌ Error updating karaoke booking status:", error);
     res.status(500).json({ message: "Error updating booking status" });
   }
 });
@@ -169,7 +179,15 @@ router.post("/karaoke-rooms", async (req, res) => {
         "9:00 PM",
         "10:00 PM",
       ],
-      weekDays: weekDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      weekDays: weekDays || [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
       inclusions: {
         microphones: inclusions?.microphones || 4,
         features: inclusions?.features || [

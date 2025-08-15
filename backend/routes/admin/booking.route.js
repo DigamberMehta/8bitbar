@@ -86,7 +86,6 @@ router.post("/karaoke", async (req, res) => {
       numberOfPeople,
       startDateTime,
       durationHours,
-      paymentStatus = "completed", // Admin bookings are typically paid
       status,
       staffPin, // New field for staff identification
     } = req.body;
@@ -170,6 +169,11 @@ router.post("/karaoke", async (req, res) => {
       });
     }
 
+    // Determine payment status based on booking status
+    // If status is "pending", payment is not completed yet
+    // If status is "confirmed", payment is completed
+    const paymentStatus = status === "confirmed" ? "completed" : "pending";
+
     // Create booking with staff information
     const booking = await KaraokeBooking.create({
       userId: user._id,
@@ -229,7 +233,6 @@ router.post("/n64", async (req, res) => {
       numberOfPeople,
       startDateTime,
       durationHours,
-      paymentStatus = "completed",
       status,
       staffPin, // New field for staff identification
     } = req.body;
@@ -314,6 +317,11 @@ router.post("/n64", async (req, res) => {
       });
     }
 
+    // Determine payment status based on booking status
+    // If status is "pending", payment is not completed yet
+    // If status is "confirmed", payment is completed
+    const paymentStatus = status === "confirmed" ? "completed" : "pending";
+
     // Create booking with staff information
     const booking = await N64Booking.create({
       userId: user._id,
@@ -375,7 +383,6 @@ router.post("/cafe", async (req, res) => {
       duration,
       specialRequests,
       deviceType = "desktop",
-      paymentStatus = "completed",
       status,
       staffPin, // New field for staff identification
     } = req.body;
@@ -453,6 +460,11 @@ router.post("/cafe", async (req, res) => {
         message: "One or more chairs are already booked for this time slot",
       });
     }
+
+    // Determine payment status based on booking status
+    // If status is "pending", payment is not completed yet
+    // If status is "confirmed", payment is completed
+    const paymentStatus = status === "confirmed" ? "completed" : "pending";
 
     // Create booking with staff information
     const booking = await CafeBooking.create({

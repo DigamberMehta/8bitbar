@@ -330,8 +330,7 @@ const ManualBooking = () => {
           time: bookingData.cafe.time,
           duration: bookingData.cafe.duration,
           specialRequests: bookingData.cafe.specialRequests,
-          status: "pending", // Always start as pending for staff
-          paymentStatus: "completed", // Payment completed for staff bookings
+          status: bookingData.cafe.status, // Use selected status
           staffPin: staffInfo.pin,
         };
       } else {
