@@ -291,6 +291,9 @@ const AllBookingsList = () => {
                     Booking Details
                   </th>
                   <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Details
+                  </th>
+                  <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
@@ -354,13 +357,21 @@ const AllBookingsList = () => {
                               formatDateTime(booking.startDateTime)
                             )}
                           </div>
-                          
+
                           {/* Duration */}
                           <div className="text-gray-600">
-                            Duration: {safeRender(booking.durationHours || booking.duration)} hour(s)
+                            Duration:{" "}
+                            {safeRender(
+                              booking.durationHours || booking.duration
+                            )}{" "}
+                            hour(s)
                           </div>
-                          
-                          {/* Additional Details */}
+
+                        </div>
+                      </td>
+                      <td className="px-3 md:px-6 py-3 md:py-4">
+                        <div className="text-sm text-gray-900 space-y-1">
+                          {/* Service-specific Details */}
                           {booking.serviceType === "cafe" && (
                             <div className="text-gray-600">
                               <div className="flex flex-wrap gap-1 mb-1">
@@ -381,32 +392,37 @@ const AllBookingsList = () => {
                               </div>
                             </div>
                           )}
-                          
-                          {booking.serviceType === "karaoke" && booking.roomId && (
-                            <div className="text-gray-600">
-                              Room: {safeRender(booking.roomId?.name || "Unknown Room")}
-                            </div>
-                          )}
-                          
+
+                          {booking.serviceType === "karaoke" &&
+                            booking.roomId && (
+                              <div className="text-gray-600">
+                                Room:{" "}
+                                {safeRender(
+                                  booking.roomId?.name || "Unknown Room"
+                                )}
+                              </div>
+                            )}
+
                           {booking.serviceType === "n64" && booking.roomId && (
                             <div className="text-gray-600">
-                              Booth: {safeRender(booking.roomId?.name || "Unknown Booth")}
+                              Booth:{" "}
+                              {safeRender(
+                                booking.roomId?.name || "Unknown Booth"
+                              )}
                             </div>
                           )}
-                          
+
                           {/* People Count */}
                           {booking.numberOfPeople && (
                             <div className="text-gray-600">
                               People: {safeRender(booking.numberOfPeople)}
                             </div>
                           )}
-                          
+
                           {/* Special Requests */}
                           {booking.specialRequests && (
-                            <div className="text-gray-600">
-                              <div className="text-xs">
-                                Requests: {booking.specialRequests}
-                              </div>
+                            <div className="text-xs text-gray-600">
+                              Requests: {booking.specialRequests}
                             </div>
                           )}
                         </div>
