@@ -65,7 +65,7 @@ const ManualBooking = () => {
   const [showPinModal, setShowPinModal] = useState(false);
   const [staffInfo, setStaffInfo] = useState(null);
   const [bookingInProgress, setBookingInProgress] = useState(false);
-  
+
   // Customer popup state
   const [showCustomerPopup, setShowCustomerPopup] = useState(false);
 
