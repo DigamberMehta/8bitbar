@@ -295,16 +295,15 @@ const KaraokeBookingsAdmin = () => {
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      {(() => {
-                        const statusInfo = getStatusInfo(booking.status);
-                        return (
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}
-                          >
-                            {statusInfo.text}
-                          </span>
-                        );
-                      })()}
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          booking.paymentStatus === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {booking.paymentStatus === "completed" ? "Paid" : "Not Paid"}
+                      </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                       <ActionButtons booking={booking} />
@@ -449,10 +448,12 @@ const KaraokeBookingsAdmin = () => {
                 </div>
                 <span
                   className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
-                    getStatusInfo(booking.status).color
+                    booking.paymentStatus === "completed"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
                   }`}
                 >
-                  {getStatusInfo(booking.status).text}
+                  {booking.paymentStatus === "completed" ? "Paid" : "Not Paid"}
                 </span>
               </div>
               <div className="mt-4 border-t border-gray-200 pt-4">
