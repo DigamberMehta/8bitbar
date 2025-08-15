@@ -127,6 +127,34 @@ const AllBookingsList = () => {
     }
   };
 
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    } catch (error) {
+      return "Invalid Date";
+    }
+  };
+
+  const formatTime = (timeString) => {
+    try {
+      if (!timeString) return "Invalid Time";
+      const [hour, minute] = timeString.split(":");
+      const date = new Date();
+      date.setHours(parseInt(hour), parseInt(minute), 0, 0);
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      return "Invalid Time";
+    }
+  };
+
   // Helper function to safely render values
   const safeRender = (value) => {
     if (value === null || value === undefined) return "";
@@ -319,7 +347,16 @@ const AllBookingsList = () => {
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {formatDateTime(booking.startDateTime)}
+                          {booking.serviceType === "cafe" ? (
+                            <div>
+                              <div>{formatDate(booking.date)}</div>
+                              <div className="text-gray-500">
+                                {formatTime(booking.time)}
+                              </div>
+                            </div>
+                          ) : (
+                            formatDateTime(booking.startDateTime)
+                          )}
                         </div>
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-900">
@@ -327,12 +364,43 @@ const AllBookingsList = () => {
                         hour(s)
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
-                        {getStatusBadge(safeRender(booking.status))}
+                        <div className="space-y-1">
+                          {getStatusBadge(safeRender(booking.status))}
+                          {booking.serviceType === "cafe" &&
+                            booking.paymentStatus && (
+                              <div className="text-xs">
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    booking.paymentStatus === "completed"
+                                      ? "bg-green-100 text-green-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                                  }`}
+                                >
+                                  Payment: {booking.paymentStatus}
+                                </span>
+                              </div>
+                            )}
+                        </div>
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-500">
                         {booking.serviceType === "cafe" && (
                           <div>
-                            Chairs: {booking.chairIds?.length || 0}
+                            <div className="flex flex-wrap gap-1 mb-1">
+                              {booking.chairIds?.map((chairId, index) => (
+                                <span
+                                  key={index}
+                                  className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                                >
+                                  {typeof chairId === "string" &&
+                                  chairId.length < 10
+                                    ? chairId
+                                    : `Chair ${index + 1}`}
+                                </span>
+                              ))}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {booking.chairIds?.length || 0} chair(s)
+                            </div>
                             {booking.specialRequests && (
                               <div className="text-xs mt-1">
                                 Requests: {booking.specialRequests}

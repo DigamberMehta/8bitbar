@@ -41,8 +41,6 @@ import ManualBooking from "./pages/admin/manualbooking";
 import FinancePage from "./pages/admin/FinancePage";
 import AllBookings from "./pages/admin/AllBookings";
 import PinManagement from "./pages/admin/PinManagement";
-import StaffLoginPage from "./pages/staff/StaffLoginPage";
-import StaffDashboard from "./pages/staff/StaffDashboard";
 
 // Import Client Components
 import ClientLayout from "./components/ClientLayout";
@@ -145,28 +143,6 @@ function App() {
                   <>
                     <Header />
                     <BarMapEditor />
-                    <Footer />
-                  </>
-                }
-              />
-
-              {/* Staff Routes */}
-              <Route
-                path="/staff-login"
-                element={
-                  <>
-                    <Header />
-                    <StaffLoginPage />
-                    <Footer />
-                  </>
-                }
-              />
-              <Route
-                path="/staff"
-                element={
-                  <>
-                    <Header />
-                    <StaffDashboard />
                     <Footer />
                   </>
                 }

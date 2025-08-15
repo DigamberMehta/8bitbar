@@ -225,3 +225,4 @@ const StaffSignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
 };
 
 export default StaffSignupModal;
+

@@ -315,11 +315,33 @@ const ManualBooking = () => {
     }
 
     try {
-      const payload = {
-        ...formData,
-        ...bookingData[activeService],
-        staffPin: staffInfo.pin,
-      };
+      // Prepare payload based on service type
+      let payload;
+
+      if (activeService === "cafe") {
+        // For cafe, ensure we send the correct data structure
+        payload = {
+          customerName: formData.customerName,
+          customerEmail: formData.customerEmail,
+          customerPhone: formData.customerPhone,
+          customerDob: formData.customerDob,
+          chairIds: bookingData.cafe.chairIds,
+          date: bookingData.cafe.date,
+          time: bookingData.cafe.time,
+          duration: bookingData.cafe.duration,
+          specialRequests: bookingData.cafe.specialRequests,
+          status: "pending", // Always start as pending for staff
+          paymentStatus: "completed", // Payment completed for staff bookings
+          staffPin: staffInfo.pin,
+        };
+      } else {
+        // For other services, use existing logic
+        payload = {
+          ...formData,
+          ...bookingData[activeService],
+          staffPin: staffInfo.pin,
+        };
+      }
 
       const response = await api.post(
         `/admin/bookings/${activeService}`,
