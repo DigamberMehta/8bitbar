@@ -457,8 +457,8 @@ const ManualBooking = () => {
   }
 
   return (
-    <div className="p-2 sm:p-4 md:p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">
+    <div className="w-full p-2 sm:p-4 md:p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">
         Manual Booking
       </h1>
 
@@ -517,7 +517,7 @@ const ManualBooking = () => {
 
       {/* Service Selection */}
       <div className="mb-4 sm:mb-6 md:mb-8">
-        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">
+        <h2 className="text-xs sm:text-sm md:text-base font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">
           Select Service
         </h2>
         <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
@@ -547,7 +547,7 @@ const ManualBooking = () => {
 
       {/* Status Selection */}
       <div className="mb-4 sm:mb-6 md:mb-8">
-        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">
+        <h2 className="text-xs sm:text-sm md:text-base font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">
           Payment Status
         </h2>
         <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
@@ -562,7 +562,7 @@ const ManualBooking = () => {
               }
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
-            <span className="text-sm sm:text-base text-gray-700">Not Paid</span>
+            <span className="text-xs sm:text-sm text-gray-700">Not Paid</span>
           </label>
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
@@ -575,7 +575,7 @@ const ManualBooking = () => {
               }
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
-            <span className="text-sm sm:text-base text-gray-700">Paid</span>
+            <span className="text-xs sm:text-sm text-gray-700">Paid</span>
           </label>
         </div>
       </div>
@@ -607,7 +607,7 @@ const ManualBooking = () => {
 
         {/* Booking Details */}
         <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
-          <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
+          <h3 className="text-xs sm:text-sm md:text-base font-semibold text-gray-800 mb-3 sm:mb-4">
             {activeService.charAt(0).toUpperCase() + activeService.slice(1)}{" "}
             Booking Details
           </h3>
