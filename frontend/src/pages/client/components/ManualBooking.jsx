@@ -5,12 +5,14 @@ import {
   MdVideogameAsset,
   MdLocalCafe,
   MdAttachMoney,
+  MdPersonAdd,
 } from "react-icons/md";
 import { ServiceTab, CustomerInfoForm } from "./FormComponents";
 import KaraokeBookingForm from "./KaraokeBookingForm";
 import N64BookingForm from "./N64BookingForm";
 import CafeBookingForm from "./CafeBookingForm";
 import PinInputModal from "../../../components/admin/PinInputModal";
+import CustomerInputPopup from "./CustomerInputPopup";
 
 const ManualBooking = () => {
   const [activeService, setActiveService] = useState("karaoke");
@@ -63,6 +65,9 @@ const ManualBooking = () => {
   const [showPinModal, setShowPinModal] = useState(false);
   const [staffInfo, setStaffInfo] = useState(null);
   const [bookingInProgress, setBookingInProgress] = useState(false);
+  
+  // Customer popup state
+  const [showCustomerPopup, setShowCustomerPopup] = useState(false);
 
   useEffect(() => {
     fetchResources();
@@ -436,6 +441,11 @@ const ManualBooking = () => {
     }
   };
 
+  const handleCustomerSubmit = (customerData) => {
+    setFormData(customerData);
+    setShowCustomerPopup(false);
+  };
+
   if (loading && !resources.karaoke.length) {
     return (
       <div className="p-6 bg-gray-100 min-h-screen">
@@ -575,10 +585,25 @@ const ManualBooking = () => {
         className="space-y-4 sm:space-y-6 md:space-y-8"
       >
         {/* Customer Information */}
-        <CustomerInfoForm
-          formData={formData}
-          handleInputChange={handleInputChange}
-        />
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+              Customer Information
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowCustomerPopup(true)}
+              className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-md"
+            >
+              <MdPersonAdd size={20} />
+              <span className="text-base font-medium">Customer Input</span>
+            </button>
+          </div>
+          <CustomerInfoForm
+            formData={formData}
+            handleInputChange={handleInputChange}
+          />
+        </div>
 
         {/* Booking Details */}
         <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
@@ -716,6 +741,14 @@ const ManualBooking = () => {
         onClose={() => !bookingInProgress && setShowPinModal(false)}
         onPinVerified={handlePinVerified}
         bookingInProgress={bookingInProgress}
+      />
+
+      {/* Customer Input Popup */}
+      <CustomerInputPopup
+        isOpen={showCustomerPopup}
+        onClose={() => setShowCustomerPopup(false)}
+        onCustomerSubmit={handleCustomerSubmit}
+        initialData={formData}
       />
     </div>
   );
