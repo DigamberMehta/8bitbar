@@ -60,7 +60,7 @@ const CustomerInputPopup = ({
                 value={formData.customerName}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border text-black border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 placeholder="Enter your full name"
               />
             </div>
@@ -76,7 +76,7 @@ const CustomerInputPopup = ({
                 value={formData.customerEmail}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border text-black border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 placeholder="Enter your email address"
               />
             </div>
@@ -92,7 +92,7 @@ const CustomerInputPopup = ({
                 value={formData.customerPhone}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border text-black border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 placeholder="Enter your phone number"
               />
             </div>

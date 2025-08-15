@@ -51,7 +51,7 @@ const ClientDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with tabs and logout */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
@@ -65,18 +65,15 @@ const ClientDashboard = () => {
                   const colorClasses = {
                     blue: {
                       active: "bg-blue-600 text-white shadow-md",
-                      inactive:
-                        "bg-blue-500 text-white hover:bg-blue-600",
+                      inactive: "bg-blue-500 text-white hover:bg-blue-600",
                     },
                     green: {
                       active: "bg-green-600 text-white shadow-md",
-                      inactive:
-                        "bg-green-500 text-white hover:bg-green-600",
+                      inactive: "bg-green-500 text-white hover:bg-green-600",
                     },
                     purple: {
                       active: "bg-purple-600 text-white shadow-md",
-                      inactive:
-                        "bg-purple-500 text-white hover:bg-purple-600",
+                      inactive: "bg-purple-500 text-white hover:bg-purple-600",
                     },
                   };
 
