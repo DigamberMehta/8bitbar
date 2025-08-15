@@ -284,7 +284,7 @@ const AllBookingsList = () => {
                   <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Service
                   </th>
-                  <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">
                     Customer
                   </th>
                   <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -327,16 +327,16 @@ const AllBookingsList = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                      <td className="px-3 md:px-6 py-3 md:py-4 w-48">
                         <div className="text-sm text-gray-900">
-                          <div className="font-medium">
+                          <div className="font-medium truncate" title={safeRender(booking.customerName)}>
                             {safeRender(booking.customerName)}
                           </div>
-                          <div className="text-gray-500">
+                          <div className="text-gray-500 truncate" title={safeRender(booking.customerEmail)}>
                             {safeRender(booking.customerEmail)}
                           </div>
                           {booking.customerPhone && (
-                            <div className="text-gray-500">
+                            <div className="text-gray-500 truncate" title={safeRender(booking.customerPhone)}>
                               {safeRender(booking.customerPhone)}
                             </div>
                           )}
