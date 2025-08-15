@@ -288,16 +288,10 @@ const AllBookingsList = () => {
                     Customer
                   </th>
                   <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date & Time
-                  </th>
-                  <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Duration
+                    Booking Details
                   </th>
                   <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
-                  </th>
-                  <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Details
                   </th>
                 </tr>
               </thead>
@@ -345,23 +339,77 @@ const AllBookingsList = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {booking.serviceType === "cafe" ? (
-                            <div>
-                              <div>{formatDate(booking.date)}</div>
-                              <div className="text-gray-500">
-                                {formatTime(booking.time)}
+                      <td className="px-3 md:px-6 py-3 md:py-4">
+                        <div className="text-sm text-gray-900 space-y-1">
+                          {/* Date & Time */}
+                          <div className="font-medium">
+                            {booking.serviceType === "cafe" ? (
+                              <div>
+                                <div>{formatDate(booking.date)}</div>
+                                <div className="text-gray-600">
+                                  {formatTime(booking.time)}
+                                </div>
+                              </div>
+                            ) : (
+                              formatDateTime(booking.startDateTime)
+                            )}
+                          </div>
+                          
+                          {/* Duration */}
+                          <div className="text-gray-600">
+                            Duration: {safeRender(booking.durationHours || booking.duration)} hour(s)
+                          </div>
+                          
+                          {/* Additional Details */}
+                          {booking.serviceType === "cafe" && (
+                            <div className="text-gray-600">
+                              <div className="flex flex-wrap gap-1 mb-1">
+                                {booking.chairIds?.map((chairId, index) => (
+                                  <span
+                                    key={index}
+                                    className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                                  >
+                                    {typeof chairId === "string" &&
+                                    chairId.length < 10
+                                      ? chairId
+                                      : `Chair ${index + 1}`}
+                                  </span>
+                                ))}
+                              </div>
+                              <div className="text-xs">
+                                {booking.chairIds?.length || 0} chair(s)
                               </div>
                             </div>
-                          ) : (
-                            formatDateTime(booking.startDateTime)
+                          )}
+                          
+                          {booking.serviceType === "karaoke" && booking.roomId && (
+                            <div className="text-gray-600">
+                              Room: {safeRender(booking.roomId?.name || "Unknown Room")}
+                            </div>
+                          )}
+                          
+                          {booking.serviceType === "n64" && booking.roomId && (
+                            <div className="text-gray-600">
+                              Booth: {safeRender(booking.roomId?.name || "Unknown Booth")}
+                            </div>
+                          )}
+                          
+                          {/* People Count */}
+                          {booking.numberOfPeople && (
+                            <div className="text-gray-600">
+                              People: {safeRender(booking.numberOfPeople)}
+                            </div>
+                          )}
+                          
+                          {/* Special Requests */}
+                          {booking.specialRequests && (
+                            <div className="text-gray-600">
+                              <div className="text-xs">
+                                Requests: {booking.specialRequests}
+                              </div>
+                            </div>
                           )}
                         </div>
-                      </td>
-                      <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                        {safeRender(booking.durationHours || booking.duration)}{" "}
-                        hour(s)
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
                         <div className="space-y-1">
@@ -378,56 +426,6 @@ const AllBookingsList = () => {
                               : "Not Paid"}
                           </span>
                         </div>
-                      </td>
-                      <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-500">
-                        {booking.serviceType === "cafe" && (
-                          <div>
-                            <div className="flex flex-wrap gap-1 mb-1">
-                              {booking.chairIds?.map((chairId, index) => (
-                                <span
-                                  key={index}
-                                  className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                                >
-                                  {typeof chairId === "string" &&
-                                  chairId.length < 10
-                                    ? chairId
-                                    : `Chair ${index + 1}`}
-                                </span>
-                              ))}
-                            </div>
-                            <div className="text-xs text-gray-600">
-                              {booking.chairIds?.length || 0} chair(s)
-                            </div>
-                            {booking.specialRequests && (
-                              <div className="text-xs mt-1">
-                                Requests: {booking.specialRequests}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {booking.serviceType === "karaoke" && (
-                          <div>
-                            People: {safeRender(booking.numberOfPeople)}
-                            {booking.roomId && (
-                              <div className="text-xs mt-1">
-                                Room:{" "}
-                                {safeRender(
-                                  booking.roomId.name || booking.roomId
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {booking.serviceType === "n64" && (
-                          <div>
-                            People: {safeRender(booking.numberOfPeople)}
-                            {booking.roomType && (
-                              <div className="text-xs mt-1">
-                                Type: {safeRender(booking.roomType)}
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </td>
                     </tr>
                   );
