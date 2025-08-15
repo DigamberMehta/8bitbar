@@ -373,7 +373,9 @@ const AllBookingsList = () => {
                                 : "bg-yellow-100 text-yellow-800"
                             }`}
                           >
-                            {booking.paymentStatus === "completed" ? "Paid" : "Not Paid"}
+                            {booking.paymentStatus === "completed"
+                              ? "Paid"
+                              : "Not Paid"}
                           </span>
                         </div>
                       </td>

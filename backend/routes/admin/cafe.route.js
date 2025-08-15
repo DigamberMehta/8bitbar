@@ -79,32 +79,48 @@ router.get("/cafe-bookings", async (req, res) => {
 router.patch("/cafe-bookings/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
-    
+
+    console.log(
+      `🔄 Updating cafe booking ${req.params.id} status to: ${status}`
+    );
+
     // Determine payment status based on booking status
     let paymentStatus;
     switch (status) {
       case "pending":
         paymentStatus = "pending";
+        console.log(`📝 Setting paymentStatus to: ${paymentStatus} (Not Paid)`);
         break;
       case "confirmed":
         paymentStatus = "completed";
+        console.log(`📝 Setting paymentStatus to: ${paymentStatus} (Paid)`);
         break;
       case "cancelled":
       case "completed":
         // Keep existing payment status for cancelled/completed bookings
         const existingBooking = await CafeBooking.findById(req.params.id);
         paymentStatus = existingBooking.paymentStatus;
+        console.log(`📝 Keeping existing paymentStatus: ${paymentStatus}`);
         break;
       default:
         paymentStatus = "pending";
+        console.log(`📝 Default paymentStatus to: ${paymentStatus}`);
     }
-    
+
+    console.log(
+      `💾 Updating cafe booking with status: ${status}, paymentStatus: ${paymentStatus}`
+    );
+
     const booking = await CafeBooking.findByIdAndUpdate(
       req.params.id,
       { status, paymentStatus },
       { new: true }
     ).populate("userId", "name email");
-    
+
+    console.log(
+      `✅ Updated cafe booking - status: ${booking.status}, paymentStatus: ${booking.paymentStatus}`
+    );
+
     res.json({ booking });
   } catch (error) {
     res.status(500).json({ message: "Error updating booking status" });
