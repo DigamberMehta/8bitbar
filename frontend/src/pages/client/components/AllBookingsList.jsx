@@ -365,25 +365,16 @@ const AllBookingsList = () => {
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
                         <div className="space-y-1">
-                          {/* Show booking status badge */}
-                          {getStatusBadge(safeRender(booking.status))}
-
-                          {/* Show simplified payment status */}
-                          {booking.paymentStatus && (
-                            <div className="text-xs">
-                              <span
-                                className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
-                                  booking.paymentStatus === "completed"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-yellow-100 text-yellow-800"
-                                }`}
-                              >
-                                {booking.paymentStatus === "completed"
-                                  ? "Paid"
-                                  : "Not Paid"}
-                              </span>
-                            </div>
-                          )}
+                          {/* Show payment status based on paymentStatus field */}
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              booking.paymentStatus === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {booking.paymentStatus === "completed" ? "Paid" : "Not Paid"}
+                          </span>
                         </div>
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-500">

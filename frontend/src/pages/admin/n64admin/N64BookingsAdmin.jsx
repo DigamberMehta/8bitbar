@@ -8,19 +8,17 @@ const N64BookingsAdmin = () => {
   const [dateFilter, setDateFilter] = useState("");
   const [sortBy, setSortBy] = useState("newest");
 
-  // Helper function to get user-friendly status text
-  const getStatusText = (status) => {
-    switch (status) {
+  // Helper function to get user-friendly payment status text
+  const getPaymentStatusText = (paymentStatus) => {
+    switch (paymentStatus) {
+      case "completed":
+        return "Paid";
       case "pending":
         return "Not Paid";
-      case "confirmed":
-        return "Paid";
-      case "completed":
-        return "Completed";
-      case "cancelled":
-        return "Cancelled";
+      case "failed":
+        return "Failed";
       default:
-        return status.charAt(0).toUpperCase() + status.slice(1);
+        return "Not Paid";
     }
   };
 
@@ -312,16 +310,15 @@ const N64BookingsAdmin = () => {
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      {(() => {
-                        const statusInfo = getStatusInfo(booking.status);
-                        return (
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}
-                          >
-                            {statusInfo.text}
-                          </span>
-                        );
-                      })()}
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          booking.paymentStatus === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {getPaymentStatusText(booking.paymentStatus)}
+                      </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                       <ActionButtons booking={booking} />
@@ -466,10 +463,12 @@ const N64BookingsAdmin = () => {
                 </div>
                 <span
                   className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
-                    getStatusInfo(booking.status).color
+                    booking.paymentStatus === "completed"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
                   }`}
                 >
-                  {getStatusInfo(booking.status).text}
+                  {getPaymentStatusText(booking.paymentStatus)}
                 </span>
               </div>
               <div className="mt-4 border-t border-gray-200 pt-4">
