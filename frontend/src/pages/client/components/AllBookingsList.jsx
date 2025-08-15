@@ -329,14 +329,23 @@ const AllBookingsList = () => {
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 w-48">
                         <div className="text-sm text-gray-900">
-                          <div className="font-medium truncate" title={safeRender(booking.customerName)}>
+                          <div
+                            className="font-medium truncate"
+                            title={safeRender(booking.customerName)}
+                          >
                             {safeRender(booking.customerName)}
                           </div>
-                          <div className="text-gray-500 truncate" title={safeRender(booking.customerEmail)}>
+                          <div
+                            className="text-gray-500 truncate"
+                            title={safeRender(booking.customerEmail)}
+                          >
                             {safeRender(booking.customerEmail)}
                           </div>
                           {booking.customerPhone && (
-                            <div className="text-gray-500 truncate" title={safeRender(booking.customerPhone)}>
+                            <div
+                              className="text-gray-500 truncate"
+                              title={safeRender(booking.customerPhone)}
+                            >
                               {safeRender(booking.customerPhone)}
                             </div>
                           )}
@@ -366,7 +375,6 @@ const AllBookingsList = () => {
                             )}{" "}
                             hour(s)
                           </div>
-
                         </div>
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4">

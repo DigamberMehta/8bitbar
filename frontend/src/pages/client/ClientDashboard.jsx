@@ -64,19 +64,19 @@ const ClientDashboard = () => {
                 {tabs.map((tab) => {
                   const colorClasses = {
                     blue: {
-                      active: "bg-blue-100 text-blue-700 border-blue-200",
+                      active: "bg-blue-600 text-white shadow-md",
                       inactive:
-                        "text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-100",
+                        "bg-blue-500 text-white hover:bg-blue-600",
                     },
                     green: {
-                      active: "bg-green-100 text-green-700 border-green-200",
+                      active: "bg-green-600 text-white shadow-md",
                       inactive:
-                        "text-green-600 hover:text-green-700 hover:bg-green-50 border-green-100",
+                        "bg-green-500 text-white hover:bg-green-600",
                     },
                     purple: {
-                      active: "bg-purple-100 text-purple-700 border-purple-200",
+                      active: "bg-purple-600 text-white shadow-md",
                       inactive:
-                        "text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-100",
+                        "bg-purple-500 text-white hover:bg-purple-600",
                     },
                   };
 
@@ -87,7 +87,7 @@ const ClientDashboard = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 ${
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         isActive ? colors.active : colors.inactive
                       }`}
                     >
