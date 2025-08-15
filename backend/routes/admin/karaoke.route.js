@@ -94,9 +94,29 @@ router.get("/karaoke-bookings", async (req, res) => {
 router.patch("/karaoke-bookings/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
+    
+    // Determine payment status based on booking status
+    let paymentStatus;
+    switch (status) {
+      case "pending":
+        paymentStatus = "pending";
+        break;
+      case "confirmed":
+        paymentStatus = "completed";
+        break;
+      case "cancelled":
+      case "completed":
+        // Keep existing payment status for cancelled/completed bookings
+        const existingBooking = await KaraokeBooking.findById(req.params.id);
+        paymentStatus = existingBooking.paymentStatus;
+        break;
+      default:
+        paymentStatus = "pending";
+    }
+    
     const booking = await KaraokeBooking.findByIdAndUpdate(
       req.params.id,
-      { status },
+      { status, paymentStatus },
       { new: true }
     )
       .populate("userId", "name email")

@@ -365,21 +365,25 @@ const AllBookingsList = () => {
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
                         <div className="space-y-1">
+                          {/* Show booking status badge */}
                           {getStatusBadge(safeRender(booking.status))}
-                          {booking.serviceType === "cafe" &&
-                            booking.paymentStatus && (
-                              <div className="text-xs">
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    booking.paymentStatus === "completed"
-                                      ? "bg-green-100 text-green-800"
-                                      : "bg-yellow-100 text-yellow-800"
-                                  }`}
-                                >
-                                  Payment: {booking.paymentStatus}
-                                </span>
-                              </div>
-                            )}
+
+                          {/* Show simplified payment status */}
+                          {booking.paymentStatus && (
+                            <div className="text-xs">
+                              <span
+                                className={`inline-flex px-1 py-0.5 text-xs font-semibold rounded ${
+                                  booking.paymentStatus === "completed"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-yellow-100 text-yellow-800"
+                                }`}
+                              >
+                                {booking.paymentStatus === "completed"
+                                  ? "Paid"
+                                  : "Not Paid"}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-500">
