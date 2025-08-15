@@ -65,21 +65,24 @@ const ClientDashboard = () => {
                   const colorClasses = {
                     blue: {
                       active: "bg-blue-100 text-blue-700 border-blue-200",
-                      inactive: "text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-100",
+                      inactive:
+                        "text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-100",
                     },
                     green: {
                       active: "bg-green-100 text-green-700 border-green-200",
-                      inactive: "text-green-600 hover:text-green-700 hover:bg-green-50 border-green-100",
+                      inactive:
+                        "text-green-600 hover:text-green-700 hover:bg-green-50 border-green-100",
                     },
                     purple: {
                       active: "bg-purple-100 text-purple-700 border-purple-200",
-                      inactive: "text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-100",
+                      inactive:
+                        "text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-100",
                     },
                   };
-                  
+
                   const isActive = activeTab === tab.id;
                   const colors = colorClasses[tab.color];
-                  
+
                   return (
                     <button
                       key={tab.id}

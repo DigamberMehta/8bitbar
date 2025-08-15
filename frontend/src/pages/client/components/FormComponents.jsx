@@ -17,27 +17,27 @@ export const ServiceTab = ({ service, icon, label, isActive, onClick }) => (
 );
 
 export const InputField = ({ label, icon, ...props }) => (
-  <div className="space-y-1">
-    <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
+  <div className="space-y-2">
+    <label className="flex items-center space-x-2 text-base sm:text-lg font-semibold text-gray-700">
       {icon}
       <span>{label}</span>
     </label>
     <input
       {...props}
-      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 text-xs sm:text-sm"
+      className="w-full px-4 py-3 text-base sm:text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
     />
   </div>
 );
 
 export const SelectField = ({ label, icon, children, ...props }) => (
-  <div className="space-y-1">
-    <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
+  <div className="space-y-2">
+    <label className="flex items-center space-x-2 text-base sm:text-lg font-semibold text-gray-700">
       {icon}
       <span>{label}</span>
     </label>
     <select
       {...props}
-      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 text-xs sm:text-sm"
+      className="w-full px-4 py-3 text-base sm:text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
     >
       {children}
     </select>
@@ -47,7 +47,7 @@ export const SelectField = ({ label, icon, children, ...props }) => (
 export const CustomerInfoForm = ({ formData, handleInputChange }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
-      <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
+      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">
         Customer Information
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
