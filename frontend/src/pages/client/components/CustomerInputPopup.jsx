@@ -32,7 +32,7 @@ const CustomerInputPopup = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[120vh] overflow-y-auto">
         {/* Header */}
         <div className="bg-blue-600 text-white p-4 rounded-t-lg">
           <div className="flex items-center justify-between">
@@ -48,7 +48,7 @@ const CustomerInputPopup = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             {/* Name Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
