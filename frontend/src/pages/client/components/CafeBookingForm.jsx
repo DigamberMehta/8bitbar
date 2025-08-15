@@ -10,6 +10,10 @@ const CafeBookingForm = ({
   handleBookingDataChange,
 }) => {
   const handleChairToggle = (chairId) => {
+    // Find the chair to check availability
+    const chair = chairsWithAvailability.find((c) => c.id === chairId);
+    if (!chair || !chair.isAvailable) return;
+
     const currentChairs = bookingData.cafe.chairIds;
     const newChairs = currentChairs.includes(chairId)
       ? currentChairs.filter((id) => id !== chairId)
@@ -44,18 +48,11 @@ const CafeBookingForm = ({
           required
         >
           <option value="">Select Time</option>
-          <option value="09:00">9:00 AM</option>
-          <option value="10:00">10:00 AM</option>
-          <option value="11:00">11:00 AM</option>
-          <option value="12:00">12:00 PM</option>
-          <option value="13:00">1:00 PM</option>
-          <option value="14:00">2:00 PM</option>
-          <option value="15:00">3:00 PM</option>
-          <option value="16:00">4:00 PM</option>
-          <option value="17:00">5:00 PM</option>
-          <option value="18:00">6:00 PM</option>
-          <option value="19:00">7:00 PM</option>
-          <option value="20:00">8:00 PM</option>
+          {resources.cafe.timeSlots?.map((slot) => (
+            <option key={slot} value={slot}>
+              {slot}
+            </option>
+          ))}
         </SelectField>
       </div>
 
@@ -98,23 +95,41 @@ const CafeBookingForm = ({
             </div>
           ) : chairsWithAvailability.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {chairsWithAvailability.map((chair) => (
-                <button
-                  key={chair._id}
-                  type="button"
-                  onClick={() => handleChairToggle(chair._id)}
-                  className={`p-3 border-2 rounded-lg text-center transition-colors ${
-                    bookingData.cafe.chairIds.includes(chair._id)
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-                  }`}
-                >
-                  <div className="text-sm font-medium">Chair {chair.name}</div>
-                  <div className="text-xs text-gray-500">
-                    ${resources.cafe?.pricePerChairPerHour || 0}/hr
-                  </div>
-                </button>
-              ))}
+              {chairsWithAvailability.map((chair) => {
+                const isSelected = bookingData.cafe.chairIds.includes(chair.id);
+                const isAvailable = chair.isAvailable;
+
+                return (
+                  <button
+                    key={chair._id}
+                    type="button"
+                    onClick={() => {
+                      if (!isAvailable) return;
+                      handleChairToggle(chair.id);
+                    }}
+                    disabled={!isAvailable}
+                    className={`p-2 sm:p-3 rounded-lg border-2 text-xs sm:text-sm font-medium transition-all ${
+                      !isAvailable
+                        ? "bg-red-50 border-red-200 text-red-400 cursor-not-allowed"
+                        : isSelected
+                        ? "bg-blue-100 border-blue-500 text-blue-700 shadow-md"
+                        : "bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-0.5 sm:space-y-1">
+                      <Coffee size={16} className="sm:w-5 sm:h-5" />
+                      <span>{chair.id}</span>
+                      <span className="text-xs">
+                        {!isAvailable
+                          ? "Booked"
+                          : isSelected
+                          ? "Selected"
+                          : "Available"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-4 text-gray-500">

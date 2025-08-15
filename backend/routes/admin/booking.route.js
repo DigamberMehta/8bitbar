@@ -692,7 +692,8 @@ router.get("/cafe/chairs/availability", async (req, res) => {
     // Add availability status to each chair
     const chairsWithAvailability = cafeLayout.chairs.map((chair) => ({
       ...chair.toObject(),
-      isAvailable: !bookedChairs.has(chair.id),
+      isAvailable:
+        !bookedChairs.has(chair.id) && !bookedChairs.has(chair._id.toString()),
     }));
 
     res.json({
