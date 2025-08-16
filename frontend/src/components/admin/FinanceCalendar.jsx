@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -6,6 +6,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import "./FinanceCalendar.css";
 
 const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
+  const [currentView, setCurrentView] = useState("dayGridMonth");
+
   const getEventColor = (serviceType) => {
     switch (serviceType) {
       case "karaoke":
@@ -47,6 +49,9 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
 
   const handleDatesSet = (dateInfo) => {
     console.log("Calendar dates changed:", dateInfo);
+    // Update current view state
+    setCurrentView(dateInfo.view.type);
+
     if (onMonthChange && dateInfo.view.type === "dayGridMonth") {
       // Get the first and last day of the month being displayed
       const startDate = new Date(dateInfo.start);
@@ -91,7 +96,7 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
       <div className="h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px]">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
+          initialView="timeGridDay"
           editable={false}
           selectable={true}
           selectMirror={true}
@@ -113,11 +118,11 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
               {arg.dayNumberText}
             </div>
           )}
-          // Mobile-friendly toolbar
+          // Mobile-friendly toolbar with day view option
           headerToolbar={{
             left: "prev,next",
             center: "title",
-            right: "dayGridMonth,timeGridWeek",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
           }}
           datesSet={handleDatesSet}
         />
