@@ -95,31 +95,26 @@ router.patch("/karaoke-bookings/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
 
-    
     // Determine payment status based on booking status
     let paymentStatus;
     switch (status) {
       case "pending":
         paymentStatus = "pending";
-       
+
         break;
       case "confirmed":
         paymentStatus = "completed";
-       
+
         break;
       case "cancelled":
       case "completed":
         // Keep existing payment status for cancelled/completed bookings
         const existingBooking = await KaraokeBooking.findById(req.params.id);
         paymentStatus = existingBooking.paymentStatus;
-      
         break;
       default:
         paymentStatus = "pending";
-      
     }
-
-  
 
     const booking = await KaraokeBooking.findByIdAndUpdate(
       req.params.id,
@@ -128,12 +123,28 @@ router.patch("/karaoke-bookings/:id/status", async (req, res) => {
     )
       .populate("userId", "name email")
       .populate("roomId", "name");
-
- 
     res.json({ booking });
   } catch (error) {
-    console.error("❌ Error updating karaoke booking status:", error);
     res.status(500).json({ message: "Error updating booking status" });
+  }
+});
+
+// Delete karaoke booking
+router.delete("/karaoke-bookings/:id", async (req, res) => {
+  try {
+    const booking = await KaraokeBooking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    await KaraokeBooking.findByIdAndDelete(req.params.id);
+
+    console.log(`🗑️ Deleted karaoke booking: ${req.params.id}`);
+    res.json({ message: "Karaoke booking deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting karaoke booking:", error);
+    res.status(500).json({ message: "Error deleting karaoke booking" });
   }
 });
 

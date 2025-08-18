@@ -38,6 +38,23 @@ const KaraokeBookingsAdmin = () => {
     }
   };
 
+  const deleteBooking = async (bookingId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this booking? This action cannot be undone."
+      )
+    ) {
+      try {
+        await api.delete(`/admin/karaoke/karaoke-bookings/${bookingId}`);
+        fetchBookings(); // Refresh the list
+        alert("Booking deleted successfully");
+      } catch (error) {
+        console.error("Error deleting booking:", error);
+        alert("Failed to delete booking");
+      }
+    }
+  };
+
   // Helper function to format dates
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -150,6 +167,12 @@ const KaraokeBookingsAdmin = () => {
           </button>
         </>
       )}
+      <button
+        onClick={() => deleteBooking(booking._id)}
+        className="text-xs lg:text-sm font-medium text-red-600 hover:text-red-800 px-2 py-1 rounded border border-red-600 hover:bg-red-50"
+      >
+        Delete
+      </button>
     </div>
   );
 
@@ -302,7 +325,9 @@ const KaraokeBookingsAdmin = () => {
                             : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {booking.paymentStatus === "completed" ? "Paid" : "Not Paid"}
+                        {booking.paymentStatus === "completed"
+                          ? "Paid"
+                          : "Not Paid"}
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">

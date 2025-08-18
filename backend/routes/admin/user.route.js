@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../../models/user.model.js";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
@@ -145,6 +146,76 @@ router.get("/stats", async (req, res) => {
   } catch (error) {
     console.error("Error fetching user stats:", error);
     res.status(500).json({ message: "Error fetching user statistics" });
+  }
+});
+
+// Create new user (superadmin only)
+router.post("/users", async (req, res) => {
+  try {
+    const { name, email, password, role = "customer" } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "Name, email, and password are required",
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        message: "Please provide a valid email address",
+      });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User with this email already exists",
+      });
+    }
+
+    // Validate role
+    if (!["customer", "admin"].includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role. Must be 'customer' or 'admin'",
+      });
+    }
+
+    // Hash password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create new user
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    await newUser.save();
+
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = newUser.toObject();
+
+    console.log(`👤 New user created: ${email} with role: ${role}`);
+    res.status(201).json({
+      message: "User created successfully",
+      user: userWithoutPassword,
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Error creating user" });
   }
 });
 
