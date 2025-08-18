@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { GiftIcon, PlusIcon, StarIcon } from "@heroicons/react/24/outline";
+import {
+  GiftIcon,
+  PlusIcon,
+  StarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/outline";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/axios";
@@ -13,6 +19,7 @@ const GiftCardPurchase = () => {
   const [customAmount, setCustomAmount] = useState("");
   const [customDescription, setCustomDescription] = useState("");
   const [error, setError] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     fetchAvailableGiftCards();
@@ -104,6 +111,20 @@ const GiftCardPurchase = () => {
     ));
   };
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % (giftCards.length + 1));
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prev) => (prev - 1 + (giftCards.length + 1)) % (giftCards.length + 1)
+    );
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -161,8 +182,188 @@ const GiftCardPurchase = () => {
             )}
           </div>
 
-          {/* Gift Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {/* Mobile Carousel */}
+          <div className="block md:hidden mb-12">
+            <div className="relative">
+              {/* Carousel Container */}
+              <div className="overflow-hidden rounded-lg">
+                <div
+                  className="flex transition-transform duration-300 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {/* Gift Cards in Carousel */}
+                  {giftCards.map((giftCard) => (
+                    <div
+                      key={giftCard._id}
+                      className="w-full flex-shrink-0 px-2"
+                    >
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 border border-white/20">
+                        {/* Gift Card Image - Reduced height for mobile */}
+                        <div className="relative h-32 bg-gradient-to-br from-pink-500 to-purple-600 p-4 flex items-center justify-center">
+                          <div className="text-center text-white">
+                            <div className="text-lg font-bold mb-1">
+                              GIFT CARD
+                            </div>
+                            <div className="text-xs opacity-90 mb-1">
+                              {giftCard.code
+                                ? giftCard.code
+                                : "Available for Purchase"}
+                            </div>
+                            <div className="w-full bg-white bg-opacity-20 h-1 mb-1"></div>
+                            <div className="text-sm font-bold">8-BIT BAR</div>
+                            <div className="text-xs opacity-75">NO EXPIRY</div>
+                          </div>
+                        </div>
+
+                        {/* Product Details - Reduced padding for mobile */}
+                        <div className="p-4 bg-black/40">
+                          <h3 className="text-sm font-semibold text-white mb-2">
+                            {giftCard.description ||
+                              `Gift card $${giftCard.amount}`}
+                          </h3>
+
+                          {/* Rating Stars */}
+                          <div className="flex items-center mb-2">
+                            {renderStars()}
+                          </div>
+
+                          {/* Price */}
+                          <div className="text-xl font-bold text-pink-400 mb-3">
+                            ${giftCard.amount.toFixed(2)}
+                          </div>
+
+                          {/* Source Badge */}
+                          {giftCard.source && (
+                            <div className="mb-2">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  giftCard.source === "admin"
+                                    ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+                                    : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                                }`}
+                              >
+                                {giftCard.source === "admin"
+                                  ? "Admin Created"
+                                  : "Predefined"}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Buy Button */}
+                          <button
+                            onClick={() => handlePurchaseGiftCard(giftCard)}
+                            disabled={!user}
+                            className={`w-full py-2 px-3 rounded-lg font-semibold transition-all duration-200 shadow-lg text-sm ${
+                              user
+                                ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 hover:shadow-pink-500/25"
+                                : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                            }`}
+                          >
+                            {user
+                              ? "Buy Now - Pay $" + giftCard.amount
+                              : "Login to purchase"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Custom Gift Card Option in Carousel */}
+                  <div className="w-full flex-shrink-0 px-2">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 border border-white/20">
+                      {/* Custom Gift Card Image - Reduced height for mobile */}
+                      <div className="relative h-32 bg-gradient-to-br from-green-500 to-cyan-600 p-4 flex items-center justify-center">
+                        <div className="text-center text-white">
+                          <PlusIcon className="w-12 h-12 mx-auto mb-1" />
+                          <div className="text-lg font-bold mb-1">CUSTOM</div>
+                          <div className="text-xs opacity-90 mb-1">
+                            Create Your Own
+                          </div>
+                          <div className="w-full bg-white bg-opacity-20 h-1 mb-1"></div>
+                          <div className="text-sm font-bold">8-BIT BAR</div>
+                          <div className="text-xs opacity-75">NO EXPIRY</div>
+                        </div>
+                      </div>
+
+                      {/* Product Details - Reduced padding for mobile */}
+                      <div className="p-4 bg-black/40">
+                        <h3 className="text-sm font-semibold text-white mb-2">
+                          Custom Gift Card
+                        </h3>
+
+                        {/* Rating Stars */}
+                        <div className="flex items-center mb-2">
+                          {renderStars()}
+                        </div>
+
+                        {/* Custom Amount Input */}
+                        <div className="mb-3">
+                          <input
+                            type="number"
+                            min="1"
+                            step="0.01"
+                            placeholder="Enter amount"
+                            value={customAmount}
+                            onChange={(e) => setCustomAmount(e.target.value)}
+                            className="w-full px-2 py-1 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 text-white placeholder-gray-300 text-sm"
+                          />
+                        </div>
+
+                        {/* Create Button */}
+                        <button
+                          onClick={() => setShowCustomForm(true)}
+                          disabled={!user || !customAmount || customAmount <= 0}
+                          className={`w-full py-2 px-3 rounded-lg font-semibold transition-all duration-200 shadow-lg text-sm ${
+                            user && customAmount && customAmount > 0
+                              ? "bg-gradient-to-r from-green-500 to-cyan-600 text-white hover:from-green-600 hover:to-cyan-700 hover:shadow-green-500/25"
+                              : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                          }`}
+                        >
+                          {user
+                            ? customAmount && customAmount > 0
+                              ? `Create & Pay $${customAmount}`
+                              : "Enter amount to create"
+                            : "Login to create"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Carousel Navigation */}
+              <button
+                onClick={prevSlide}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 z-10"
+              >
+                <ChevronLeftIcon className="w-5 h-5" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 z-10"
+              >
+                <ChevronRightIcon className="w-5 h-5" />
+              </button>
+
+              {/* Carousel Indicators */}
+              <div className="flex justify-center mt-4 space-x-2">
+                {Array.from({ length: giftCards.length + 1 }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                      index === currentSlide
+                        ? "bg-pink-500 w-6"
+                        : "bg-white/30 hover:bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Grid - Hidden on mobile */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {/* Available Predefined Gift Cards */}
             {giftCards.map((giftCard) => (
               <div
