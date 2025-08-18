@@ -30,9 +30,6 @@ const SquarePaymentForm = ({
     script.async = true;
     script.onload = () => {
       setIsSquareLoaded(true);
-      console.log(
-        `Square Web Payments SDK loaded successfully (${environment})`
-      );
     };
     script.onerror = (e) => {
       console.error("Failed to load Square Web Payments SDK", e);
@@ -54,9 +51,6 @@ const SquarePaymentForm = ({
         // Debug: Check if environment variables are loaded
         const appId = import.meta.env.VITE_SQUARE_APPLICATION_ID;
         const locationId = import.meta.env.VITE_SQUARE_LOCATION_ID;
-
-        console.log("Square App ID:", appId);
-        console.log("Square Location ID:", locationId);
 
         if (!appId || !locationId) {
           throw new Error(
