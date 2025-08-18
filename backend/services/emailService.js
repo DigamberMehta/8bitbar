@@ -12,12 +12,29 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER || "orders@8bitbar.com.au",
     pass: process.env.SMTP_PASS || "Arcade123...",
   },
+  // Add connection timeout
+  connectionTimeout: 20000, // 20 seconds
+  greetingTimeout: 20000, // 20 seconds
+  socketTimeout: 20000, // 20 seconds
 });
 
-// Test SMTP connection
+// Timeout wrapper function
+const withTimeout = (promise, timeoutMs = 20000) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(
+        () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
+        timeoutMs
+      )
+    ),
+  ]);
+};
+
+// Test SMTP connection with timeout
 const testConnection = async () => {
   try {
-    await transporter.verify();
+    await withTimeout(transporter.verify(), 20000);
     console.log("✅ SMTP connection verified successfully");
     return true;
   } catch (error) {
@@ -66,7 +83,7 @@ export const sendBookingConfirmation = async (
       html: emailTemplate.html,
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    const result = await withTimeout(transporter.sendMail(mailOptions), 20000);
     console.log(
       "✅ Booking confirmation email sent successfully:",
       result.messageId
@@ -78,8 +95,14 @@ export const sendBookingConfirmation = async (
       error.message
     );
 
+    // If it's a timeout error, provide specific information
+    if (error.message.includes("timed out")) {
+      console.error("⏰ Email service timed out after 20 seconds");
+      console.error("   This prevents the booking process from hanging");
+      console.error("   The booking was still created successfully");
+    }
     // If it's a DNS error, provide helpful information
-    if (error.code === "EDNS" || error.code === "ENOTFOUND") {
+    else if (error.code === "EDNS" || error.code === "ENOTFOUND") {
       console.error("📧 SMTP server not found. Please check:");
       console.error("   1. SMTP hostname: smtp.8bitbar.com.au");
       console.error("   2. Network connectivity");
@@ -93,4 +116,35 @@ export const sendBookingConfirmation = async (
   }
 };
 
-export default { sendBookingConfirmation };
+// Fire-and-forget email function that doesn't block the response
+export const sendBookingConfirmationAsync = (
+  bookingType,
+  booking,
+  additionalData = {}
+) => {
+  // Don't await this - let it run in background
+  sendBookingConfirmation(bookingType, booking, additionalData)
+    .then((result) => {
+      if (result.success) {
+        console.log(
+          `📧 Email sent successfully for ${bookingType} booking:`,
+          booking._id
+        );
+      } else {
+        console.warn(
+          `📧 Email failed for ${bookingType} booking:`,
+          booking._id,
+          result.error
+        );
+      }
+    })
+    .catch((error) => {
+      console.error(
+        `📧 Email error for ${bookingType} booking:`,
+        booking._id,
+        error.message
+      );
+    });
+};
+
+export default { sendBookingConfirmation, sendBookingConfirmationAsync };

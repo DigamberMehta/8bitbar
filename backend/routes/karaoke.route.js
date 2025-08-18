@@ -2,7 +2,7 @@ import express from "express";
 import KaraokeRoom from "../models/KaraokeRoom.js";
 import KaraokeBooking from "../models/KaraokeBooking.js";
 import authenticateUser from "../middlewares/authenticateUser.js";
-import { sendBookingConfirmation } from "../services/emailService.js";
+import { sendBookingConfirmationAsync } from "../services/emailService.js";
 
 const router = express.Router();
 
@@ -134,13 +134,8 @@ router.post("/bookings", authenticateUser, async (req, res) => {
     const room = await KaraokeRoom.findById(roomId);
     const roomName = room ? room.name : "Karaoke Room";
 
-    // Send confirmation email
-    try {
-      await sendBookingConfirmation("karaoke", newBooking, { roomName });
-    } catch (emailError) {
-      console.error("Failed to send confirmation email:", emailError);
-      // Don't fail the booking if email fails
-    }
+    // Send confirmation email (non-blocking)
+    sendBookingConfirmationAsync("karaoke", newBooking, { roomName });
 
     res.status(201).json({
       success: true,

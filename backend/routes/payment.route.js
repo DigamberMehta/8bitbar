@@ -4,6 +4,8 @@ import authenticateUser from "../middlewares/authenticateUser.js";
 import CafeBooking from "../models/CafeBooking.js";
 import KaraokeBooking from "../models/KaraokeBooking.js";
 import N64Booking from "../models/N64Booking.js";
+import AdminGiftCard from "../models/AdminGiftCard.js";
+import GiftCard from "../models/GiftCard.js";
 
 const router = express.Router();
 
@@ -73,10 +75,131 @@ router.get("/test", authenticateUser, async (req, res) => {
   }
 });
 
+// POST /process-gift-card-only - Handle orders fully covered by gift cards
+router.post("/process-gift-card-only", authenticateUser, async (req, res) => {
+  try {
+    const { giftCardData } = req.body;
+
+    console.log("Gift card only payment request received:", {
+      userId: req.user.id,
+      giftCardData: giftCardData ? "Present" : "Missing",
+    });
+
+    // Create a mock payment response for gift card only transactions
+    const mockPayment = {
+      id: `GIFT_CARD_ONLY_${Date.now()}_${req.user.id}`,
+      status: "COMPLETED",
+      amount_money: {
+        amount: 0,
+        currency: "AUD",
+      },
+      created_at: new Date().toISOString(),
+    };
+
+    // Handle gift card creation if this is a gift card purchase
+    if (giftCardData) {
+      try {
+        let createdGiftCard = null;
+
+        if (giftCardData.itemType === "custom") {
+          // Create custom gift card
+          const giftCard = new GiftCard({
+            amount: giftCardData.amount,
+            type: "custom",
+            description: giftCardData.description,
+            createdBy: req.user.id,
+            purchasedBy: req.user.id,
+            purchasedAt: new Date(),
+          });
+          await giftCard.save();
+          createdGiftCard = giftCard;
+        } else if (giftCardData.itemType === "admin") {
+          // Handle admin gift card template purchase
+          const adminTemplate = await AdminGiftCard.findById(
+            giftCardData.giftCardId
+          );
+          if (!adminTemplate) {
+            throw new Error("Admin gift card template not found");
+          }
+
+          const giftCard = new GiftCard({
+            amount: adminTemplate.amount,
+            description:
+              adminTemplate.description ||
+              `Gift Card - $${adminTemplate.amount}`,
+            type: "predefined",
+            status: "active",
+            isActive: true,
+            createdBy: adminTemplate.createdBy,
+            purchasedBy: req.user.id,
+            purchasedAt: new Date(),
+            adminTemplateId: adminTemplate._id,
+          });
+
+          await giftCard.save();
+          await giftCard.populate("purchasedBy", "name email");
+          createdGiftCard = giftCard;
+        } else {
+          // Complete predefined gift card purchase
+          const giftCard = await GiftCard.findById(giftCardData.giftCardId);
+          if (
+            giftCard &&
+            giftCard.status === "active" &&
+            !giftCard.purchasedBy
+          ) {
+            giftCard.purchasedBy = req.user.id;
+            giftCard.purchasedAt = new Date();
+            await giftCard.save();
+            createdGiftCard = giftCard;
+          }
+        }
+
+        if (createdGiftCard) {
+          return res.json({
+            success: true,
+            payment: mockPayment,
+            giftCard: {
+              code: createdGiftCard.code,
+              pin: createdGiftCard.pin,
+              amount: createdGiftCard.amount,
+              type: createdGiftCard.type,
+              description: createdGiftCard.description,
+            },
+          });
+        }
+      } catch (giftCardError) {
+        console.error("Gift card creation failed:", giftCardError);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to create gift card",
+          error: giftCardError.message,
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      payment: mockPayment,
+    });
+  } catch (err) {
+    console.error("Gift card only payment error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Payment processing failed",
+    });
+  }
+});
+
 // POST /process
 router.post("/process", authenticateUser, async (req, res) => {
   try {
-    const { sourceId, amount, currency = "AUD", locationId } = req.body;
+    const {
+      sourceId,
+      amount,
+      currency = "AUD",
+      locationId,
+      giftCardData,
+    } = req.body;
 
     console.log("Payment request received:", {
       sourceId: sourceId ? "Present" : "Missing",
@@ -84,6 +207,7 @@ router.post("/process", authenticateUser, async (req, res) => {
       currency,
       locationId,
       userId: req.user.id,
+      giftCardData: giftCardData ? "Present" : "Missing",
     });
 
     if (!sourceId || !amount) {
@@ -117,7 +241,9 @@ router.post("/process", authenticateUser, async (req, res) => {
         currency: currency.toUpperCase(),
       },
       location_id: finalLocationId,
-      note: `User ID: ${req.user.id}`,
+      note: `User ID: ${req.user.id}${
+        giftCardData ? " - Gift Card Purchase" : ""
+      }`,
     };
 
     const response = await fetch(`${SQUARE_CONFIG.baseURL}/v2/payments`, {
@@ -135,6 +261,137 @@ router.post("/process", authenticateUser, async (req, res) => {
     if (response.ok) {
       const payment = data.payment;
       console.log("Payment successful:", payment.id);
+
+      // Handle gift card creation after successful payment
+      if (giftCardData) {
+        try {
+          let createdGiftCard = null;
+
+          if (giftCardData.itemType === "custom") {
+            // Create custom gift card
+            const giftCard = new GiftCard({
+              amount: giftCardData.amount,
+              type: "custom",
+              description: giftCardData.description,
+              createdBy: req.user.id,
+              purchasedBy: req.user.id, // User immediately owns custom gift cards
+              purchasedAt: new Date(),
+            });
+            await giftCard.save();
+            createdGiftCard = giftCard;
+            console.log(
+              "Custom gift card created:",
+              giftCard.code,
+              "PIN:",
+              giftCard.pin
+            );
+          } else if (giftCardData.itemType === "admin") {
+            // Handle admin gift card template purchase
+            try {
+              const adminTemplate = await AdminGiftCard.findById(
+                giftCardData.giftCardId
+              );
+              if (adminTemplate) {
+                // Create a new gift card from admin template
+                const giftCard = new GiftCard({
+                  amount: adminTemplate.amount,
+                  description:
+                    adminTemplate.description ||
+                    `Gift Card - $${adminTemplate.amount}`,
+
+                  type: "predefined", // Use predefined type for admin templates
+                  status: "active",
+                  isActive: true,
+                  createdBy: adminTemplate.createdBy, // Keep original creator
+                  purchasedBy: req.user.id, // This triggers the auto-generation
+                  purchasedAt: new Date(),
+                  adminTemplateId: adminTemplate._id, // Track the template source
+                });
+
+                await giftCard.save();
+
+                // Populate the created gift card to ensure we have all data
+                await giftCard.populate("purchasedBy", "name email");
+
+                createdGiftCard = giftCard;
+                console.log(
+                  "Admin template gift card created:",
+                  giftCard.code,
+                  "PIN:",
+                  giftCard.pin,
+                  "Amount:",
+                  giftCard.amount
+                );
+              }
+            } catch (error) {
+              console.error(
+                "Error creating gift card from admin template:",
+                error
+              );
+              // Don't fail the payment for this error
+            }
+          } else {
+            // Complete predefined gift card purchase
+            const giftCard = await GiftCard.findById(giftCardData.giftCardId);
+
+            if (
+              giftCard &&
+              giftCard.status === "active" &&
+              !giftCard.purchasedBy
+            ) {
+              giftCard.purchasedBy = req.user.id;
+              giftCard.purchasedAt = new Date();
+              // Code and PIN will be auto-generated by pre-save middleware
+              await giftCard.save();
+              createdGiftCard = giftCard;
+              console.log(
+                "Predefined gift card purchased:",
+                giftCard.code,
+                "PIN:",
+                giftCard.pin
+              );
+            }
+          }
+
+          // Add gift card info to response
+          if (createdGiftCard) {
+            return res.json({
+              success: true,
+              payment: {
+                id: payment.id,
+                status: payment.status,
+                amountMoney: payment.amount_money,
+                createdAt: payment.created_at,
+              },
+              giftCard: {
+                code: createdGiftCard.code,
+                pin: createdGiftCard.pin,
+                amount: createdGiftCard.amount,
+                type: createdGiftCard.type,
+                description: createdGiftCard.description,
+              },
+            });
+          }
+        } catch (giftCardError) {
+          console.error(
+            "Gift card creation/purchase failed after payment:",
+            giftCardError
+          );
+          // Payment was successful, but gift card creation failed
+          // Return success with warning
+          return res.json({
+            success: true,
+            payment: {
+              id: payment.id,
+              status: payment.status,
+              amountMoney: payment.amount_money,
+              createdAt: payment.created_at,
+            },
+            warning:
+              "Payment successful but gift card creation failed. Please contact support.",
+          });
+        }
+      }
 
       res.json({
         success: true,

@@ -25,7 +25,7 @@ const AboutSection = () => {
               your go-to spot for good vibes, games, and great food.
             </p>
             <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">
-              eat, drink, play and repeat
+              Eat, Drink, Play and Repeat
             </p>
           </div>
         </div>

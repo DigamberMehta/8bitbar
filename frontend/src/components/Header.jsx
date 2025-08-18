@@ -14,7 +14,8 @@ const Header = () => {
     { path: "/", label: "Home" },
     { path: "/karaoke-booking", label: "Karaoke Room" },
     { path: "/n64-booth-booking", label: "N64 Booth" },
-    { path: "/cafe-booking", label: "Ticket Show" },
+    // { path: "/cafe-booking", label: "Ticket Show" },
+    { path: "/gift-cards", label: "Gift Cards" },
     { path: "/contact", label: "Contact" },
   ];
 

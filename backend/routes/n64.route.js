@@ -2,7 +2,7 @@ import express from "express";
 import N64Room from "../models/N64Room.js";
 import N64Booking from "../models/N64Booking.js";
 import authenticateUser from "../middlewares/authenticateUser.js";
-import { sendBookingConfirmation } from "../services/emailService.js";
+import { sendBookingConfirmationAsync } from "../services/emailService.js";
 
 const router = express.Router();
 
@@ -132,13 +132,8 @@ router.post("/bookings", authenticateUser, async (req, res) => {
     const room = await N64Room.findById(roomId);
     const roomName = room ? room.name : "N64 Gaming Booth";
 
-    // Send confirmation email
-    try {
-      await sendBookingConfirmation("n64", newBooking, { roomName });
-    } catch (emailError) {
-      console.error("Failed to send confirmation email:", emailError);
-      // Don't fail the booking if email fails
-    }
+    // Send confirmation email (non-blocking)
+    sendBookingConfirmationAsync("n64", newBooking, { roomName });
 
     res.status(201).json({
       success: true,

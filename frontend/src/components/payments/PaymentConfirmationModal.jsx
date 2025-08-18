@@ -7,6 +7,7 @@ const PaymentConfirmationModal = ({
   status, // 'loading', 'success', 'error'
   message,
   paymentData,
+  giftCardData, // Add gift card data prop
 }) => {
   if (!isOpen) return null;
 
@@ -90,6 +91,42 @@ const PaymentConfirmationModal = ({
                 <p>
                   <strong>Status:</strong> {paymentData.status}
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* Gift Card Details (for success) */}
+          {status === "success" && giftCardData && (
+            <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-4 mb-4">
+              <div className="text-center">
+                <h4 className="text-lg font-bold text-blue-300 mb-3">
+                  🎁 Gift Card Created Successfully!
+                </h4>
+                <div className="text-sm text-blue-200 space-y-2">
+                  <p>
+                    <strong>Code:</strong>{" "}
+                    <span className="font-mono text-blue-100">
+                      {giftCardData.code}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>PIN:</strong>{" "}
+                    <span className="font-mono text-blue-100">
+                      {giftCardData.pin}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Amount:</strong> ${giftCardData.amount.toFixed(2)}
+                  </p>
+                  <p>
+                    <strong>Type:</strong>{" "}
+                    {giftCardData.type === "custom" ? "Custom" : "Predefined"}
+                  </p>
+                </div>
+                <div className="mt-3 p-2 bg-yellow-900/30 border border-yellow-600/50 rounded text-xs text-yellow-200">
+                  ⚠️ Please save your Code and PIN securely. You'll need them to
+                  redeem your gift card.
+                </div>
               </div>
             </div>
           )}
