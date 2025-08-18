@@ -291,7 +291,8 @@ const BookingForm = ({ room }) => {
               setSelectedTime(""); // reset time when date changes
             }}
             min={new Date().toISOString().split("T")[0]}
-            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors"
+            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors cursor-pointer"
+            onClick={(e) => e.target.showPicker()}
           />
 
           {/* Available Days Information */}

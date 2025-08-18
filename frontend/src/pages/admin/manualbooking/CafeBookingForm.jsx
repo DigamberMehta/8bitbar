@@ -22,6 +22,7 @@ const CafeBookingForm = ({
             handleBookingDataChange("cafe", "date", e.target.value)
           }
           required
+          onClick={(e) => e.target.showPicker()}
         />
 
         <SelectField

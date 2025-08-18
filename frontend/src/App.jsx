@@ -6,6 +6,10 @@ import {
   Navigate,
 } from "react-router-dom";
 
+// Import Maintenance Configuration
+import { MAINTENANCE_MODE } from "./config/maintenance";
+import MaintenancePage from "./components/MaintenancePage";
+
 // Import Layout Components
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -16,6 +20,7 @@ import HomePage from "./pages/HomePage";
 import KaraokeBookingPage from "./pages/KaraokeBookingPage";
 import N64BoothBookingPage from "./pages/N64BoothBookingPage";
 import CafeBookingPage from "./components/CafeBooking/CafeBookingPage";
+import GiftCardPage from "./pages/GiftCardPage";
 
 import ContactPage from "./pages/ContactPage";
 import Cart from "./components/cart"; // Assuming cart is in components
@@ -41,11 +46,14 @@ import ManualBooking from "./pages/admin/manualbooking";
 import FinancePage from "./pages/admin/FinancePage";
 import AllBookings from "./pages/admin/AllBookings";
 import PinManagement from "./pages/admin/PinManagement";
+import AdminGiftCardManagement from "./pages/admin/AdminGiftCardManagement";
+import PurchasedGiftCardsManagement from "./pages/admin/PurchasedGiftCardsManagement";
 
 // Import Client Components
 import ClientLayout from "./components/ClientLayout";
 import ClientLogin from "./pages/client/ClientLogin";
 import ClientDashboard from "./pages/client/ClientDashboard";
+import ClientPurchasedGiftCardsManagement from "./pages/client/components/PurchasedGiftCardsManagement";
 
 import BarMapEditor from "./components/cafe/BarMapEditor";
 
@@ -53,6 +61,11 @@ import BarMapEditor from "./components/cafe/BarMapEditor";
 import { ModalProvider } from "./contexts/ModalContext";
 
 function App() {
+  // Check if maintenance mode is enabled
+  if (MAINTENANCE_MODE) {
+    return <MaintenancePage />;
+  }
+
   return (
     // The Router provides routing capabilities to the entire app.
     // AuthProvider should wrap this in main.jsx to provide auth context everywhere.
@@ -93,6 +106,16 @@ function App() {
                   <>
                     <Header />
                     <N64BoothBookingPage />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/gift-cards"
+                element={
+                  <>
+                    <Header />
+                    <GiftCardPage />
                     <Footer />
                   </>
                 }
@@ -157,6 +180,14 @@ function App() {
                   element={
                     <ProtectedClientRoute>
                       <ClientDashboard />
+                    </ProtectedClientRoute>
+                  }
+                />
+                <Route
+                  path="gift-cards"
+                  element={
+                    <ProtectedClientRoute>
+                      <ClientPurchasedGiftCardsManagement />
                     </ProtectedClientRoute>
                   }
                 />
@@ -259,6 +290,22 @@ function App() {
                   element={
                     <ProtectedRoute allowedRoles={["superadmin"]}>
                       <PinManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="gift-cards"
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <AdminGiftCardManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="purchased-gift-cards"
+                  element={
+                    <ProtectedRoute allowedRoles={["superadmin"]}>
+                      <PurchasedGiftCardsManagement />
                     </ProtectedRoute>
                   }
                 />

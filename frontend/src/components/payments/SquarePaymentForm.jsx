@@ -7,6 +7,7 @@ const SquarePaymentForm = ({
   onPaymentSuccess,
   onPaymentError,
   disabled,
+  giftCardData = null, // Add gift card data prop
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSquareLoaded, setIsSquareLoaded] = useState(false);
@@ -100,6 +101,7 @@ const SquarePaymentForm = ({
           sourceId: token,
           amount: amount,
           currency: "AUD",
+          ...(giftCardData && { giftCardData }), // Include gift card data if present
         });
 
         console.log("Payment response status:", response.status);
@@ -107,7 +109,12 @@ const SquarePaymentForm = ({
         const data = response.data;
 
         if (data.success) {
-          onPaymentSuccess(data.payment);
+          // Pass both payment data and any warnings or gift card info
+          onPaymentSuccess({
+            ...data.payment,
+            warning: data.warning,
+            giftCard: data.giftCard,
+          });
         } else {
           console.error("Payment failed:", data.message || "Payment failed");
           if (onPaymentError) onPaymentError(data.message || "Payment failed");

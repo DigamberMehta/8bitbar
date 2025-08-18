@@ -3,7 +3,7 @@ import CafeBooking from "../models/CafeBooking.js";
 import CafeLayout from "../models/CafeLayout.js";
 import CafeSettings from "../models/CafeSettings.js";
 import authenticateUser from "../middlewares/authenticateUser.js";
-import { sendBookingConfirmation } from "../services/emailService.js";
+import { sendBookingConfirmationAsync } from "../services/emailService.js";
 
 const router = express.Router();
 
@@ -270,13 +270,8 @@ router.post("/bookings", authenticateUser, async (req, res) => {
 
     await newBooking.save();
 
-    // Send confirmation email
-    try {
-      await sendBookingConfirmation("cafe", newBooking);
-    } catch (emailError) {
-      console.error("Failed to send confirmation email:", emailError);
-      // Don't fail the booking if email fails
-    }
+    // Send confirmation email (non-blocking)
+    sendBookingConfirmationAsync("cafe", newBooking);
 
     res.status(201).json({
       success: true,

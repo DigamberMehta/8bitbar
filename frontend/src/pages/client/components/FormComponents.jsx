@@ -24,7 +24,10 @@ export const InputField = ({ label, icon, ...props }) => (
     </label>
     <input
       {...props}
-      className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
+      className={`w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500 ${
+        props.type === "date" ? "cursor-pointer" : ""
+      }`}
+      onClick={props.type === "date" ? (e) => e.target.showPicker() : undefined}
     />
   </div>
 );
@@ -42,7 +45,7 @@ export const SelectField = ({ label, icon, children, ...props }) => (
       {children}
     </select>
   </div>
- );
+);
 
 export const CustomerInfoForm = ({ formData, handleInputChange }) => {
   return (

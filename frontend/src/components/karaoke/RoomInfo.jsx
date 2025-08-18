@@ -152,19 +152,19 @@ const RoomInfo = ({ room }) => {
           <div className="flex items-center space-x-3">
             <Phone className="h-4 w-4 text-green-400" />
             <a
-              href="tel:+61288888888"
+              href="tel:+61493091188"
               className="text-gray-300 hover:text-green-400 transition-colors"
             >
-              (02) 8888-8888
+              +61 493 091 188
             </a>
           </div>
           <div className="flex items-center space-x-3">
             <Mail className="h-4 w-4 text-cyan-400" />
             <a
-              href="mailto:play@8bitbar.com.au"
+              href="mailto:info@8bitbar.com.au"
               className="text-gray-300 hover:text-cyan-400 transition-colors"
             >
-              play@8bitbar.com.au
+              info@8bitbar.com.au
             </a>
           </div>
         </div>

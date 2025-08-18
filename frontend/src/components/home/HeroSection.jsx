@@ -45,19 +45,23 @@ const HeroSection = () => {
         <p className="text-sm text-yellow-400 mb-6">
           Under 18's welcome Fri & Sat till 6pm and all day Sunday
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <p className="text-sm md:text-base text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
+          Join us for an unforgettable night of gaming, drinks, and nostalgia.
+          Book your Alice in Wonderland karaoke experience now!
+        </p>
+        <div className="flex flex-row gap-2 justify-center">
           <Link
             to="/karaoke-booking"
-            className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-lg text-base transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink flex items-center justify-center gap-2"
+            className="px-3 py-1.5 md:px-6 md:py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-lg text-xs md:text-base transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-pink flex items-center justify-center gap-1"
           >
-            <span className="text-lg">🎤</span>
+            <span className="text-xs md:text-lg">🎤</span>
             <span>BOOK KARAOKE</span>
           </Link>
           <Link
             to="/n64-booth-booking"
-            className="px-6 py-3 bg-gradient-to-r from-green-500 to-cyan-600 text-white font-bold rounded-lg text-base transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-green flex items-center justify-center gap-2"
+            className="px-3 py-1.5 md:px-6 md:py-3 bg-gradient-to-r from-green-500 to-cyan-600 text-white font-bold rounded-lg text-xs md:text-base transition-all duration-300 hover:scale-105 hover:shadow-2xl neon-glow-green flex items-center justify-center gap-1"
           >
-            <span className="text-lg">🎮</span>
+            <span className="text-xs md:text-lg">🎮</span>
             <span>BOOK N64 BOOTH</span>
           </Link>
         </div>

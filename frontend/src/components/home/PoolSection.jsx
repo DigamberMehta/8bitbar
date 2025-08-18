@@ -15,7 +15,7 @@ const PoolSection = () => {
             </h3>
             <p className="text-gray-300 text-lg mb-8 leading-relaxed">
               Enjoy a game of pool on the house! Just buy a drink at the bar to
-              play. No charge for the table – just grab your favorite Beer,
+              play. No charge for the table – just grab your favorite beer,
               cocktail, or soft drink and rack 'em up.
             </p>
 

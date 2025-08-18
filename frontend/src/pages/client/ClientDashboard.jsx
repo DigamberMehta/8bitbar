@@ -4,7 +4,14 @@ import api from "../../utils/axios";
 import AllBookingsList from "./components/AllBookingsList";
 import CalendarView from "./components/CalendarView";
 import ManualBooking from "./components/ManualBooking";
-import { MdLogout, MdList, MdCalendarToday, MdAdd } from "react-icons/md";
+import PurchasedGiftCardsManagement from "./components/PurchasedGiftCardsManagement";
+import {
+  MdLogout,
+  MdList,
+  MdCalendarToday,
+  MdAdd,
+  MdCardGiftcard,
+} from "react-icons/md";
 
 const ClientDashboard = () => {
   const [activeTab, setActiveTab] = useState("bookings");
@@ -46,6 +53,13 @@ const ClientDashboard = () => {
       component: <ManualBooking />,
       color: "purple",
     },
+    {
+      id: "giftcards",
+      label: "Gift Cards",
+      icon: <MdCardGiftcard size={20} />,
+      component: <PurchasedGiftCardsManagement />,
+      color: "orange",
+    },
   ];
 
   return (
@@ -74,6 +88,10 @@ const ClientDashboard = () => {
                     purple: {
                       active: "bg-purple-600 text-white shadow-md",
                       inactive: "bg-purple-500 text-white hover:bg-purple-600",
+                    },
+                    orange: {
+                      active: "bg-orange-600 text-white shadow-md",
+                      inactive: "bg-orange-500 text-white hover:bg-orange-600",
                     },
                   };
 

@@ -24,8 +24,8 @@ const Footer = () => {
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
               8-Bit Bar, the place to be in Hervey Bay. The ultimate fusion of
-              classic arcade thrills and delicious tapas bites. Eat, Drink, Play
-              – Only at 8 Bit Bar.
+              classic arcade thrills and delicious tapas bites. Eat, Drink,
+              Play, Repeat – Only at 8 Bit Bar.
             </p>
             <div className="flex space-x-4">
               <a
@@ -102,11 +102,9 @@ const Footer = () => {
               >
                 <MapPin className="h-4 w-4 text-pink-400 mt-1 flex-shrink-0 group-hover:text-pink-300" />
                 <div>
-                  <p className="text-white font-semibold">
-                    8-Bit Bar Australia
-                  </p>
-                  <p>Shop 1/352 Esplanade, Scarness</p>
-                  <p>QLD 4655, Australia</p>
+                  <p className="text-white font-semibold">8-Bit Bar</p>
+                  <p>1/352 Esplanade, Scarness</p>
+                  <p>QLD 4655</p>
                 </div>
                 <ExternalLink className="h-3 w-3 text-gray-500 group-hover:text-gray-300" />
               </a>

@@ -79,6 +79,7 @@ const N64BookingForm = ({
           }}
           min={new Date().toISOString().split("T")[0]}
           required
+          onClick={(e) => e.target.showPicker()}
         />
 
         <SelectField

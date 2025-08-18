@@ -1,7 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const KaraokeSection = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const images = [
+    {
+      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/0b42d0ef-96db-40f0-abf4-51edbb96ac42-e1748892865932.jpeg",
+      alt: "Alice in Wonderland Karaoke Room",
+    },
+    {
+      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/eab1029c-b6c9-430c-b0e2-0e80fff6aa21.jpeg",
+      alt: "Karaoke Room Interior",
+    },
+    {
+      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/0b42d0ef-96db-40f0-abf4-51edbb96ac42-1536x865.jpeg",
+      alt: "Karaoke Room Setup",
+    },
+    {
+      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/275bbbcf-cb28-4acf-b4b2-2fede476aeca.jpeg",
+      alt: "Karaoke Room Atmosphere",
+    },
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,47 +86,30 @@ const KaraokeSection = () => {
             </Link>
           </div>
 
-          <div className="order-2 lg:order-1 grid grid-cols-2 gap-4">
+          <div className="order-2 lg:order-1 relative">
             <img
-              src="https://8bitbar.com.au/wp-content/uploads/2025/05/0b42d0ef-96db-40f0-abf4-51edbb96ac42-e1748892865932.jpeg"
-              alt="Alice in Wonderland Karaoke Room"
-              className="w-full h-48 object-cover rounded-lg"
+              src={images[currentImageIndex].src}
+              alt={images[currentImageIndex].alt}
+              className="w-full h-48 object-cover rounded-lg transition-opacity duration-500"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src =
                   "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room";
               }}
             />
-            <img
-              src="https://8bitbar.com.au/wp-content/uploads/2025/05/eab1029c-b6c9-430c-b0e2-0e80fff6aa21.jpeg"
-              alt="Karaoke Room Interior"
-              className="w-full h-48 object-cover rounded-lg"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Interior";
-              }}
-            />
-            <img
-              src="https://8bitbar.com.au/wp-content/uploads/2025/05/0b42d0ef-96db-40f0-abf4-51edbb96ac42-1536x865.jpeg"
-              alt="Karaoke Room Setup"
-              className="w-full h-48 object-cover rounded-lg"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Setup";
-              }}
-            />
-            <img
-              src="https://8bitbar.com.au/wp-content/uploads/2025/05/275bbbcf-cb28-4acf-b4b2-2fede476aeca.jpeg"
-              alt="Karaoke Room Atmosphere"
-              className="w-full h-48 object-cover rounded-lg"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Atmosphere";
-              }}
-            />
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                    index === currentImageIndex
+                      ? "bg-white"
+                      : "bg-white/50 hover:bg-white/75"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
