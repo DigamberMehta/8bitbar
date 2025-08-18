@@ -90,7 +90,7 @@ const MaintenancePage = () => {
             📞 Need to reach us?
           </p>
           <p className="text-gray-300 mb-2">
-            For urgent bookings or inquiries, please contact us directly:
+            For urgent bookings or enquiry, please contact us directly:
           </p>
           <div className="space-y-2 text-gray-300">
             <p>📱 Phone: +61 493 091 188</p>
