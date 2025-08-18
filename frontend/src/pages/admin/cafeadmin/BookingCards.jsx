@@ -1,6 +1,6 @@
 import React from "react";
 
-const BookingCards = ({ bookings, onUpdateStatus }) => {
+const BookingCards = ({ bookings, onUpdateStatus, onDelete }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "confirmed":
@@ -154,6 +154,12 @@ const BookingCards = ({ bookings, onUpdateStatus }) => {
                 Mark Complete
               </button>
             )}
+            <button
+              onClick={() => onDelete(booking._id)}
+              className="flex-1 min-w-[100px] px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+            >
+              Delete
+            </button>
           </div>
         </div>
       ))}

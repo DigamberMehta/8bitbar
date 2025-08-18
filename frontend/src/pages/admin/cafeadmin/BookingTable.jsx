@@ -1,6 +1,6 @@
 import React from "react";
 
-const BookingTable = ({ bookings, onUpdateStatus }) => {
+const BookingTable = ({ bookings, onUpdateStatus, onDelete }) => {
   const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
@@ -142,7 +142,9 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                           : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {booking.paymentStatus === "completed" ? "Paid" : "Not Paid"}
+                      {booking.paymentStatus === "completed"
+                        ? "Paid"
+                        : "Not Paid"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -177,6 +179,12 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                           Complete
                         </button>
                       )}
+                      <button
+                        onClick={() => onDelete(booking._id)}
+                        className="text-red-600 hover:text-red-900 px-2 py-1 bg-red-100 rounded"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -305,6 +313,12 @@ const BookingTable = ({ bookings, onUpdateStatus }) => {
                           Complete
                         </button>
                       )}
+                      <button
+                        onClick={() => onDelete(booking._id)}
+                        className="text-xs text-red-600 hover:text-red-800 px-2 py-1 rounded"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>

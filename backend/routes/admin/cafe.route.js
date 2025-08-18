@@ -127,6 +127,25 @@ router.patch("/cafe-bookings/:id/status", async (req, res) => {
   }
 });
 
+// Delete cafe booking
+router.delete("/cafe-bookings/:id", async (req, res) => {
+  try {
+    const booking = await CafeBooking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    await CafeBooking.findByIdAndDelete(req.params.id);
+
+    console.log(`🗑️ Deleted cafe booking: ${req.params.id}`);
+    res.json({ message: "Cafe booking deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting cafe booking:", error);
+    res.status(500).json({ message: "Error deleting cafe booking" });
+  }
+});
+
 // Cafe Layout Management
 router.get("/cafe-layout", async (req, res) => {
   try {

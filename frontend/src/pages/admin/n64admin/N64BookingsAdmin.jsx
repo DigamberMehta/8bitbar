@@ -52,6 +52,23 @@ const N64BookingsAdmin = () => {
     }
   };
 
+  const deleteBooking = async (bookingId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this booking? This action cannot be undone."
+      )
+    ) {
+      try {
+        await api.delete(`/admin/n64/n64-bookings/${bookingId}`);
+        fetchBookings(); // Refresh the list
+        alert("Booking deleted successfully");
+      } catch (error) {
+        console.error("Error deleting booking:", error);
+        alert("Failed to delete booking");
+      }
+    }
+  };
+
   // Helper function to format dates
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -164,6 +181,12 @@ const N64BookingsAdmin = () => {
           </button>
         </>
       )}
+      <button
+        onClick={() => deleteBooking(booking._id)}
+        className="text-xs lg:text-sm font-medium text-red-600 hover:text-red-800 px-2 py-1 rounded border border-red-600 hover:bg-red-50"
+      >
+        Delete
+      </button>
     </div>
   );
 

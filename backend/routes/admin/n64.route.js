@@ -92,7 +92,7 @@ router.get("/n64-bookings", async (req, res) => {
 router.patch("/n64-bookings/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
-    
+
     // Determine payment status based on booking status
     let paymentStatus;
     switch (status) {
@@ -111,7 +111,7 @@ router.patch("/n64-bookings/:id/status", async (req, res) => {
       default:
         paymentStatus = "pending";
     }
-    
+
     const booking = await N64Booking.findByIdAndUpdate(
       req.params.id,
       { status, paymentStatus },
@@ -122,6 +122,25 @@ router.patch("/n64-bookings/:id/status", async (req, res) => {
     res.json({ booking });
   } catch (error) {
     res.status(500).json({ message: "Error updating booking status" });
+  }
+});
+
+// Delete N64 booking
+router.delete("/n64-bookings/:id", async (req, res) => {
+  try {
+    const booking = await N64Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    await N64Booking.findByIdAndDelete(req.params.id);
+
+    console.log(`🗑️ Deleted N64 booking: ${req.params.id}`);
+    res.json({ message: "N64 booking deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting N64 booking:", error);
+    res.status(500).json({ message: "Error deleting N64 booking" });
   }
 });
 

@@ -61,6 +61,23 @@ const CafeBookingsAdmin = () => {
     }
   };
 
+  const deleteBooking = async (bookingId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this booking? This action cannot be undone."
+      )
+    ) {
+      try {
+        await api.delete(`/admin/cafe/cafe-bookings/${bookingId}`);
+        fetchBookings(); // Refresh the list
+        alert("Booking deleted successfully");
+      } catch (error) {
+        console.error("Error deleting booking:", error);
+        alert("Failed to delete booking");
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -105,10 +122,12 @@ const CafeBookingsAdmin = () => {
           <BookingTable
             bookings={filteredBookings}
             onUpdateStatus={updateBookingStatus}
+            onDelete={deleteBooking}
           />
           <BookingCards
             bookings={filteredBookings}
             onUpdateStatus={updateBookingStatus}
+            onDelete={deleteBooking}
           />
         </>
       )}
