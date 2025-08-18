@@ -305,7 +305,6 @@ const ContactPage = () => {
                   <option value="booking">Booking Inquiry</option>
                   <option value="event">Private Event</option>
                   <option value="feedback">Feedback</option>
-                  <option value="partnership">Partnership</option>
                   <option value="general">General Question</option>
                 </select>
               </div>
