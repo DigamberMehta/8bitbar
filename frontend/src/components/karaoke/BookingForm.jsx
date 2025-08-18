@@ -401,7 +401,22 @@ const BookingForm = ({ room }) => {
         <div className="border-t border-gray-700 pt-6">
           <div className="flex justify-between items-center text-lg mb-4">
             <span className="text-gray-300">
-              Price ({numberOfHours} {numberOfHours > 1 ? "hours" : "hour"}):
+              Price (
+              {(() => {
+                // Calculate actual karaoke time (reduced by 5 minutes for cleaning)
+                const totalMinutes = numberOfHours * 60 - 5;
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+
+                if (hours === 0) {
+                  return `${minutes}m`;
+                } else if (minutes === 0) {
+                  return `${hours}h`;
+                } else {
+                  return `${hours}:${minutes.toString().padStart(2, "0")}`;
+                }
+              })()}
+              ):
             </span>
             <span className="text-white">
               {pricePerHour === 0 ? (

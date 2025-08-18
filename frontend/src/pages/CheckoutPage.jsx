@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
   CreditCard,
@@ -15,6 +16,7 @@ import PaymentConfirmationModal from "../components/payments/PaymentConfirmation
 import GiftCardRedeem from "../components/GiftCardRedeem";
 
 const CheckoutPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth(); // Get user details from AuthContext
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -380,6 +382,11 @@ const CheckoutPage = () => {
       status: "loading",
       message: "",
     });
+
+    // Redirect to home page after successful payment modal is closed
+    if (modalState.status === "success") {
+      navigate("/");
+    }
   };
 
   const renderInputField = (
