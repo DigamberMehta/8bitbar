@@ -1,5 +1,4 @@
 import React from "react";
-import Footer from "../components/Footer";
 import GiftCardPurchase from "../components/GiftCardPurchase";
 
 const GiftCardPage = () => {
@@ -8,7 +7,6 @@ const GiftCardPage = () => {
       <main>
         <GiftCardPurchase />
       </main>
-      <Footer />
     </>
   );
 };
