@@ -8,5 +8,4 @@
 /frontend/.env
 /frontend/.env.*
 
-# Optional: system files
-.DS_Store
+
