@@ -131,7 +131,7 @@ const BookingForm = ({ room }) => {
         roomId: room._id, // Store roomId for potential future use
         imageUrl:
           room.imageUrl ||
-          "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room",
+          "/home_images/karaoke1.png",
         date: selectedDate,
         time: selectedTime,
         duration: numberOfHours,

@@ -97,8 +97,19 @@ router.post("/bookings", authenticateUser, async (req, res) => {
     if (period === "PM" && hour !== 12) hour += 12;
     if (period === "AM" && hour === 12) hour = 0;
 
-    const startDateTime = new Date(date);
-    startDateTime.setHours(hour, minute, 0, 0);
+    // TIMEZONE FIX: Create date in client's local timezone (Australia) instead of server timezone (India)
+    // The frontend sends time in client's local timezone, so we need to preserve that
+    // Create a date string that preserves the intended local time
+    //
+    // LONG-TERM SOLUTION: Consider adding timezone support by:
+    // 1. Frontend sends timezone info (e.g., 'Australia/Sydney')
+    // 2. Use libraries like 'moment-timezone' or 'date-fns-tz' for proper timezone handling
+    // 3. Store timezone info in the booking model
+    const startDateTime = new Date(
+      `${date}T${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}:00`
+    );
 
     const endDateTime = new Date(startDateTime);
     endDateTime.setHours(startDateTime.getHours() + durationHours);

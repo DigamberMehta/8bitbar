@@ -6,15 +6,15 @@ const N64BoothsSection = () => {
 
   const images = [
     {
-      src: "https://8bitbar.com.au/wp-content/uploads/2025/03/20250419_212301-scaled.jpg",
+      src: "/home_images/n64booth1.png",
       alt: "N64 Gaming Booth",
     },
     {
-      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/20250419_225434-1153x2048.jpg",
+      src: "/home_images/n64booth2.png",
       alt: "N64 Booth Interior",
     },
     {
-      src: "https://8bitbar.com.au/wp-content/uploads/2025/03/mario-kart.jpeg",
+      src: "/home_images/n64booth3.png",
       alt: "Mario Kart N64",
     },
   ];

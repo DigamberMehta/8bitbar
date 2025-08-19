@@ -4,9 +4,9 @@ const BookingTable = ({ bookings, onUpdateStatus, onDelete }) => {
   const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
-        return { color: "bg-green-100 text-green-800", text: "Paid" };
+        return { color: "bg-green-100 text-green-800", text: "Confirmed" };
       case "pending":
-        return { color: "bg-yellow-100 text-yellow-800", text: "Not Paid" };
+        return { color: "bg-yellow-100 text-yellow-800", text: "Pending" };
       case "cancelled":
         return { color: "bg-red-100 text-red-800", text: "Cancelled" };
       case "completed":
@@ -312,6 +312,30 @@ const BookingTable = ({ bookings, onUpdateStatus, onDelete }) => {
                         >
                           Complete
                         </button>
+                      )}
+                      {booking.status === "completed" && (
+                        <>
+                          <button
+                            onClick={() =>
+                              onUpdateStatus(booking._id, "completed")
+                            }
+                            disabled
+                            className="text-xs text-gray-400 px-2 py-1 rounded cursor-not-allowed"
+                            title="Booking already completed"
+                          >
+                            Complete
+                          </button>
+                          <button
+                            onClick={() =>
+                              onUpdateStatus(booking._id, "cancelled")
+                            }
+                            disabled
+                            className="text-xs text-gray-400 px-2 py-1 rounded cursor-not-allowed"
+                            title="Cannot cancel completed bookings"
+                          >
+                            Cancel
+                          </button>
+                        </>
                       )}
                       <button
                         onClick={() => onDelete(booking._id)}

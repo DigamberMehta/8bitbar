@@ -95,9 +95,9 @@ const KaraokeBookingsAdmin = () => {
   const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
-        return { color: "bg-green-100 text-green-800", text: "Paid" };
+        return { color: "bg-green-100 text-green-800", text: "Confirmed" };
       case "pending":
-        return { color: "bg-yellow-100 text-yellow-800", text: "Not Paid" };
+        return { color: "bg-yellow-100 text-yellow-800", text: "Pending" };
       case "cancelled":
         return { color: "bg-red-100 text-red-800", text: "Cancelled" };
       case "completed":
@@ -167,6 +167,26 @@ const KaraokeBookingsAdmin = () => {
           </button>
         </>
       )}
+      {booking.status === "completed" && (
+        <>
+          <button
+            onClick={() => updateBookingStatus(booking._id, "completed")}
+            disabled
+            className="text-xs lg:text-sm font-medium text-gray-400 px-2 py-1 rounded cursor-not-allowed"
+            title="Booking already completed"
+          >
+            Complete
+          </button>
+          <button
+            onClick={() => updateBookingStatus(booking._id, "cancelled")}
+            disabled
+            className="text-xs lg:text-sm font-medium text-gray-400 px-2 py-1 rounded cursor-not-allowed"
+            title="Cannot cancel completed bookings"
+          >
+            Cancel
+          </button>
+        </>
+      )}
       <button
         onClick={() => deleteBooking(booking._id)}
         className="text-xs lg:text-sm font-medium text-red-600 hover:text-red-800 px-2 py-1 rounded border border-red-600 hover:bg-red-50"
@@ -229,10 +249,7 @@ const KaraokeBookingsAdmin = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contact Info
+                    Customer Info
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Booking Details
@@ -255,19 +272,17 @@ const KaraokeBookingsAdmin = () => {
                       <div className="text-sm font-medium text-gray-900">
                         {booking.customerName || "N/A"}
                       </div>
-                      {booking.isManualBooking && booking.staffName && (
-                        <div className="text-xs text-blue-600 mt-1">
-                          Staff: {booking.staffName}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
                         {booking.customerEmail || "N/A"}
                       </div>
                       {booking.customerPhone && (
                         <div className="text-sm text-gray-500">
                           {booking.customerPhone}
+                        </div>
+                      )}
+                      {booking.isManualBooking && booking.staffName && (
+                        <div className="text-xs text-blue-600 mt-1">
+                          Staff: {booking.staffName}
                         </div>
                       )}
                     </td>
@@ -320,14 +335,26 @@ const KaraokeBookingsAdmin = () => {
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          booking.paymentStatus === "completed"
+                          booking.status === "confirmed"
                             ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                            : booking.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : booking.status === "cancelled"
+                            ? "bg-red-100 text-red-800"
+                            : booking.status === "completed"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
                         }`}
                       >
-                        {booking.paymentStatus === "completed"
-                          ? "Paid"
-                          : "Not Paid"}
+                        {booking.status === "confirmed"
+                          ? "Confirmed"
+                          : booking.status === "pending"
+                          ? "Pending"
+                          : booking.status === "cancelled"
+                          ? "Cancelled"
+                          : booking.status === "completed"
+                          ? "Completed"
+                          : booking.status}
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
@@ -473,12 +500,26 @@ const KaraokeBookingsAdmin = () => {
                 </div>
                 <span
                   className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
-                    booking.paymentStatus === "completed"
+                    booking.status === "confirmed"
                       ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
+                      : booking.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : booking.status === "cancelled"
+                      ? "bg-red-100 text-red-800"
+                      : booking.status === "completed"
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {booking.paymentStatus === "completed" ? "Paid" : "Not Paid"}
+                  {booking.status === "confirmed"
+                    ? "Confirmed"
+                    : booking.status === "pending"
+                    ? "Pending"
+                    : booking.status === "cancelled"
+                    ? "Cancelled"
+                    : booking.status === "completed"
+                    ? "Completed"
+                    : booking.status}
                 </span>
               </div>
               <div className="mt-4 border-t border-gray-200 pt-4">

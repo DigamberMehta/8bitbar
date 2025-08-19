@@ -16,8 +16,7 @@ const AdminGiftCardManagement = () => {
   const [formData, setFormData] = useState({
     amount: "",
     description: "",
-    imageUrl:
-      "https://8bitbar.com.au/wp-content/uploads/2025/05/4d7846ed-b5ad-4444-bba5-35271a0d87bc-500x500.jpeg",
+    imageUrl: "/home_images/logo.png",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -68,8 +67,7 @@ const AdminGiftCardManagement = () => {
       setFormData({
         amount: "",
         description: "",
-        imageUrl:
-          "https://8bitbar.com.au/wp-content/uploads/2025/05/4d7846ed-b5ad-4444-bba5-35271a0d87bc-500x500.jpeg",
+        imageUrl: "/home_images/logo.png",
       });
       setEditingCard(null);
       setShowForm(false);
@@ -85,9 +83,7 @@ const AdminGiftCardManagement = () => {
     setFormData({
       amount: card.amount.toString(),
       description: card.description || "",
-      imageUrl:
-        card.imageUrl ||
-        "https://8bitbar.com.au/wp-content/uploads/2025/05/4d7846ed-b5ad-4444-bba5-35271a0d87bc-500x500.jpeg",
+      imageUrl: card.imageUrl || "/home_images/logo.png",
     });
     setShowForm(true);
   };
@@ -120,8 +116,7 @@ const AdminGiftCardManagement = () => {
     setFormData({
       amount: "",
       description: "",
-      imageUrl:
-        "https://8bitbar.com.au/wp-content/uploads/2025/05/4d7846ed-b5ad-4444-bba5-35271a0d87bc-500x500.jpeg",
+      imageUrl: "/home_images/logo.png",
     });
     setEditingCard(null);
     setShowForm(false);

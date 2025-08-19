@@ -100,7 +100,8 @@ class FinanceController {
         ...cafeBookings.map((booking) => ({
           ...booking.toObject(),
           serviceType: "cafe",
-          bookingDate: new Date(booking.date + "T" + booking.time),
+          // TIMEZONE FIX: Create date in client's local timezone instead of server timezone
+          bookingDate: new Date(booking.date + "T" + booking.time + ":00"),
           roomName: `${booking.chairIds.length} Chair${
             booking.chairIds.length > 1 ? "s" : ""
           }`,
@@ -489,7 +490,8 @@ class FinanceController {
       const cafeBookings = await CafeBooking.find({ date: dateQuery });
 
       cafeBookings.forEach((booking) => {
-        const startTime = new Date(booking.date + "T" + booking.time);
+        // TIMEZONE FIX: Create date in client's local timezone instead of server timezone
+        const startTime = new Date(booking.date + "T" + booking.time + ":00");
         const endTime = new Date(
           startTime.getTime() + booking.duration * 60 * 60 * 1000
         );
@@ -610,7 +612,8 @@ class FinanceController {
           customerName: booking.customerName,
           customerEmail: booking.customerEmail,
           customerPhone: booking.customerPhone,
-          bookingDate: new Date(booking.date + "T" + booking.time),
+          // TIMEZONE FIX: Create date in client's local timezone instead of server timezone
+          bookingDate: new Date(booking.date + "T" + booking.time + ":00"),
           duration: booking.duration,
           totalPrice: booking.totalCost,
           status: booking.status,

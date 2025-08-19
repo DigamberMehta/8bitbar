@@ -140,7 +140,7 @@ const GiftCardPurchase = () => {
         {/* Background image with reduced opacity */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://8bitbar.com.au/wp-content/uploads/2025/03/476430123_503383535925338_3430500913908929137_n-1.jpg"
+            src="/home_images/hero_background_image.png"
             alt="8-Bit Bar Background"
             className="w-full h-full object-cover opacity-40"
           />

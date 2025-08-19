@@ -104,11 +104,13 @@ const AllBookings = () => {
   const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
-        return { color: "bg-green-100 text-green-800", text: "Paid" };
+        return { color: "bg-green-100 text-green-800", text: "Confirmed" };
       case "pending":
-        return { color: "bg-yellow-100 text-yellow-800", text: "Not Paid" };
+        return { color: "bg-yellow-100 text-yellow-800", text: "Pending" };
       case "cancelled":
         return { color: "bg-red-100 text-red-800", text: "Cancelled" };
+      case "completed":
+        return { color: "bg-blue-100 text-blue-800", text: "Completed" };
       default:
         return { color: "bg-gray-100 text-gray-800", text: status };
     }
