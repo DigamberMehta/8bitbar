@@ -166,7 +166,7 @@ const AllBookingsController = {
       const karaokeBookings = await KaraokeBooking.find(karaokeFilter)
         .populate("roomId", "name")
         .select(
-          "startDateTime endDateTime customerName roomId status totalPrice"
+          "startDateTime endDateTime customerName customerEmail roomId status paymentStatus totalPrice"
         );
 
       karaokeBookings.forEach((booking) => {
@@ -179,6 +179,7 @@ const AllBookingsController = {
           end: booking.endDateTime,
           serviceType: "karaoke",
           status: booking.status,
+          paymentStatus: booking.paymentStatus,
           revenue: booking.totalPrice || 0,
           roomName: booking.roomId?.name || "Karaoke Room",
           customerName: booking.customerName,
@@ -198,7 +199,7 @@ const AllBookingsController = {
       const n64Bookings = await N64Booking.find(n64Filter)
         .populate("roomId", "name")
         .select(
-          "startDateTime endDateTime customerName roomId status totalPrice"
+          "startDateTime endDateTime customerName customerEmail roomId status paymentStatus totalPrice"
         );
 
       n64Bookings.forEach((booking) => {
@@ -211,6 +212,7 @@ const AllBookingsController = {
           end: booking.endDateTime,
           serviceType: "n64",
           status: booking.status,
+          paymentStatus: booking.paymentStatus,
           revenue: booking.totalPrice || 0,
           roomName: booking.roomId?.name || "N64 Booth",
           customerName: booking.customerName,
@@ -228,7 +230,7 @@ const AllBookingsController = {
       }
 
       const cafeBookings = await CafeBooking.find(cafeFilter).select(
-        "date time duration customerName chairIds status totalCost"
+        "date time duration customerName customerEmail chairIds status paymentStatus totalCost"
       );
 
       cafeBookings.forEach((booking) => {
@@ -246,6 +248,7 @@ const AllBookingsController = {
           end: endDateTime,
           serviceType: "cafe",
           status: booking.status,
+          paymentStatus: booking.paymentStatus,
           revenue: booking.totalCost || 0,
           roomName: `Table ${booking.chairIds.join(", ")}`,
           customerName: booking.customerName,

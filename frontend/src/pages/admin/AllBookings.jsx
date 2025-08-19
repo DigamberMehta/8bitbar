@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../utils/axios";
 import FinanceCalendar from "../../components/admin/FinanceCalendar";
+import BookingDetailsModal from "../../components/admin/BookingDetailsModal";
 import {
   MdCalendarToday,
   MdFilterList,
@@ -32,6 +33,10 @@ const AllBookings = () => {
       endDate: endDate.toISOString().split("T")[0],
     };
   });
+
+  // Modal state
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -132,12 +137,37 @@ const AllBookings = () => {
   };
 
   const handleEventClick = (event) => {
-    // Handle event click - could open a modal with booking details
-    console.log("Event clicked:", event);
+    // Debug: Log the full event object to see what's available
+    console.log("Calendar event clicked:", event);
+    console.log("Event extendedProps:", event.extendedProps);
+
+    // Extract booking data from calendar event
+    const bookingData = {
+      id: event.id,
+      serviceType: event.extendedProps.serviceType,
+      status: event.extendedProps.status,
+      paymentStatus: event.extendedProps.paymentStatus,
+      revenue: event.extendedProps.revenue,
+      roomName: event.extendedProps.roomName,
+      customerName: event.extendedProps.customerName,
+      customerEmail: event.extendedProps.customerEmail,
+      start: event.start,
+      end: event.end,
+      title: event.title,
+    };
+
+    console.log("Extracted booking data:", bookingData);
+    setSelectedBooking(bookingData);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedBooking(null);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 ">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -329,6 +359,13 @@ const AllBookings = () => {
           )}
         </div>
       </div>
+
+      {/* Booking Details Modal */}
+      <BookingDetailsModal
+        booking={selectedBooking}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </div>
   );
 };

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../utils/axios";
 import FinanceCalendar from "../../../components/admin/FinanceCalendar";
+import BookingDetailsModal from "../../../components/admin/BookingDetailsModal";
 
 const CalendarView = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarData, setCalendarData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Modal state
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchCalendarData();
@@ -40,6 +45,36 @@ const CalendarView = () => {
     }
   };
 
+  const handleEventClick = (event) => {
+    // Debug: Log the full event object to see what's available
+    console.log("Client Calendar - Event clicked:", event);
+    console.log("Client Calendar - Event extendedProps:", event.extendedProps);
+
+    // Extract booking data from calendar event
+    const bookingData = {
+      id: event.id,
+      serviceType: event.extendedProps.serviceType,
+      status: event.extendedProps.status,
+      paymentStatus: event.extendedProps.paymentStatus,
+      revenue: event.extendedProps.revenue,
+      roomName: event.extendedProps.roomName,
+      customerName: event.extendedProps.customerName,
+      customerEmail: event.extendedProps.customerEmail,
+      start: event.start,
+      end: event.end,
+      title: event.title,
+    };
+
+    console.log("Client Calendar - Extracted booking data:", bookingData);
+    setSelectedBooking(bookingData);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedBooking(null);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -59,16 +94,20 @@ const CalendarView = () => {
       <div className="bg-white">
         <FinanceCalendar
           events={calendarData}
-          onEventClick={(event) => {
-            console.log("Event clicked:", event);
-            // You can add modal or detailed view here
-          }}
+          onEventClick={handleEventClick}
           onMonthChange={(monthInfo) => {
             console.log("Month changed:", monthInfo);
             // Update date range if needed
           }}
         />
       </div>
+
+      {/* Booking Details Modal */}
+      <BookingDetailsModal
+        booking={selectedBooking}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </div>
   );
 };
