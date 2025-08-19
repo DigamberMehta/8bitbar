@@ -6,6 +6,7 @@ import KaraokeBooking from "../models/KaraokeBooking.js";
 import N64Booking from "../models/N64Booking.js";
 import AdminGiftCard from "../models/AdminGiftCard.js";
 import GiftCard from "../models/GiftCard.js";
+import { sendGiftCardPurchaseConfirmationAsync } from "../services/emailService.js";
 
 const router = express.Router();
 
@@ -155,6 +156,21 @@ router.post("/process-gift-card-only", authenticateUser, async (req, res) => {
         }
 
         if (createdGiftCard) {
+          // Send gift card purchase confirmation email
+          try {
+            await createdGiftCard.populate("purchasedBy", "name email");
+            sendGiftCardPurchaseConfirmationAsync(
+              createdGiftCard,
+              createdGiftCard.purchasedBy
+            );
+          } catch (emailError) {
+            console.warn(
+              "Failed to send gift card purchase email:",
+              emailError.message
+            );
+            // Don't fail the response for email errors
+          }
+
           return res.json({
             success: true,
             payment: mockPayment,
@@ -355,6 +371,21 @@ router.post("/process", authenticateUser, async (req, res) => {
 
           // Add gift card info to response
           if (createdGiftCard) {
+            // Send gift card purchase confirmation email
+            try {
+              await createdGiftCard.populate("purchasedBy", "name email");
+              sendGiftCardPurchaseConfirmationAsync(
+                createdGiftCard,
+                createdGiftCard.purchasedBy
+              );
+            } catch (emailError) {
+              console.warn(
+                "Failed to send gift card purchase email:",
+                emailError.message
+              );
+              // Don't fail the response for email errors
+            }
+
             return res.json({
               success: true,
               payment: {
