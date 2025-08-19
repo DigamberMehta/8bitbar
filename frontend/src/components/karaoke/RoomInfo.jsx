@@ -46,8 +46,7 @@ const RoomInfo = ({ room }) => {
               className="w-full h-64 object-cover"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room";
+                e.target.src = "/home_images/karaoke1.png";
               }}
             />
             {allImages.length > 1 && (
@@ -82,7 +81,7 @@ const RoomInfo = ({ room }) => {
           </div>
         ) : (
           <img
-            src="https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room"
+            src="/home_images/karaoke1.png"
             alt={room.name}
             className="w-full h-64 object-cover"
           />

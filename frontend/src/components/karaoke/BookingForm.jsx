@@ -129,9 +129,7 @@ const BookingForm = ({ room }) => {
         title: "Karaoke Room",
         roomName: room.name,
         roomId: room._id, // Store roomId for potential future use
-        imageUrl:
-          room.imageUrl ||
-          "/home_images/karaoke1.png",
+        imageUrl: room.imageUrl || "/home_images/karaoke1.png",
         date: selectedDate,
         time: selectedTime,
         duration: numberOfHours,
