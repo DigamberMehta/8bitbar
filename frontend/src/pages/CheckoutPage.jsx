@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import {
-  CreditCard,
-  Globe,
-  Calendar,
-  Clock,
-  Users,
-  Home,
-  Gift,
-} from "lucide-react";
+import { CreditCard, Calendar, Clock, Users, Home, Gift } from "lucide-react";
 import axios from "../utils/axios";
 import SquarePaymentForm from "../components/payments/SquarePaymentForm";
 import PaymentConfirmationModal from "../components/payments/PaymentConfirmationModal";
@@ -30,8 +22,6 @@ const CheckoutPage = () => {
   const [billingDetails, setBillingDetails] = useState({
     firstName: "",
     lastName: "",
-    country: "Australia",
-    street: "",
     apartment: "",
     suburb: "",
     state: "Queensland",
@@ -445,7 +435,7 @@ const CheckoutPage = () => {
                     <span className="w-2 h-2 bg-pink-400 rounded-full mr-3"></span>
                     Personal Information
                   </h3>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {renderInputField("firstName", "First Name", "Alice", true)}
                     {renderInputField(
                       "lastName",
@@ -453,15 +443,6 @@ const CheckoutPage = () => {
                       "Wonderland",
                       true
                     )}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Country/Region <span className="text-pink-500">*</span>
-                      </label>
-                      <div className="flex items-center bg-gray-800 border border-gray-600 rounded-lg px-3 py-3 text-white">
-                        <Globe className="h-4 w-4 text-pink-500 mr-2" />
-                        <span className="text-sm">Australia</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -472,14 +453,8 @@ const CheckoutPage = () => {
                     Address Information
                   </h3>
 
-                  {/* Street Address Row */}
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    {renderInputField(
-                      "street",
-                      "Street Address",
-                      "House number and street name",
-                      true
-                    )}
+                  {/* Apartment/Suite Row */}
+                  <div className="mb-4">
                     {renderInputField(
                       "apartment",
                       "Apartment, suite, etc.",
@@ -487,8 +462,8 @@ const CheckoutPage = () => {
                     )}
                   </div>
 
-                  {/* Location Details Row */}
-                  <div className="grid grid-cols-3 gap-4">
+                  {/* Location Details Row - Mobile Optimized */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {renderInputField(
                       "suburb",
                       "Suburb",
