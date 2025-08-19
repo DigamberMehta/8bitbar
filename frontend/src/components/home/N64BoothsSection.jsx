@@ -84,8 +84,7 @@ const N64BoothsSection = () => {
               className="w-full h-48 object-cover rounded-lg transition-opacity duration-500"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/600x400/1a202c/9f7aea?text=N64+Booth";
+                e.target.src = "/home_images/n64booth1.png";
               }}
             />
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">

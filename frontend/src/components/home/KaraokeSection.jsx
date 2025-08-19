@@ -89,8 +89,7 @@ const KaraokeSection = () => {
               className="w-full h-48 object-cover rounded-lg transition-opacity duration-500"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/600x400/1a202c/ed64a6?text=Karaoke+Room";
+                e.target.src = "/home_images/karaoke1.png";
               }}
             />
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">

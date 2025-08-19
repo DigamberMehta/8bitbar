@@ -45,7 +45,7 @@ const KaraokeRoomsAdmin = () => {
   const handleToggleVisibility = async (roomId, currentVisibility) => {
     try {
       await api.patch(`/admin/karaoke/karaoke-rooms/${roomId}/visibility`, {
-        isVisible: !currentVisibility
+        isVisible: !currentVisibility,
       });
       await fetchRooms(); // Refresh the list
     } catch (error) {
@@ -57,7 +57,7 @@ const KaraokeRoomsAdmin = () => {
   const handleToggleActive = async (roomId, currentActive) => {
     try {
       await api.patch(`/admin/karaoke/karaoke-rooms/${roomId}/active`, {
-        isActive: !currentActive
+        isActive: !currentActive,
       });
       await fetchRooms(); // Refresh the list
     } catch (error) {
@@ -98,7 +98,7 @@ const KaraokeRoomsAdmin = () => {
             >
               <div className="md:w-48">
                 <img
-                  src={room.imageUrl || "https://via.placeholder.com/150"}
+                  src={room.imageUrl || "/home_images/karaoke1.png"}
                   alt={room.name}
                   className="w-full h-48 object-cover md:h-full"
                 />
@@ -111,30 +111,50 @@ const KaraokeRoomsAdmin = () => {
                     </h2>
                     <div className="flex-shrink-0 flex gap-2">
                       <button
-                        onClick={() => handleToggleVisibility(room._id, room.isVisible)}
+                        onClick={() =>
+                          handleToggleVisibility(room._id, room.isVisible)
+                        }
                         className={`p-2 rounded-md transition-colors ${
-                          room.isVisible 
-                            ? "text-green-600 hover:text-green-800 hover:bg-green-100" 
+                          room.isVisible
+                            ? "text-green-600 hover:text-green-800 hover:bg-green-100"
                             : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                         }`}
-                        title={room.isVisible ? "Hide from customers" : "Show to customers"}
+                        title={
+                          room.isVisible
+                            ? "Hide from customers"
+                            : "Show to customers"
+                        }
                       >
-                        {room.isVisible ? <Eye size={20} /> : <EyeOff size={20} />}
-                      </button>
-                      <button
-                        onClick={() => handleToggleActive(room._id, room.isActive)}
-                        className={`p-2 rounded-md transition-colors ${
-                          room.isActive 
-                            ? "text-blue-600 hover:text-blue-800 hover:bg-blue-100" 
-                            : "text-orange-400 hover:text-orange-600 hover:bg-orange-100"
-                        }`}
-                        title={room.isActive ? "Deactivate room" : "Activate room"}
-                      >
-                        {room.isActive ? <Pause size={20} /> : <Play size={20} />}
+                        {room.isVisible ? (
+                          <Eye size={20} />
+                        ) : (
+                          <EyeOff size={20} />
+                        )}
                       </button>
                       <button
                         onClick={() =>
-                          navigate(`/admin/karaoke/karaoke-room/edit?id=${room._id}`)
+                          handleToggleActive(room._id, room.isActive)
+                        }
+                        className={`p-2 rounded-md transition-colors ${
+                          room.isActive
+                            ? "text-blue-600 hover:text-blue-800 hover:bg-blue-100"
+                            : "text-orange-400 hover:text-orange-600 hover:bg-orange-100"
+                        }`}
+                        title={
+                          room.isActive ? "Deactivate room" : "Activate room"
+                        }
+                      >
+                        {room.isActive ? (
+                          <Pause size={20} />
+                        ) : (
+                          <Play size={20} />
+                        )}
+                      </button>
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/karaoke/karaoke-room/edit?id=${room._id}`
+                          )
                         }
                         className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md"
                         title="Edit room"
@@ -192,18 +212,22 @@ const KaraokeRoomsAdmin = () => {
 
                   {/* Status Indicators */}
                   <div className="mt-4 flex gap-2">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      room.isVisible 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-gray-100 text-gray-800"
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        room.isVisible
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
                       {room.isVisible ? "Visible" : "Hidden"}
                     </span>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      room.isActive 
-                        ? "bg-blue-100 text-blue-800" 
-                        : "bg-orange-100 text-orange-800"
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        room.isActive
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-orange-100 text-orange-800"
+                      }`}
+                    >
                       {room.isActive ? "Active" : "Inactive"}
                     </span>
                   </div>

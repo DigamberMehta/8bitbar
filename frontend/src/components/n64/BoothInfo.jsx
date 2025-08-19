@@ -76,8 +76,7 @@ const BoothInfo = () => {
               className="w-full h-64 object-cover"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/600x400/1a202c/9f7aea?text=N64+Booth";
+                e.target.src = "/home_images/n64booth1.png";
               }}
             />
             {allImages.length > 1 && (
@@ -112,7 +111,7 @@ const BoothInfo = () => {
           </div>
         ) : (
           <img
-            src="https://placehold.co/600x400/1a202c/9f7aea?text=N64+Booth"
+            src="/home_images/n64booth1.png"
             alt="N64 Gaming Booth"
             className="w-full h-64 object-cover"
           />

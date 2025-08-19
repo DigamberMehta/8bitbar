@@ -48,7 +48,7 @@ const N64RoomsAdmin = () => {
             >
               <div className="md:w-48">
                 <img
-                  src={room.imageUrl || "https://via.placeholder.com/150"}
+                  src={room.imageUrl || "/home_images/n64booth1.png"}
                   alt={room.name}
                   className="w-full h-48 object-cover md:h-full"
                 />
@@ -134,7 +134,7 @@ const N64RoomsAdmin = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="mt-4">
                   <h3 className="text-sm font-medium text-gray-500">
                     Available Days
