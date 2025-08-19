@@ -1,6 +1,6 @@
 // Maintenance Mode Configuration
 // Set this to true to enable maintenance mode
-export const MAINTENANCE_MODE = false;
+export const MAINTENANCE_MODE = true;
 
 // Maintenance page title
 export const MAINTENANCE_TITLE = "WEBSITE UNDER MAINTENANCE";
