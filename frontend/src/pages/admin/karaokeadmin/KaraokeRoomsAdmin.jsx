@@ -75,7 +75,7 @@ const KaraokeRoomsAdmin = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
+    <div className="p-2 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">

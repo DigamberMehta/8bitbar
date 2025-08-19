@@ -246,12 +246,12 @@ const KaraokeRoomCreateAdmin = () => {
   ]);
   const [weekDaysArr, setWeekDaysArr] = useState([
     "Monday",
-    "Tuesday", 
+    "Tuesday",
     "Wednesday",
     "Thursday",
     "Friday",
     "Saturday",
-    "Sunday"
+    "Sunday",
   ]);
 
   const handleSubmit = async (e) => {
@@ -301,7 +301,7 @@ const KaraokeRoomCreateAdmin = () => {
     <div className="min-h-screen bg-gray-50">
       <form onSubmit={handleSubmit}>
         <div className="bg-white shadow-lg sm:rounded-xl md:w-full">
-          <div className="px-4 py-5 sm:p-6">
+          <div className="p-2">
             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl">
               Create New Karaoke Room
             </h2>
@@ -313,7 +313,7 @@ const KaraokeRoomCreateAdmin = () => {
             </div>
           )}
 
-          <div className="border-t border-gray-200 px-4 py-5 sm:p-6 space-y-8">
+          <div className="border-t border-gray-200 p-2 space-y-8">
             {/* --- GENERAL INFO SECTION --- */}
             <div>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
@@ -412,13 +412,22 @@ const KaraokeRoomCreateAdmin = () => {
               <div className="mt-6 space-y-6">
                 <div>
                   <MultiSelect
-                    options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+                    options={[
+                      "Monday",
+                      "Tuesday",
+                      "Wednesday",
+                      "Thursday",
+                      "Friday",
+                      "Saturday",
+                      "Sunday",
+                    ]}
                     selected={weekDaysArr}
                     onChange={setWeekDaysArr}
                     label="Available Week Days"
                   />
                   <p className="mt-2 text-sm text-gray-500">
-                    Selected {weekDaysArr.length} day(s) - Customers can only book on selected days
+                    Selected {weekDaysArr.length} day(s) - Customers can only
+                    book on selected days
                   </p>
                 </div>
                 <div>

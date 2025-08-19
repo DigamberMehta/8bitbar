@@ -271,7 +271,17 @@ const KaraokeRoomEditAdmin = () => {
         });
         setFeaturesArr(room.inclusions?.features || []);
         setTimeSlotsArr(room.timeSlots || []);
-        setWeekDaysArr(room.weekDays || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]);
+        setWeekDaysArr(
+          room.weekDays || [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ]
+        );
       } catch (err) {
         console.error("Error fetching room:", err);
         setError("Failed to fetch room data");
@@ -338,12 +348,12 @@ const KaraokeRoomEditAdmin = () => {
     <div className="min-h-screen bg-gray-50">
       <form onSubmit={handleSubmit}>
         <div className="bg-white shadow-lg sm:rounded-xl md:w-full">
-          <div className="px-4 py-5 sm:p-6">
+          <div className="p-2">
             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl">
               Edit Karaoke Room
             </h2>
           </div>
-          <div className="border-t border-gray-200 px-4 py-5 sm:p-6 space-y-8">
+          <div className="border-t border-gray-200 p-2 space-y-8">
             {/* --- GENERAL INFO SECTION --- */}
             <div>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
@@ -442,13 +452,22 @@ const KaraokeRoomEditAdmin = () => {
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-6">
                   <MultiSelect
-                    options={["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+                    options={[
+                      "Monday",
+                      "Tuesday",
+                      "Wednesday",
+                      "Thursday",
+                      "Friday",
+                      "Saturday",
+                      "Sunday",
+                    ]}
                     selected={weekDaysArr}
                     onChange={setWeekDaysArr}
                     label="Available Week Days"
                   />
                   <p className="mt-2 text-sm text-gray-500">
-                    Selected {weekDaysArr.length} day(s) - Customers can only book on selected days
+                    Selected {weekDaysArr.length} day(s) - Customers can only
+                    book on selected days
                   </p>
                 </div>
                 <div className="sm:col-span-6">

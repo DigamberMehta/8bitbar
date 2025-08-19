@@ -94,7 +94,7 @@ const AdminDashboard = () => {
 
   const StatCard = ({ title, value, icon, color, isRevenue = false }) => (
     <div
-      className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6 lg:p-8 border-l-4 ${color} transform hover:-translate-y-1`}
+      className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-2 border-l-4 ${color} transform hover:-translate-y-1`}
     >
       <div className="flex items-center justify-between">
         <div className="min-w-0 flex-1">
@@ -129,7 +129,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-3 sm:px-4 lg:px-6 py-4 lg:py-6">
+    <div className="min-h-screen bg-gray-50 px-2 py-4 lg:py-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 lg:mb-8 space-y-4 lg:space-y-0">
@@ -138,7 +138,7 @@ const AdminDashboard = () => {
           </h1>
 
           {/* Date Filter Controls */}
-          <div className="w-full lg:w-auto bg-white rounded-lg shadow-sm border border-gray-200 p-3 lg:p-4">
+          <div className="w-full lg:w-auto bg-white rounded-lg shadow-sm border border-gray-200 p-2">
             <div className="flex items-center gap-2 mb-3">
               <MdDateRange className="text-gray-500" size={18} />
               <span className="text-sm font-medium text-gray-700">
@@ -198,7 +198,7 @@ const AdminDashboard = () => {
 
         {/* Date Range Display */}
         {(startDate || endDate) && (
-          <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-6 p-2 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center gap-2 text-blue-800">
               <MdDateRange size={16} className="flex-shrink-0" />
               <span className="text-sm font-medium">

@@ -33,6 +33,7 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
       extendedProps: {
         serviceType: event.serviceType,
         status: event.status,
+        paymentStatus: event.paymentStatus,
         revenue: event.revenue,
         roomName: event.roomName,
         customerName: event.customerName,

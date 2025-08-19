@@ -205,7 +205,7 @@ const KaraokeBookingsAdmin = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
+    <div className="p-2 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">

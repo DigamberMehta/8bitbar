@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../utils/axios";
 import FinanceCalendar from "../../components/admin/FinanceCalendar";
+import BookingDetailsModal from "../../components/admin/BookingDetailsModal";
 import {
   MdCalendarToday,
   MdBarChart,
@@ -34,6 +35,10 @@ const FinancePage = () => {
       .split("T")[0],
     endDate: new Date().toISOString().split("T")[0],
   });
+
+  // Modal state
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -664,14 +669,50 @@ const FinancePage = () => {
               <FinanceCalendar
                 events={calendarData}
                 onEventClick={(event) => {
-                  console.log("Event clicked:", event);
-                  // You can add a modal here to show event details
+                  // Debug: Log the full event object to see what's available
+                  console.log("FinancePage - Calendar event clicked:", event);
+                  console.log(
+                    "FinancePage - Event extendedProps:",
+                    event.extendedProps
+                  );
+
+                  // Extract booking data from calendar event
+                  const bookingData = {
+                    id: event.id,
+                    serviceType: event.extendedProps.serviceType,
+                    status: event.extendedProps.status,
+                    paymentStatus: event.extendedProps.paymentStatus,
+                    revenue: event.extendedProps.revenue,
+                    roomName: event.extendedProps.roomName,
+                    customerName: event.extendedProps.customerName,
+                    customerEmail: event.extendedProps.customerEmail,
+                    start: event.start,
+                    end: event.end,
+                    title: event.title,
+                  };
+
+                  console.log(
+                    "FinancePage - Extracted booking data:",
+                    bookingData
+                  );
+                  setSelectedBooking(bookingData);
+                  setIsModalOpen(true);
                 }}
               />
             )}
           </div>
         </div>
       </div>
+
+      {/* Booking Details Modal */}
+      <BookingDetailsModal
+        booking={selectedBooking}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedBooking(null);
+        }}
+      />
     </div>
   );
 };
