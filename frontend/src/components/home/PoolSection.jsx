@@ -40,7 +40,7 @@ const PoolSection = () => {
 
           <div className="flex justify-center">
             <img
-              src="https://8bitbar.com.au/wp-content/uploads/2025/05/openart-a8d36e2a-b3ee-4dcc-b348-5fef533e0550.jpeg"
+              src="/home_images/pooltable.png"
               alt="FREE Pool Table at 8-Bit Bar"
               className="w-full max-w-md h-96 object-cover rounded-lg shadow-2xl"
             />

@@ -17,7 +17,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <img
-                src="https://8bitbar.com.au/wp-content/uploads/2025/02/logo-1.png"
+                src="/home_images/logo.png"
                 alt="8-Bit Bar Logo"
                 className="h-10 w-auto"
               />

@@ -98,8 +98,7 @@ const BookingForm = ({ booths, bookings }) => {
           (selectedBooth.name?.toLowerCase().includes("mickey")
             ? "mickey"
             : "minnie"),
-        imageUrl:
-          "https://8bitbar.com.au/wp-content/uploads/2025/03/20250419_212301-scaled.jpg",
+        imageUrl: "/home_images/n64booth1.png",
         date: selectedDate,
         time: selectedTime,
         duration,

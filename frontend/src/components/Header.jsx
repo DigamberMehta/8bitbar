@@ -40,7 +40,7 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <img
-              src="https://8bitbar.com.au/wp-content/uploads/2025/02/logo-1.png"
+              src="/home_images/logo.png"
               alt="8-Bit Bar Logo"
               className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
             />

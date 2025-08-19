@@ -7,7 +7,7 @@ const MaintenancePage = () => {
         {/* Logo */}
         <div className="mb-8 flex justify-center">
           <img
-            src="https://8bitbar.com.au/wp-content/uploads/2025/02/logo-1.png"
+            src="/home_images/logo.png"
             alt="8-Bit Bar Logo"
             className="h-20 w-auto"
           />

@@ -109,9 +109,9 @@ const N64BookingsAdmin = () => {
   const getStatusInfo = (status) => {
     switch (status) {
       case "confirmed":
-        return { color: "bg-green-100 text-green-800", text: "Paid" };
+        return { color: "bg-green-100 text-green-800", text: "Confirmed" };
       case "pending":
-        return { color: "bg-yellow-100 text-yellow-800", text: "Not Paid" };
+        return { color: "bg-yellow-100 text-yellow-800", text: "Pending" };
       case "cancelled":
         return { color: "bg-red-100 text-red-800", text: "Cancelled" };
       case "completed":
@@ -176,6 +176,26 @@ const N64BookingsAdmin = () => {
           <button
             onClick={() => updateBookingStatus(booking._id, "cancelled")}
             className="text-xs lg:text-sm font-medium text-red-600 hover:text-red-800 px-2 py-1 rounded"
+          >
+            Cancel
+          </button>
+        </>
+      )}
+      {booking.status === "completed" && (
+        <>
+          <button
+            onClick={() => updateBookingStatus(booking._id, "completed")}
+            disabled
+            className="text-xs lg:text-sm font-medium text-gray-400 px-2 py-1 rounded cursor-not-allowed"
+            title="Booking already completed"
+          >
+            Complete
+          </button>
+          <button
+            onClick={() => updateBookingStatus(booking._id, "cancelled")}
+            disabled
+            className="text-xs lg:text-sm font-medium text-gray-400 px-2 py-1 rounded cursor-not-allowed"
+            title="Cannot cancel completed bookings"
           >
             Cancel
           </button>

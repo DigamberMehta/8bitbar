@@ -6,20 +6,16 @@ const KaraokeSection = () => {
 
   const images = [
     {
-      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/0b42d0ef-96db-40f0-abf4-51edbb96ac42-e1748892865932.jpeg",
+      src: "/home_images/karaoke1.png",
       alt: "Alice in Wonderland Karaoke Room",
     },
     {
-      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/eab1029c-b6c9-430c-b0e2-0e80fff6aa21.jpeg",
+      src: "/home_images/karaoke2.png",
       alt: "Karaoke Room Interior",
     },
     {
-      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/0b42d0ef-96db-40f0-abf4-51edbb96ac42-1536x865.jpeg",
+      src: "/home_images/karaoke3.png",
       alt: "Karaoke Room Setup",
-    },
-    {
-      src: "https://8bitbar.com.au/wp-content/uploads/2025/05/275bbbcf-cb28-4acf-b4b2-2fede476aeca.jpeg",
-      alt: "Karaoke Room Atmosphere",
     },
   ];
 

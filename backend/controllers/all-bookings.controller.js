@@ -97,7 +97,8 @@ const AllBookingsController = {
             ...booking.toObject(),
             serviceType: "cafe",
             tableName: `Table ${booking.chairIds.join(", ")}`,
-            bookingDate: new Date(`${booking.date}T${booking.time}`), // Combine date and time
+            // TIMEZONE FIX: Create date in client's local timezone instead of server timezone
+            bookingDate: new Date(`${booking.date}T${booking.time}:00`), // Combine date and time
             amount: booking.totalCost || 0, // Map price field
           }))
         );
@@ -231,7 +232,8 @@ const AllBookingsController = {
       );
 
       cafeBookings.forEach((booking) => {
-        const startDateTime = new Date(`${booking.date}T${booking.time}`);
+        // TIMEZONE FIX: Create date in client's local timezone instead of server timezone
+        const startDateTime = new Date(`${booking.date}T${booking.time}:00`);
         const endDateTime = new Date(startDateTime);
         endDateTime.setHours(endDateTime.getHours() + booking.duration);
 
