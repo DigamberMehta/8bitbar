@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import { getCafeBookingTemplate } from "./templates/cafeBookingTemplate.js";
 import { getKaraokeBookingTemplate } from "./templates/karaokeBookingTemplate.js";
 import { getN64BookingTemplate } from "./templates/n64BookingTemplate.js";
+import { getGiftCardPurchaseTemplate } from "./templates/giftCardPurchaseTemplate.js";
 
 // Create transporter with 8BitBar SMTP configuration
 const transporter = nodemailer.createTransport({
@@ -79,6 +80,7 @@ export const sendBookingConfirmation = async (
     const mailOptions = {
       from: '"8-Bit Bar" <orders@8bitbar.com.au>',
       to: booking.customerEmail,
+      cc: "orders@8bitbar.com.au", // Send a copy to orders email
       subject: emailTemplate.subject,
       html: emailTemplate.html,
     };
@@ -147,4 +149,89 @@ export const sendBookingConfirmationAsync = (
     });
 };
 
-export default { sendBookingConfirmation, sendBookingConfirmationAsync };
+// Function to send gift card purchase confirmation email
+export const sendGiftCardPurchaseConfirmation = async (giftCard, user) => {
+  try {
+    // Test connection first
+    const connectionOk = await testConnection();
+    if (!connectionOk) {
+      console.warn("SMTP connection failed, email will not be sent");
+      return { success: false, error: "SMTP connection failed" };
+    }
+
+    const emailTemplate = getGiftCardPurchaseTemplate(giftCard, user);
+
+    const mailOptions = {
+      from: '"8-Bit Bar" <orders@8bitbar.com.au>',
+      to: user.email,
+      cc: "orders@8bitbar.com.au", // Send a copy to orders email
+      subject: emailTemplate.subject,
+      html: emailTemplate.html,
+    };
+
+    const result = await withTimeout(transporter.sendMail(mailOptions), 20000);
+    console.log(
+      "✅ Gift card purchase confirmation email sent successfully:",
+      result.messageId
+    );
+    return { success: true, messageId: result.messageId };
+  } catch (error) {
+    console.error(
+      "❌ Error sending gift card purchase confirmation email:",
+      error.message
+    );
+
+    // If it's a timeout error, provide specific information
+    if (error.message.includes("timed out")) {
+      console.error("⏰ Email service timed out after 20 seconds");
+      console.error("   This prevents the purchase process from hanging");
+      console.error("   The gift card was still created successfully");
+    }
+    // If it's a DNS error, provide helpful information
+    else if (error.code === "EDNS" || error.code === "ENOTFOUND") {
+      console.error("📧 SMTP server not found. Please check:");
+      console.error("   1. SMTP hostname: smtp.8bitbar.com.au");
+      console.error("   2. Network connectivity");
+      console.error("   3. DNS resolution");
+      console.error(
+        "   4. Consider using environment variables for SMTP config"
+      );
+    }
+
+    return { success: false, error: error.message };
+  }
+};
+
+// Fire-and-forget email function for gift card purchases
+export const sendGiftCardPurchaseConfirmationAsync = (giftCard, user) => {
+  // Don't await this - let it run in background
+  sendGiftCardPurchaseConfirmation(giftCard, user)
+    .then((result) => {
+      if (result.success) {
+        console.log(
+          `📧 Gift card purchase email sent successfully:`,
+          giftCard._id
+        );
+      } else {
+        console.warn(
+          `📧 Gift card purchase email failed:`,
+          giftCard._id,
+          result.error
+        );
+      }
+    })
+    .catch((error) => {
+      console.error(
+        `📧 Gift card purchase email error:`,
+        giftCard._id,
+        error.message
+      );
+    });
+};
+
+export default {
+  sendBookingConfirmation,
+  sendBookingConfirmationAsync,
+  sendGiftCardPurchaseConfirmation,
+  sendGiftCardPurchaseConfirmationAsync,
+};

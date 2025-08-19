@@ -2,6 +2,7 @@ import express from "express";
 import authenticateUser from "../middlewares/authenticateUser.js";
 import GiftCard from "../models/GiftCard.js";
 import AdminGiftCard from "../models/AdminGiftCard.js";
+import { sendGiftCardPurchaseConfirmationAsync } from "../services/emailService.js";
 
 const router = express.Router();
 
@@ -74,6 +75,17 @@ router.post("/custom", authenticateUser, async (req, res) => {
 
     // Populate user info
     await giftCard.populate("purchasedBy", "name email");
+
+    // Send gift card purchase confirmation email
+    try {
+      sendGiftCardPurchaseConfirmationAsync(giftCard, giftCard.purchasedBy);
+    } catch (emailError) {
+      console.warn(
+        "Failed to send gift card purchase email:",
+        emailError.message
+      );
+      // Don't fail the response for email errors
+    }
 
     res.status(201).json({
       success: true,
