@@ -1,5 +1,5 @@
 // Maintenance Mode Configuration
-// Set this to true to enable maintenance mode
+// Set this to true to enable maintenance  mode
 export const MAINTENANCE_MODE = false;
 
 // Maintenance page title
