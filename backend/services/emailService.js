@@ -36,10 +36,8 @@ const withTimeout = (promise, timeoutMs = 20000) => {
 const testConnection = async () => {
   try {
     await withTimeout(transporter.verify(), 20000);
-    console.log("✅ SMTP connection verified successfully");
     return true;
   } catch (error) {
-    console.warn("⚠️ SMTP connection failed:", error.message);
     return false;
   }
 };
@@ -54,7 +52,6 @@ export const sendBookingConfirmation = async (
     // Test connection first
     const connectionOk = await testConnection();
     if (!connectionOk) {
-      console.warn("SMTP connection failed, email will not be sent");
       return { success: false, error: "SMTP connection failed" };
     }
 
@@ -86,17 +83,8 @@ export const sendBookingConfirmation = async (
     };
 
     const result = await withTimeout(transporter.sendMail(mailOptions), 20000);
-    console.log(
-      "✅ Booking confirmation email sent successfully:",
-      result.messageId
-    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error(
-      "❌ Error sending booking confirmation email:",
-      error.message
-    );
-
     // If it's a timeout error, provide specific information
     if (error.message.includes("timed out")) {
       console.error("⏰ Email service timed out after 20 seconds");
@@ -127,25 +115,10 @@ export const sendBookingConfirmationAsync = (
   // Don't await this - let it run in background
   sendBookingConfirmation(bookingType, booking, additionalData)
     .then((result) => {
-      if (result.success) {
-        console.log(
-          `📧 Email sent successfully for ${bookingType} booking:`,
-          booking._id
-        );
-      } else {
-        console.warn(
-          `📧 Email failed for ${bookingType} booking:`,
-          booking._id,
-          result.error
-        );
-      }
+      // Email sent or failed silently
     })
     .catch((error) => {
-      console.error(
-        `📧 Email error for ${bookingType} booking:`,
-        booking._id,
-        error.message
-      );
+      // Email error handled silently
     });
 };
 
@@ -155,7 +128,6 @@ export const sendGiftCardPurchaseConfirmation = async (giftCard, user) => {
     // Test connection first
     const connectionOk = await testConnection();
     if (!connectionOk) {
-      console.warn("SMTP connection failed, email will not be sent");
       return { success: false, error: "SMTP connection failed" };
     }
 
@@ -170,17 +142,8 @@ export const sendGiftCardPurchaseConfirmation = async (giftCard, user) => {
     };
 
     const result = await withTimeout(transporter.sendMail(mailOptions), 20000);
-    console.log(
-      "✅ Gift card purchase confirmation email sent successfully:",
-      result.messageId
-    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error(
-      "❌ Error sending gift card purchase confirmation email:",
-      error.message
-    );
-
     // If it's a timeout error, provide specific information
     if (error.message.includes("timed out")) {
       console.error("⏰ Email service timed out after 20 seconds");
@@ -207,25 +170,10 @@ export const sendGiftCardPurchaseConfirmationAsync = (giftCard, user) => {
   // Don't await this - let it run in background
   sendGiftCardPurchaseConfirmation(giftCard, user)
     .then((result) => {
-      if (result.success) {
-        console.log(
-          `📧 Gift card purchase email sent successfully:`,
-          giftCard._id
-        );
-      } else {
-        console.warn(
-          `📧 Gift card purchase email failed:`,
-          giftCard._id,
-          result.error
-        );
-      }
+      // Email sent or failed silently
     })
     .catch((error) => {
-      console.error(
-        `📧 Gift card purchase email error:`,
-        giftCard._id,
-        error.message
-      );
+      // Email error handled silently
     });
 };
 

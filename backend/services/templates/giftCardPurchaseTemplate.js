@@ -214,13 +214,10 @@ export const getGiftCardPurchaseTemplate = (giftCard, user) => {
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Purchase Date:</span>
-                        <span class="detail-value">${new Date(
-                          giftCard.purchasedAt
-                        ).toLocaleDateString("en-AU", {
+                        <span class="detail-value">${giftCard.purchasedAt.toLocaleDateString("en-AU", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
-                          timeZone: "UTC",
                         })}</span>
                     </div>
                     <div class="detail-row">
