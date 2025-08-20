@@ -52,17 +52,20 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
         title: event.title,
         start: convertTimeToISO(event.start),
         end: convertTimeToISO(event.end),
-        backgroundColor: getEventColor(event.serviceType),
-        borderColor: getEventColor(event.serviceType),
+        backgroundColor: getEventColor(event.extendedProps?.serviceType),
+        borderColor: getEventColor(event.extendedProps?.serviceType),
         textColor: "#FFFFFF",
         extendedProps: {
-          serviceType: event.serviceType,
-          status: event.status,
-          paymentStatus: event.paymentStatus,
-          revenue: event.revenue,
-          roomName: event.roomName,
-          customerName: event.customerName,
-          customerEmail: event.customerEmail,
+          serviceType: event.extendedProps?.serviceType,
+          status: event.extendedProps?.status,
+          paymentStatus: event.extendedProps?.paymentStatus,
+          revenue: event.extendedProps?.revenue,
+          roomName: event.extendedProps?.roomName,
+          customerName: event.extendedProps?.customerName,
+          customerEmail: event.extendedProps?.customerEmail,
+          time: event.extendedProps?.time, // Include time field
+          durationHours: event.extendedProps?.durationHours, // Include duration for karaoke/N64
+          duration: event.extendedProps?.duration, // Include duration for cafe
         },
       };
     });

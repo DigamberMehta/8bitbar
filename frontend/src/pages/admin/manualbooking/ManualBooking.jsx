@@ -41,6 +41,7 @@ const ManualBooking = () => {
       time: "",
       numberOfPeople: 1,
       durationHours: 1,
+      paymentStatus: "pending", // Default to "Not Paid"
     },
     n64: {
       roomId: "",
@@ -49,6 +50,7 @@ const ManualBooking = () => {
       time: "",
       numberOfPeople: 1,
       durationHours: 1,
+      paymentStatus: "pending", // Default to "Not Paid"
     },
     cafe: {
       chairIds: [],
@@ -57,6 +59,7 @@ const ManualBooking = () => {
       duration: 1,
       specialRequests: "",
       deviceType: "desktop",
+      paymentStatus: "pending", // Default to "Not Paid"
     },
   });
   const [result, setResult] = useState(null);
@@ -462,6 +465,7 @@ const ManualBooking = () => {
                 date: "",
                 time: "",
                 durationHours: 1,
+                paymentStatus: "pending", // Reset payment status
               }
             : activeService === "n64"
             ? {
@@ -470,6 +474,7 @@ const ManualBooking = () => {
                 date: "",
                 time: "",
                 durationHours: 1,
+                paymentStatus: "pending", // Reset payment status
               }
             : {
                 chairIds: [],
@@ -478,6 +483,7 @@ const ManualBooking = () => {
                 duration: 1,
                 specialRequests: "",
                 deviceType: "desktop",
+                paymentStatus: "pending", // Reset payment status
               },
       }));
 
@@ -653,11 +659,15 @@ const ManualBooking = () => {
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
               type="radio"
-              name="status"
+              name="paymentStatus"
               value="pending"
-              checked={bookingData[activeService].status === "pending"}
+              checked={bookingData[activeService].paymentStatus === "pending"}
               onChange={(e) =>
-                handleBookingDataChange(activeService, "status", e.target.value)
+                handleBookingDataChange(
+                  activeService,
+                  "paymentStatus",
+                  e.target.value
+                )
               }
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
@@ -666,11 +676,15 @@ const ManualBooking = () => {
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
               type="radio"
-              name="status"
-              value="confirmed"
-              checked={bookingData[activeService].status === "confirmed"}
+              name="paymentStatus"
+              value="completed"
+              checked={bookingData[activeService].paymentStatus === "completed"}
               onChange={(e) =>
-                handleBookingDataChange(activeService, "status", e.target.value)
+                handleBookingDataChange(
+                  activeService,
+                  "paymentStatus",
+                  e.target.value
+                )
               }
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />

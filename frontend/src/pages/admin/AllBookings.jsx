@@ -43,7 +43,6 @@ const AllBookings = () => {
   }, [filters, dateRange.startDate, dateRange.endDate]);
 
   const fetchData = async () => {
-    console.log("Fetching data with date range:", dateRange);
     setLoading(true);
     try {
       // Fetch all bookings
@@ -62,9 +61,6 @@ const AllBookings = () => {
           endDate: dateRange.endDate,
         },
       });
-
-      console.log("Bookings response:", bookingsResponse.data);
-      console.log("Calendar response:", calendarResponse.data);
 
       setBookings(bookingsResponse.data.bookings || []);
       setCalendarData(calendarResponse.data.calendarData || []);
@@ -85,7 +81,6 @@ const AllBookings = () => {
   };
 
   const handleMonthChange = (monthInfo) => {
-    console.log("Month change detected in AllBookings:", monthInfo);
     // Update the date range to cover the entire month being displayed
     setDateRange({
       startDate: monthInfo.startDate,
@@ -144,10 +139,6 @@ const AllBookings = () => {
   };
 
   const handleEventClick = (event) => {
-    // Debug: Log the full event object to see what's available
-    console.log("Calendar event clicked:", event);
-    console.log("Event extendedProps:", event.extendedProps);
-
     // Extract booking data from calendar event
     const bookingData = {
       id: event.id,
@@ -158,12 +149,15 @@ const AllBookings = () => {
       roomName: event.extendedProps.roomName,
       customerName: event.extendedProps.customerName,
       customerEmail: event.extendedProps.customerEmail,
+      time: event.extendedProps.time, // Include the time field
+      durationHours: event.extendedProps.durationHours, // Include duration for karaoke/N64
+      duration: event.extendedProps.duration, // Include duration for cafe
       start: event.start,
       end: event.end,
       title: event.title,
     };
 
-    console.log("Extracted booking data:", bookingData);
+    console.log("Modal receiving data:", bookingData);
     setSelectedBooking(bookingData);
     setIsModalOpen(true);
   };
@@ -322,8 +316,7 @@ const AllBookings = () => {
                             {booking.customerEmail}
                           </div>
                           <div className="text-sm text-gray-600">
-                            {formatDate(booking.bookingDate)} at{" "}
-                            {formatTime(booking.bookingDate)}
+                            {formatDate(booking.bookingDate)} at {booking.time}
                           </div>
                           <div className="text-sm text-gray-700">
                             {booking.serviceType === "karaoke" && (

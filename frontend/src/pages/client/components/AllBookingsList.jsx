@@ -45,7 +45,6 @@ const AllBookingsList = () => {
           endDate: dateRange.endDate,
         },
       });
-      console.log("Bookings data:", response.data.bookings);
       setBookings(response.data.bookings || []);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -155,12 +154,37 @@ const AllBookingsList = () => {
   const formatTime = (timeString) => {
     try {
       if (!timeString) return "Invalid Time";
+
+      // Handle AM/PM format (e.g., "3:00 PM")
+      if (timeString.includes("AM") || timeString.includes("PM")) {
+        const match = timeString.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+        if (match) {
+          const [_, hourStr, minuteStr, period] = match;
+          let hour = parseInt(hourStr, 10);
+          const minute = parseInt(minuteStr, 10);
+
+          // Convert to 24-hour format
+          if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+          if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+          const date = new Date();
+          date.setHours(hour, minute, 0, 0);
+          return date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          });
+        }
+      }
+
+      // Handle 24-hour format (e.g., "15:00")
       const [hour, minute] = timeString.split(":");
       const date = new Date();
       date.setHours(parseInt(hour), parseInt(minute), 0, 0);
       return date.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
+        hour12: true,
       });
     } catch (error) {
       return "Invalid Time";
@@ -314,17 +338,8 @@ const AllBookingsList = () => {
                 {bookings.map((booking) => {
                   // Skip invalid booking objects
                   if (!booking || typeof booking !== "object") {
-                    console.warn("Invalid booking object:", booking);
                     return null;
                   }
-
-                  // Debug log for each booking
-                  console.log("Processing booking:", {
-                    id: booking._id,
-                    serviceType: booking.serviceType,
-                    roomId: booking.roomId,
-                    roomType: booking.roomType,
-                  });
 
                   return (
                     <tr
