@@ -60,8 +60,8 @@ const seedData = async () => {
       numberOfPeople: 3,
       roomId: mickey._id,
       roomType: "mickey",
-      startDateTime: new Date("2025-08-01T18:00:00"), // 2:00 PM
-      endDateTime: new Date("2025-08-01T20:00:00"), // 5:00 PM
+      date: "2025-08-01", // FIX: Use separate date and time fields
+      time: "6:00 PM",
       durationHours: 2,
       totalPrice: 40, // assuming $20/hour
       status: "confirmed",
@@ -76,8 +76,8 @@ const seedData = async () => {
       numberOfPeople: 2,
       roomId: minnie._id,
       roomType: "minnie",
-      startDateTime: new Date("2025-08-01T14:00:00"), // 2:00 PM
-      endDateTime: new Date("2025-08-01T17:00:00"), // 5:00 PM
+      date: "2025-08-01", // FIX: Use separate date and time fields
+      time: "2:00 PM",
       durationHours: 2,
       totalPrice: 40, // assuming $20/hour
       status: "confirmed",

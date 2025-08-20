@@ -51,7 +51,14 @@ const GiftCardDetails = ({ giftCard, onClose }) => {
                 Created
               </label>
               <p className="mt-1 text-sm text-gray-900">
-                {new Date(giftCard.createdAt).toLocaleString()}
+                {new Date(giftCard.createdAt).toLocaleString("en-US", {
+                  timeZone: "UTC",
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </p>
             </div>
 
@@ -89,7 +96,12 @@ const GiftCardDetails = ({ giftCard, onClose }) => {
                       className="text-xs text-gray-600 border-l-2 border-gray-200 pl-2"
                     >
                       Used ${usage.amount} on{" "}
-                      {new Date(usage.usedAt).toLocaleDateString()}
+                      {new Date(usage.usedAt).toLocaleDateString("en-US", {
+                        timeZone: "UTC",
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
                       {usage.bookingType && ` (${usage.bookingType})`}
                       <br />
                       Remaining: ${usage.remainingBalance}

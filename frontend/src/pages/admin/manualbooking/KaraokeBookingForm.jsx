@@ -22,7 +22,8 @@ const KaraokeBookingForm = ({
           value={bookingData.karaoke.roomId}
           onChange={(e) => {
             handleBookingDataChange("karaoke", "roomId", e.target.value);
-            handleBookingDataChange("karaoke", "startDateTime", "");
+            handleBookingDataChange("karaoke", "date", "");
+            handleBookingDataChange("karaoke", "time", "");
           }}
           required
         >
@@ -57,18 +58,10 @@ const KaraokeBookingForm = ({
           label="Date"
           icon={<Calendar size={16} />}
           type="date"
-          value={
-            bookingData.karaoke.startDateTime
-              ? bookingData.karaoke.startDateTime.split("T")[0]
-              : ""
-          }
+          value={bookingData.karaoke.date || ""}
           onChange={(e) => {
             const date = e.target.value;
-            handleBookingDataChange(
-              "karaoke",
-              "startDateTime",
-              date ? `${date}T00:00` : ""
-            );
+            handleBookingDataChange("karaoke", "date", date);
           }}
           min={new Date().toISOString().split("T")[0]}
           required
@@ -97,7 +90,7 @@ const KaraokeBookingForm = ({
       </div>
 
       {/* Time Slot Selection */}
-      {bookingData.karaoke.roomId && bookingData.karaoke.startDateTime && (
+      {bookingData.karaoke.roomId && bookingData.karaoke.date && (
         <div className="space-y-2 sm:space-y-3">
           <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
             <Clock size={14} className="sm:w-4 sm:h-4" />
@@ -107,21 +100,16 @@ const KaraokeBookingForm = ({
           <TimeSlotSelector
             timeSlots={roomAvailability.karaoke.timeSlots}
             blockedSlots={(() => {
-              const date = bookingData.karaoke.startDateTime.split("T")[0];
               return getBlockedSlots(
                 "karaoke",
-                date,
+                bookingData.karaoke.date,
                 bookingData.karaoke.durationHours
               );
             })()}
-            selectedTime={
-              bookingData.karaoke.startDateTime.includes("T")
-                ? bookingData.karaoke.startDateTime.split("T")[1]
-                : ""
-            }
-            date={bookingData.karaoke.startDateTime.split("T")[0]}
-            onTimeSelect={(dateTime) =>
-              handleBookingDataChange("karaoke", "startDateTime", dateTime)
+            selectedTime={bookingData.karaoke.time || ""}
+            date={bookingData.karaoke.date}
+            onTimeSelect={(time) =>
+              handleBookingDataChange("karaoke", "time", time)
             }
             getSlotDate={getSlotDate}
             loading={loadingRoomAvailability}

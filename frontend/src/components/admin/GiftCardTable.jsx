@@ -116,7 +116,12 @@ const GiftCardTable = ({
                   {getStatusBadge(giftCard.status)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(giftCard.createdAt).toLocaleDateString()}
+                  {new Date(giftCard.createdAt).toLocaleDateString("en-US", {
+                    timeZone: "UTC",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">

@@ -33,21 +33,22 @@ const ManualBooking = () => {
     customerPhone: "",
     customerDob: "",
   });
+  // Initialize booking data for each service
   const [bookingData, setBookingData] = useState({
     karaoke: {
       roomId: "",
+      date: "",
+      time: "",
       numberOfPeople: 1,
-      startDateTime: "",
       durationHours: 1,
-      status: "pending", // Add status field
     },
     n64: {
       roomId: "",
-      roomType: "mickey",
+      roomType: "",
+      date: "",
+      time: "",
       numberOfPeople: 1,
-      startDateTime: "",
       durationHours: 1,
-      status: "pending", // Add status field
     },
     cafe: {
       chairIds: [],
@@ -55,7 +56,7 @@ const ManualBooking = () => {
       time: "",
       duration: 1,
       specialRequests: "",
-      status: "pending", // Add status field
+      deviceType: "desktop",
     },
   });
   const [result, setResult] = useState(null);
@@ -117,12 +118,20 @@ const ManualBooking = () => {
 
   const fetchRoomAvailability = async (service, date, roomId) => {
     if (!date || !roomId) {
+      console.log(
+        `⚠️ fetchRoomAvailability: Missing date or roomId for ${service}`,
+        { date, roomId }
+      );
       setRoomAvailability((prev) => ({
         ...prev,
         [service]: { room: null, bookings: [], timeSlots: [] },
       }));
       return;
     }
+
+    console.log(
+      `🔄 fetchRoomAvailability: Fetching ${service} availability for date ${date}, roomId ${roomId}`
+    );
 
     try {
       setLoadingRoomAvailability(true);
@@ -132,6 +141,13 @@ const ManualBooking = () => {
           params: { date, roomId },
         }
       );
+
+      console.log(`✅ fetchRoomAvailability: ${service} data received:`, {
+        room: response.data.room?.name,
+        bookingsCount: response.data.bookings?.length,
+        timeSlotsCount: response.data.timeSlots?.length,
+      });
+
       setRoomAvailability((prev) => ({
         ...prev,
         [service]: {
@@ -141,7 +157,7 @@ const ManualBooking = () => {
         },
       }));
     } catch (error) {
-      console.error(`Error fetching ${service} availability:`, error);
+      console.error(`❌ Error fetching ${service} availability:`, error);
       setRoomAvailability((prev) => ({
         ...prev,
         [service]: { room: null, bookings: [], timeSlots: [] },
@@ -151,44 +167,87 @@ const ManualBooking = () => {
     }
   };
 
-  // Helper function to get slot date
-  const getSlotDate = (dateStr, slot) => {
-    const match = slot.match(/(\d+):(\d+) (AM|PM)/);
-    if (!match) return null;
-    const [_, slotHour, slotMinute, slotPeriod] = match;
-    let hour = parseInt(slotHour, 10);
-    if (slotPeriod === "PM" && hour !== 12) hour += 12;
-    if (slotPeriod === "AM" && hour === 12) hour = 0;
-    const slotDate = new Date(dateStr);
-    slotDate.setHours(hour, parseInt(slotMinute, 10), 0, 0);
-    return slotDate;
+  // Helper function to convert time string to minutes since midnight
+  const convertTimeToMinutes = (timeString) => {
+    const match = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return 0;
+
+    let [_, hourStr, minuteStr, period] = match;
+    let hour = parseInt(hourStr, 10);
+    const minute = parseInt(minuteStr, 10);
+
+    // Convert to 24-hour format
+    if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+    if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+    return hour * 60 + minute;
   };
 
   // Helper function to get blocked slots
   const getBlockedSlots = (service, dateStr, duration) => {
+    // Guard clause: check if roomAvailability data exists for this service
+    if (
+      !roomAvailability[service] ||
+      !roomAvailability[service].bookings ||
+      !roomAvailability[service].timeSlots
+    ) {
+      console.log(`⚠️ No availability data for ${service} yet`);
+      return [];
+    }
+
     const { bookings, timeSlots } = roomAvailability[service];
 
+    // Guard clause: check if we have valid data
+    if (
+      !Array.isArray(bookings) ||
+      !Array.isArray(timeSlots) ||
+      timeSlots.length === 0
+    ) {
+      console.log(`⚠️ Invalid availability data for ${service}:`, {
+        bookings,
+        timeSlots,
+      });
+      return [];
+    }
+
+    console.log(`🔍 Checking blocked slots for ${service}:`, {
+      dateStr,
+      duration,
+      bookingsCount: bookings.length,
+      timeSlotsCount: timeSlots.length,
+    });
+
+    // FIX: Proper overlap detection using time string comparisons
     return timeSlots.filter((slot) => {
-      const slotStart = getSlotDate(dateStr, slot);
-      if (!slotStart) return false;
+      // Convert current slot time to minutes
+      const slotStart = convertTimeToMinutes(slot);
+      const slotEnd = slotStart + duration * 60;
 
-      // For each hour in the duration, check if any hour overlaps with a booking
-      for (let d = 0; d < duration; d++) {
-        const checkStart = new Date(slotStart);
-        checkStart.setHours(checkStart.getHours() + d);
-        const checkEnd = new Date(checkStart);
-        checkEnd.setHours(checkEnd.getHours() + 1);
+      // Check for overlap with any booking on the same date
+      const conflict = bookings.some((booking) => {
+        // Only check bookings on the same date
+        if (booking.date !== dateStr) return false;
 
-        // Check for overlap with any booking
-        const overlap = bookings.some((booking) => {
-          const bookingStart = new Date(booking.startDateTime);
-          const bookingEnd = new Date(booking.endDateTime);
-          return checkStart < bookingEnd && checkEnd > bookingStart;
-        });
+        // Only check pending/confirmed bookings
+        if (!["pending", "confirmed"].includes(booking.status)) return false;
 
-        if (overlap) return true;
-      }
-      return false;
+        // Convert booking time to minutes
+        const bookingStart = convertTimeToMinutes(booking.time);
+        const bookingEnd = bookingStart + booking.durationHours * 60;
+
+        // Check for overlap: (StartA < EndB) and (StartB < EndA)
+        const hasOverlap = slotStart < bookingEnd && bookingStart < slotEnd;
+
+        if (hasOverlap) {
+          console.log(
+            `🚫 Slot ${slot} blocked: overlaps with ${booking.time} (${booking.durationHours}h) on ${dateStr}`
+          );
+        }
+
+        return hasOverlap;
+      });
+
+      return conflict;
     });
   };
 
@@ -208,24 +267,30 @@ const ManualBooking = () => {
   // Fetch room availability when karaoke booking details change
   useEffect(() => {
     if (activeService === "karaoke") {
-      const { roomId, startDateTime } = bookingData.karaoke;
-      const date = startDateTime ? startDateTime.split("T")[0] : "";
-      fetchRoomAvailability("karaoke", date, roomId);
+      const { roomId, date, time } = bookingData.karaoke;
+      const dateStr = date ? date : "";
+      fetchRoomAvailability("karaoke", dateStr, roomId);
     }
   }, [
     activeService,
     bookingData.karaoke.roomId,
-    bookingData.karaoke.startDateTime,
+    bookingData.karaoke.date,
+    bookingData.karaoke.time,
   ]);
 
   // Fetch room availability when N64 booking details change
   useEffect(() => {
     if (activeService === "n64") {
-      const { roomId, startDateTime } = bookingData.n64;
-      const date = startDateTime ? startDateTime.split("T")[0] : "";
-      fetchRoomAvailability("n64", date, roomId);
+      const { roomId, date, time } = bookingData.n64;
+      const dateStr = date ? date : "";
+      fetchRoomAvailability("n64", dateStr, roomId);
     }
-  }, [activeService, bookingData.n64.roomId, bookingData.n64.startDateTime]);
+  }, [
+    activeService,
+    bookingData.n64.roomId,
+    bookingData.n64.date,
+    bookingData.n64.time,
+  ]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -291,20 +356,37 @@ const ManualBooking = () => {
       customerEmail: formData.customerEmail,
       ...(activeService === "karaoke" && {
         roomId: bookingData.karaoke.roomId,
-        startDateTime: bookingData.karaoke.startDateTime,
+        date: bookingData.karaoke.date,
+        time: bookingData.karaoke.time,
+        numberOfPeople: bookingData.karaoke.numberOfPeople,
+        durationHours: bookingData.karaoke.durationHours,
       }),
       ...(activeService === "n64" && {
         roomId: bookingData.n64.roomId,
-        startDateTime: bookingData.n64.startDateTime,
+        roomType: bookingData.n64.roomType,
+        date: bookingData.n64.date,
+        time: bookingData.n64.time,
+        numberOfPeople: bookingData.n64.numberOfPeople,
+        durationHours: bookingData.n64.durationHours,
       }),
       ...(activeService === "cafe" && {
         chairIds: bookingData.cafe.chairIds,
         date: bookingData.cafe.date,
         time: bookingData.cafe.time,
+        duration: bookingData.cafe.duration,
       }),
     };
 
     console.log("🔍 Required fields check:", requiredFields);
+    console.log("🔍 Current bookingData state:", bookingData[activeService]);
+    console.log(
+      "🔍 numberOfPeople value:",
+      bookingData[activeService]?.numberOfPeople
+    );
+    console.log(
+      "🔍 durationHours value:",
+      bookingData[activeService]?.durationHours
+    );
 
     // Check for missing required fields
     const missingFields = Object.entries(requiredFields).filter(
@@ -312,7 +394,15 @@ const ManualBooking = () => {
         if (Array.isArray(value)) {
           return value.length === 0;
         }
-        return !value || value.trim() === "";
+        // Handle different data types properly
+        if (typeof value === "string") {
+          return !value || value.trim() === "";
+        }
+        if (typeof value === "number") {
+          return value === 0 || isNaN(value);
+        }
+        // For other types (boolean, object), just check if falsy
+        return !value;
       }
     );
 
@@ -333,6 +423,7 @@ const ManualBooking = () => {
       const payload = {
         ...formData,
         ...bookingData[activeService],
+        status: "confirmed", // Default status for manual bookings
         staffPin: staffInfo.pin, // Include staff PIN
       };
 
@@ -368,19 +459,17 @@ const ManualBooking = () => {
           activeService === "karaoke"
             ? {
                 roomId: "",
-                numberOfPeople: 1,
-                startDateTime: "",
+                date: "",
+                time: "",
                 durationHours: 1,
-                status: "pending",
               }
             : activeService === "n64"
             ? {
                 roomId: "",
-                roomType: "mickey",
-                numberOfPeople: 1,
-                startDateTime: "",
+                roomType: "",
+                date: "",
+                time: "",
                 durationHours: 1,
-                status: "pending",
               }
             : {
                 chairIds: [],
@@ -388,7 +477,7 @@ const ManualBooking = () => {
                 time: "",
                 duration: 1,
                 specialRequests: "",
-                status: "pending",
+                deviceType: "desktop",
               },
       }));
 
@@ -614,7 +703,6 @@ const ManualBooking = () => {
               roomAvailability={roomAvailability}
               loadingRoomAvailability={loadingRoomAvailability}
               handleBookingDataChange={handleBookingDataChange}
-              getSlotDate={getSlotDate}
               getBlockedSlots={getBlockedSlots}
             />
           )}
@@ -626,7 +714,6 @@ const ManualBooking = () => {
               roomAvailability={roomAvailability}
               loadingRoomAvailability={loadingRoomAvailability}
               handleBookingDataChange={handleBookingDataChange}
-              getSlotDate={getSlotDate}
               getBlockedSlots={getBlockedSlots}
             />
           )}

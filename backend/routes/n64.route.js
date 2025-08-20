@@ -6,6 +6,22 @@ import { sendBookingConfirmationAsync } from "../services/emailService.js";
 
 const router = express.Router();
 
+// Helper function to convert time string to minutes since midnight
+const convertTimeToMinutes = (timeString) => {
+  const match = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!match) return 0;
+
+  let [_, hourStr, minuteStr, period] = match;
+  let hour = parseInt(hourStr, 10);
+  const minute = parseInt(minuteStr, 10);
+
+  // Convert to 24-hour format
+  if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+  if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+  return hour * 60 + minute;
+};
+
 // GET /api/v1/n64-rooms - fetch all N64 booths
 router.get("/", async (req, res) => {
   try {
@@ -97,22 +113,36 @@ router.post("/bookings", authenticateUser, async (req, res) => {
     if (period === "PM" && hour !== 12) hour += 12;
     if (period === "AM" && hour === 12) hour = 0;
 
-    // TIMEZONE FIX: Create date in client's local timezone (Australia) instead of server timezone (India)
-    // The frontend sends time in client's local timezone, so we need to preserve that
-    // Create a date string that preserves the intended local time
-    //
-    // LONG-TERM SOLUTION: Consider adding timezone support by:
-    // 1. Frontend sends timezone info (e.g., 'Australia/Sydney')
-    // 2. Use libraries like 'moment-timezone' or 'date-fns-tz' for proper timezone handling
-    // 3. Store timezone info in the booking model
-    const startDateTime = new Date(
-      `${date}T${hour.toString().padStart(2, "0")}:${minute
-        .toString()
-        .padStart(2, "0")}:00`
-    );
+    // FIX: Store the exact time user selected without timezone conversion
+    // If user books 5 PM, store 5 PM, display 5 PM everywhere
+    // No need to create DateTime objects anymore - just use the strings directly
 
-    const endDateTime = new Date(startDateTime);
-    endDateTime.setHours(startDateTime.getHours() + durationHours);
+    // Check for conflicts using proper overlap detection
+    const allBookingsForDate = await N64Booking.find({
+      roomId,
+      date,
+      status: { $in: ["pending", "confirmed"] },
+    });
+
+    // Check for time slot overlaps
+    const conflictingBooking = allBookingsForDate.find((booking) => {
+      // Convert times to comparable format
+      const requestedStart = convertTimeToMinutes(time);
+      const requestedEnd = requestedStart + durationHours * 60;
+
+      const bookingStart = convertTimeToMinutes(booking.time);
+      const bookingEnd = bookingStart + booking.durationHours * 60;
+
+      // Check for overlap: (StartA < EndB) and (StartB < EndA)
+      return requestedStart < bookingEnd && bookingStart < requestedEnd;
+    });
+
+    if (conflictingBooking) {
+      return res.status(400).json({
+        success: false,
+        message: "Time slot conflicts with existing booking",
+      });
+    }
 
     // Determine booking status based on payment status
     const bookingStatus =
@@ -128,8 +158,8 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       numberOfPeople,
       roomId,
       roomType,
-      startDateTime,
-      endDateTime,
+      date,
+      time,
       durationHours,
       totalPrice,
       paymentId,

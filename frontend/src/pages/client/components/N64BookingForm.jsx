@@ -22,7 +22,8 @@ const N64BookingForm = ({
           value={bookingData.n64.roomId}
           onChange={(e) => {
             handleBookingDataChange("n64", "roomId", e.target.value);
-            handleBookingDataChange("n64", "startDateTime", "");
+            handleBookingDataChange("n64", "date", "");
+            handleBookingDataChange("n64", "time", "");
           }}
           required
         >
@@ -51,14 +52,25 @@ const N64BookingForm = ({
         />
       </div>
 
-      {/* Duration Selection */}
+      {/* Date and Duration Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <InputField
+          label="Date"
+          icon={<Calendar size={16} />}
+          type="date"
+          value={bookingData.n64.date || ""}
+          onChange={(e) => {
+            const date = e.target.value;
+            handleBookingDataChange("n64", "date", date);
+          }}
+          min={new Date().toISOString().split("T")[0]}
+          required
+          onClick={(e) => e.target.showPicker()}
+        />
+
+        <SelectField
           label="Duration"
           icon={<Clock size={16} />}
-          type="number"
-          min="1"
-          max="4"
           value={bookingData.n64.durationHours}
           onChange={(e) =>
             handleBookingDataChange(
@@ -68,77 +80,47 @@ const N64BookingForm = ({
             )
           }
           required
-        />
-      </div>
-
-      {/* Date Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-        <InputField
-          label="Date"
-          icon={<Calendar size={16} />}
-          type="date"
-          value={
-            bookingData.n64.startDateTime
-              ? bookingData.n64.startDateTime.split("T")[0]
-              : ""
-          }
-          onChange={(e) => {
-            const date = e.target.value;
-            handleBookingDataChange(
-              "n64",
-              "startDateTime",
-              date ? `${date}T00:00` : ""
-            );
-          }}
-          min={new Date().toISOString().split("T")[0]}
-          required
-          onClick={(e) => e.target.showPicker()}
-        />
-
-        <div className="flex items-end">
-          <p className="text-sm text-gray-500">
-            Select a date to see available time slots
-          </p>
-        </div>
+        >
+          {Array.from({ length: 4 }, (_, i) => i + 1).map((num) => (
+            <option key={num} value={num}>
+              {num} {num === 1 ? "hour" : "hours"}
+            </option>
+          ))}
+        </SelectField>
       </div>
 
       {/* Time Slot Selection */}
-      {bookingData.n64.roomId && bookingData.n64.startDateTime && (
+      {bookingData.n64.roomId && bookingData.n64.date && (
         <div className="space-y-2 sm:space-y-3">
-          <h4 className="text-sm sm:text-base font-medium text-gray-700">
-            Available Time Slots
-          </h4>
+          <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
+            <Clock size={14} className="sm:w-4 sm:h-4" />
+            <span>Select Start Time</span>
+          </label>
+
           <TimeSlotSelector
-            service="n64"
-            date={bookingData.n64.startDateTime.split("T")[0]}
-            duration={bookingData.n64.durationHours}
-            roomAvailability={roomAvailability}
-            loading={loadingRoomAvailability}
-            getSlotDate={getSlotDate}
-            getBlockedSlots={getBlockedSlots}
-            selectedTime={
-              bookingData.n64.startDateTime &&
-              bookingData.n64.startDateTime !== "" &&
-              !bookingData.n64.startDateTime.endsWith("T00:00")
-                ? new Date(bookingData.n64.startDateTime)
-                    .toTimeString()
-                    .slice(0, 5)
-                : ""
-            }
-            onTimeSelect={(time) => {
-              const date = bookingData.n64.startDateTime.split("T")[0];
-              const [hour, minute] = time.split(":");
-              const dateTime = new Date(date);
-              dateTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
-              handleBookingDataChange(
+            timeSlots={roomAvailability.n64.timeSlots}
+            blockedSlots={(() => {
+              return getBlockedSlots(
                 "n64",
-                "startDateTime",
-                dateTime.toISOString()
+                bookingData.n64.date,
+                bookingData.n64.durationHours
               );
-            }}
+            })()}
+            selectedTime={bookingData.n64.time || ""}
+            date={bookingData.n64.date}
+            onTimeSelect={(time) =>
+              handleBookingDataChange("n64", "time", time)
+            }
+            loading={loadingRoomAvailability}
           />
         </div>
       )}
+
+      {/* Note: Form submission is handled by the parent component */}
+      <div className="text-sm text-gray-500 text-center py-2">
+        Fill in all required fields above, then use the "Create Booking" button
+        below
+      </div>
 
       {/* Room Information */}
       {roomAvailability.n64.room && (

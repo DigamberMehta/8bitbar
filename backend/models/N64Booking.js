@@ -32,12 +32,13 @@ const n64BookingSchema = new mongoose.Schema(
       enum: ["mickey", "minnie"],
       required: true,
     },
-    startDateTime: {
-      type: Date,
+    // FIX: Use separate date and time fields to avoid timezone issues
+    date: {
+      type: String, // YYYY-MM-DD format
       required: true,
     },
-    endDateTime: {
-      type: Date,
+    time: {
+      type: String, // HH:MM AM/PM format
       required: true,
     },
     durationHours: {

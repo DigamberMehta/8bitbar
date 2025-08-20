@@ -131,37 +131,125 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+  const formatDate = (dateInput) => {
+    if (!dateInput) return "N/A";
 
     try {
-      const date = new Date(dateString);
+      let date;
+
+      // Handle Date objects (from FullCalendar)
+      if (dateInput instanceof Date) {
+        date = dateInput;
+      }
+      // Handle string formats
+      else if (typeof dateInput === "string") {
+        if (dateInput.includes("AM") || dateInput.includes("PM")) {
+          // Handle "2025-08-23T2:00 PM" format
+          const match = dateInput.match(
+            /(\d{4}-\d{2}-\d{2})T(\d{1,2}):(\d{2})\s*(AM|PM)/i
+          );
+          if (match) {
+            const [_, datePart, hourStr, minuteStr, period] = match;
+            let hour = parseInt(hourStr, 10);
+            const minute = parseInt(minuteStr, 10);
+
+            // Convert to 24-hour format for proper parsing
+            if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+            if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+            const isoString = `${datePart}T${hour
+              .toString()
+              .padStart(2, "0")}:${minute.toString().padStart(2, "0")}:00`;
+            date = new Date(isoString);
+          } else {
+            date = new Date(dateInput);
+          }
+        } else {
+          // Handle "2025-08-23T14:00:00" format
+          date = new Date(dateInput);
+        }
+      } else {
+        console.error(
+          "Unexpected date input type:",
+          typeof dateInput,
+          dateInput
+        );
+        return "N/A";
+      }
+
       if (isNaN(date.getTime())) return "N/A";
 
+      // Display exact date without timezone conversion
       return date.toLocaleDateString("en-US", {
         weekday: "long",
         year: "numeric",
         month: "long",
         day: "numeric",
+        timeZone: "UTC",
       });
     } catch (error) {
+      console.error("Error formatting date:", error, dateInput);
       return "N/A";
     }
   };
 
-  const formatTime = (dateString) => {
-    if (!dateString) return "N/A";
+  const formatTime = (dateInput) => {
+    if (!dateInput) return "N/A";
 
     try {
-      const date = new Date(dateString);
+      let date;
+
+      // Handle Date objects (from FullCalendar)
+      if (dateInput instanceof Date) {
+        date = dateInput;
+      }
+      // Handle string formats
+      else if (typeof dateInput === "string") {
+        if (dateInput.includes("AM") || dateInput.includes("PM")) {
+          // Handle "2025-08-23T2:00 PM" format
+          const match = dateInput.match(
+            /(\d{4}-\d{2}-\d{2})T(\d{1,2}):(\d{2})\s*(AM|PM)/i
+          );
+          if (match) {
+            const [_, datePart, hourStr, minuteStr, period] = match;
+            let hour = parseInt(hourStr, 10);
+            const minute = parseInt(minuteStr, 10);
+
+            // Convert to 24-hour format for proper parsing
+            if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+            if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+            const isoString = `${datePart}T${hour
+              .toString()
+              .padStart(2, "0")}:${minute.toString().padStart(2, "0")}:00`;
+            date = new Date(isoString);
+          } else {
+            date = new Date(dateInput);
+          }
+        } else {
+          // Handle "2025-08-23T14:00:00" format
+          date = new Date(dateInput);
+        }
+      } else {
+        console.error(
+          "Unexpected time input type:",
+          typeof dateInput,
+          dateInput
+        );
+        return "N/A";
+      }
+
       if (isNaN(date.getTime())) return "N/A";
 
+      // Display exact time without timezone conversion
       return date.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true,
+        timeZone: "UTC",
       });
     } catch (error) {
+      console.error("Error formatting time:", error, dateInput);
       return "N/A";
     }
   };
@@ -170,11 +258,60 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
     if (!start || !end) return "N/A";
 
     try {
-      const startTime = new Date(start);
-      const endTime = new Date(end);
+      // Helper function to parse both time formats and Date objects
+      const parseTime = (timeInput) => {
+        // Handle Date objects (from FullCalendar)
+        if (timeInput instanceof Date) {
+          return timeInput;
+        }
+        // Handle string formats
+        else if (typeof timeInput === "string") {
+          if (timeInput.includes("AM") || timeInput.includes("PM")) {
+            // Handle "2025-08-23T2:00 PM" format
+            const match = timeInput.match(
+              /(\d{4}-\d{2}-\d{2})T(\d{1,2}):(\d{2})\s*(AM|PM)/i
+            );
+            if (match) {
+              const [_, datePart, hourStr, minuteStr, period] = match;
+              let hour = parseInt(hourStr, 10);
+              const minute = parseInt(minuteStr, 10);
+
+              // Convert to 24-hour format for proper parsing
+              if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+              if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+              const isoString = `${datePart}T${hour
+                .toString()
+                .padStart(2, "0")}:${minute.toString().padStart(2, "0")}:00`;
+              return new Date(isoString);
+            }
+          }
+          // Handle "2025-08-23T14:00:00" format
+          return new Date(timeInput);
+        } else {
+          console.error(
+            "Unexpected time input type in duration:",
+            typeof timeInput,
+            timeInput
+          );
+          return null;
+        }
+      };
+
+      const startTime = parseTime(start);
+      const endTime = parseTime(end);
+
+      if (
+        !startTime ||
+        !endTime ||
+        isNaN(startTime.getTime()) ||
+        isNaN(endTime.getTime())
+      )
+        return "N/A";
+
       const durationMs = endTime - startTime;
 
-      if (isNaN(durationMs) || durationMs < 0) return "N/A";
+      if (durationMs < 0) return "N/A";
 
       const hours = Math.floor(durationMs / (1000 * 60 * 60));
       const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -184,6 +321,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
       }
       return `${minutes}m`;
     } catch (error) {
+      console.error("Error formatting duration:", error, { start, end });
       return "N/A";
     }
   };

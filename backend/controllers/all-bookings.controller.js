@@ -29,15 +29,15 @@ const AllBookingsController = {
       if (serviceType === "all" || serviceType === "karaoke") {
         const karaokeFilter = { ...filter };
         if (startDate && endDate) {
-          karaokeFilter.startDateTime = {
-            $gte: new Date(startDate),
-            $lte: new Date(endDate + "T23:59:59.999Z"),
+          karaokeFilter.date = {
+            $gte: startDate,
+            $lte: endDate,
           };
         }
 
         const karaokeBookings = await KaraokeBooking.find(karaokeFilter)
           .populate("roomId", "name")
-          .sort({ startDateTime: -1 })
+          .sort({ date: -1, time: -1 })
           .skip(skip)
           .limit(parseInt(limit));
 
@@ -46,7 +46,7 @@ const AllBookingsController = {
             ...booking.toObject(),
             serviceType: "karaoke",
             roomName: booking.roomId?.name || "Unknown Room",
-            bookingDate: booking.startDateTime, // Map to consistent field name
+            bookingDate: booking.date, // Map to consistent field name
             amount: booking.totalPrice || 0, // Map price field
           }))
         );
@@ -55,15 +55,15 @@ const AllBookingsController = {
       if (serviceType === "all" || serviceType === "n64") {
         const n64Filter = { ...filter };
         if (startDate && endDate) {
-          n64Filter.startDateTime = {
-            $gte: new Date(startDate),
-            $lte: new Date(endDate + "T23:59:59.999Z"),
+          n64Filter.date = {
+            $gte: startDate,
+            $lte: endDate,
           };
         }
 
         const n64Bookings = await N64Booking.find(n64Filter)
           .populate("roomId", "name")
-          .sort({ startDateTime: -1 })
+          .sort({ date: -1, time: -1 })
           .skip(skip)
           .limit(parseInt(limit));
 
@@ -72,7 +72,7 @@ const AllBookingsController = {
             ...booking.toObject(),
             serviceType: "n64",
             boothName: booking.roomId?.name || "Unknown Booth",
-            bookingDate: booking.startDateTime, // Map to consistent field name
+            bookingDate: booking.date, // Map to consistent field name
             amount: booking.totalPrice || 0, // Map price field
           }))
         );
@@ -97,8 +97,8 @@ const AllBookingsController = {
             ...booking.toObject(),
             serviceType: "cafe",
             tableName: `Table ${booking.chairIds.join(", ")}`,
-            // TIMEZONE FIX: Create date in client's local timezone instead of server timezone
-            bookingDate: new Date(`${booking.date}T${booking.time}:00`), // Combine date and time
+            // FIX: Use the date directly since cafe still uses the old format
+            bookingDate: booking.date,
             amount: booking.totalCost || 0, // Map price field
           }))
         );
@@ -157,26 +157,53 @@ const AllBookingsController = {
       // Fetch karaoke bookings for calendar
       const karaokeFilter = {};
       if (startDate && endDate) {
-        karaokeFilter.startDateTime = {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate + "T23:59:59.999Z"),
+        karaokeFilter.date = {
+          $gte: startDate, // Use string comparison for YYYY-MM-DD format
+          $lte: endDate, // Use string comparison for YYYY-MM-DD format
         };
       }
 
       const karaokeBookings = await KaraokeBooking.find(karaokeFilter)
         .populate("roomId", "name")
         .select(
-          "startDateTime endDateTime customerName customerEmail roomId status paymentStatus totalPrice"
+          "date time customerName customerEmail roomId status paymentStatus totalPrice durationHours"
         );
 
       karaokeBookings.forEach((booking) => {
+        // FIX: Calculate end time without timezone complications
+        const startTime = `${booking.date}T${booking.time}`;
+        const endTime = (() => {
+          // Convert time to minutes for safe calculation
+          const timeMatch = booking.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!timeMatch) return startTime;
+
+          let [_, hourStr, minuteStr, period] = timeMatch;
+          let hour = parseInt(hourStr, 10);
+          const minute = parseInt(minuteStr, 10);
+
+          // Convert to 24-hour format
+          if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+          if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+          // Calculate end time
+          const endHour = hour + booking.durationHours;
+          const endHour24 = endHour % 24;
+          const endHour12 =
+            endHour24 === 0 ? 12 : endHour24 > 12 ? endHour24 - 12 : endHour24;
+          const endPeriod = endHour24 >= 12 ? "PM" : "AM";
+
+          return `${booking.date}T${endHour12}:${minute
+            .toString()
+            .padStart(2, "0")} ${endPeriod}`;
+        })();
+
         calendarData.push({
           id: booking._id.toString(),
           title: `${booking.customerName} - ${
             booking.roomId?.name || "Karaoke Room"
           }`,
-          start: booking.startDateTime,
-          end: booking.endDateTime,
+          start: startTime,
+          end: endTime,
           serviceType: "karaoke",
           status: booking.status,
           paymentStatus: booking.paymentStatus,
@@ -190,26 +217,53 @@ const AllBookingsController = {
       // Fetch N64 bookings for calendar
       const n64Filter = {};
       if (startDate && endDate) {
-        n64Filter.startDateTime = {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate + "T23:59:59.999Z"),
+        n64Filter.date = {
+          $gte: startDate, // Use string comparison for YYYY-MM-DD format
+          $lte: endDate, // Use string comparison for YYYY-MM-DD format
         };
       }
 
       const n64Bookings = await N64Booking.find(n64Filter)
         .populate("roomId", "name")
         .select(
-          "startDateTime endDateTime customerName customerEmail roomId status paymentStatus totalPrice"
+          "date time customerName customerEmail roomId status paymentStatus totalPrice durationHours"
         );
 
       n64Bookings.forEach((booking) => {
+        // FIX: Calculate end time without timezone complications
+        const startTime = `${booking.date}T${booking.time}`;
+        const endTime = (() => {
+          // Convert time to minutes for safe calculation
+          const timeMatch = booking.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!timeMatch) return startTime;
+
+          let [_, hourStr, minuteStr, period] = timeMatch;
+          let hour = parseInt(hourStr, 10);
+          const minute = parseInt(minuteStr, 10);
+
+          // Convert to 24-hour format
+          if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+          if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+          // Calculate end time
+          const endHour = hour + booking.durationHours;
+          const endHour24 = endHour % 24;
+          const endHour12 =
+            endHour24 === 0 ? 12 : endHour24 > 12 ? endHour24 - 12 : endHour24;
+          const endPeriod = endHour24 >= 12 ? "PM" : "AM";
+
+          return `${booking.date}T${endHour12}:${minute
+            .toString()
+            .padStart(2, "0")} ${endPeriod}`;
+        })();
+
         calendarData.push({
           id: booking._id.toString(),
           title: `${booking.customerName} - ${
             booking.roomId?.name || "N64 Booth"
           }`,
-          start: booking.startDateTime,
-          end: booking.endDateTime,
+          start: startTime,
+          end: endTime,
           serviceType: "n64",
           status: booking.status,
           paymentStatus: booking.paymentStatus,
@@ -283,11 +337,11 @@ const AllBookingsController = {
       const cafeFilter = {};
 
       if (startDate && endDate) {
-        karaokeFilter.startDateTime = {
+        karaokeFilter.date = {
           $gte: new Date(startDate),
           $lte: new Date(endDate + "T23:59:59.999Z"),
         };
-        n64Filter.startDateTime = {
+        n64Filter.date = {
           $gte: new Date(startDate),
           $lte: new Date(endDate + "T23:59:59.999Z"),
         };

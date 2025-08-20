@@ -27,12 +27,13 @@ const karaokeBookingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    startDateTime: {
-      type: Date, // full datetime (includes both date and time)
+    // FIX: Use separate date and time fields to avoid timezone issues
+    date: {
+      type: String, // YYYY-MM-DD format
       required: true,
     },
-    endDateTime: {
-      type: Date, // full datetime (includes both date and time)
+    time: {
+      type: String, // HH:MM AM/PM format
       required: true,
     },
     durationHours: {

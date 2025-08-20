@@ -120,7 +120,17 @@ const AllBookingsList = () => {
 
   const formatDateTime = (dateTime) => {
     try {
-      return new Date(dateTime).toLocaleString();
+      // Display exact time without timezone conversion
+      const date = new Date(dateTime);
+      return date.toLocaleString("en-US", {
+        timeZone: "UTC",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
     } catch (error) {
       return "Invalid Date";
     }
@@ -128,11 +138,14 @@ const AllBookingsList = () => {
 
   const formatDate = (dateString) => {
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      // Display exact date without timezone conversion
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
         weekday: "short",
         day: "numeric",
         month: "short",
         year: "numeric",
+        timeZone: "UTC",
       });
     } catch (error) {
       return "Invalid Date";
@@ -362,7 +375,12 @@ const AllBookingsList = () => {
                                 </div>
                               </div>
                             ) : (
-                              formatDateTime(booking.startDateTime)
+                              <div>
+                                <div>{formatDate(booking.date)}</div>
+                                <div className="text-gray-600">
+                                  {formatTime(booking.time)}
+                                </div>
+                              </div>
                             )}
                           </div>
 

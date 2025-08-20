@@ -7,7 +7,6 @@ const TimeSlotSelector = ({
   selectedTime,
   date,
   onTimeSelect,
-  getSlotDate,
   loading,
 }) => {
   if (loading) {
@@ -31,18 +30,15 @@ const TimeSlotSelector = ({
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 sm:gap-2">
       {timeSlots.map((timeSlot) => {
         const isBlocked = blockedSlots.includes(timeSlot);
-        const slotDate = getSlotDate(date, timeSlot);
-        const timeValue = slotDate ? slotDate.toTimeString().slice(0, 5) : "";
-        const isSelected = selectedTime === timeValue;
+        const isSelected = selectedTime === timeSlot;
 
         return (
           <button
             key={timeSlot}
             type="button"
             onClick={() => {
-              if (!isBlocked && slotDate) {
-                const dateTime = `${date}T${timeValue}`;
-                onTimeSelect(dateTime);
+              if (!isBlocked) {
+                onTimeSelect(timeSlot);
               }
             }}
             disabled={isBlocked}

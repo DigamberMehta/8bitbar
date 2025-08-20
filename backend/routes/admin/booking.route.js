@@ -12,6 +12,22 @@ import StaffPin from "../../models/StaffPin.js";
 
 const router = express.Router();
 
+// Helper function to convert time string to minutes since midnight
+const convertTimeToMinutes = (timeString) => {
+  const match = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!match) return 0;
+
+  let [_, hourStr, minuteStr, period] = match;
+  let hour = parseInt(hourStr, 10);
+  const minute = parseInt(minuteStr, 10);
+
+  // Convert to 24-hour format
+  if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+  if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+  return hour * 60 + minute;
+};
+
 // Helper function to find or create user
 const findOrCreateUser = async (userData) => {
   const { name, email, phone, dob } = userData;
@@ -84,7 +100,8 @@ router.post("/karaoke", async (req, res) => {
       customerDob,
       roomId,
       numberOfPeople,
-      startDateTime,
+      date,
+      time,
       durationHours,
       status,
       staffPin, // New field for staff identification
@@ -96,7 +113,8 @@ router.post("/karaoke", async (req, res) => {
       !customerEmail ||
       !roomId ||
       !numberOfPeople ||
-      !startDateTime ||
+      !date ||
+      !time ||
       !durationHours ||
       !status ||
       !staffPin // PIN is now required for manual bookings
@@ -143,23 +161,33 @@ router.post("/karaoke", async (req, res) => {
       });
     }
 
-    // Calculate end time and total price
-    const startDate = new Date(startDateTime);
-    const endDate = new Date(
-      startDate.getTime() + durationHours * 60 * 60 * 1000
-    );
+    // Calculate total price
+    // FIX: No more timezone issues - just use the date and time as provided
+    console.log("🔍 Manual Karaoke Booking - Date Debug:");
+    console.log("  Input date:", date);
+    console.log("  Input time:", time);
+    console.log("  Input durationHours:", durationHours);
+
     const totalPrice = room.pricePerHour * durationHours;
 
-    // Check for conflicts
-    const conflictingBooking = await KaraokeBooking.findOne({
+    // Check for conflicts using proper overlap detection
+    const allBookingsForDate = await KaraokeBooking.find({
       roomId,
+      date,
       status: { $in: ["pending", "confirmed"] },
-      $or: [
-        {
-          startDateTime: { $lt: endDate },
-          endDateTime: { $gt: startDate },
-        },
-      ],
+    });
+
+    // Check for time slot overlaps
+    const conflictingBooking = allBookingsForDate.find((booking) => {
+      // Convert times to comparable format
+      const requestedStart = convertTimeToMinutes(time);
+      const requestedEnd = requestedStart + durationHours * 60;
+
+      const bookingStart = convertTimeToMinutes(booking.time);
+      const bookingEnd = bookingStart + booking.durationHours * 60;
+
+      // Check for overlap: (StartA < EndB) and (StartB < EndA)
+      return requestedStart < bookingEnd && bookingStart < requestedEnd;
     });
 
     if (conflictingBooking) {
@@ -182,8 +210,8 @@ router.post("/karaoke", async (req, res) => {
       customerEmail: customerEmail.toLowerCase().trim(),
       customerPhone,
       numberOfPeople,
-      startDateTime: startDate,
-      endDateTime: endDate,
+      date,
+      time,
       durationHours,
       totalPrice,
       status,
@@ -231,7 +259,8 @@ router.post("/n64", async (req, res) => {
       roomId,
       roomType,
       numberOfPeople,
-      startDateTime,
+      date,
+      time,
       durationHours,
       status,
       staffPin, // New field for staff identification
@@ -244,7 +273,8 @@ router.post("/n64", async (req, res) => {
       !roomId ||
       !roomType ||
       !numberOfPeople ||
-      !startDateTime ||
+      !date ||
+      !time ||
       !durationHours ||
       !status ||
       !staffPin // PIN is now required for manual bookings
@@ -291,23 +321,28 @@ router.post("/n64", async (req, res) => {
       });
     }
 
-    // Calculate end time and total price
-    const startDate = new Date(startDateTime);
-    const endDate = new Date(
-      startDate.getTime() + durationHours * 60 * 60 * 1000
-    );
+    // Calculate total price
+    // FIX: No more timezone issues - just use the date and time as provided
     const totalPrice = room.pricePerHour * durationHours;
 
-    // Check for conflicts
-    const conflictingBooking = await N64Booking.findOne({
+    // Check for conflicts using proper overlap detection
+    const allBookingsForDate = await N64Booking.find({
       roomId,
+      date,
       status: { $in: ["pending", "confirmed"] },
-      $or: [
-        {
-          startDateTime: { $lt: endDate },
-          endDateTime: { $gt: startDate },
-        },
-      ],
+    });
+
+    // Check for time slot overlaps
+    const conflictingBooking = allBookingsForDate.find((booking) => {
+      // Convert times to comparable format
+      const requestedStart = convertTimeToMinutes(time);
+      const requestedEnd = requestedStart + durationHours * 60;
+
+      const bookingStart = convertTimeToMinutes(booking.time);
+      const bookingEnd = bookingStart + booking.durationHours * 60;
+
+      // Check for overlap: (StartA < EndB) and (StartB < EndA)
+      return requestedStart < bookingEnd && bookingStart < requestedEnd;
     });
 
     if (conflictingBooking) {
@@ -331,13 +366,13 @@ router.post("/n64", async (req, res) => {
       customerEmail: customerEmail.toLowerCase().trim(),
       customerPhone,
       numberOfPeople,
-      startDateTime: startDate,
-      endDateTime: endDate,
+      date,
+      time,
       durationHours,
       totalPrice,
       status,
       paymentStatus,
-      paymentId: `admin-${Date.now()}`,
+      paymentId: `admin-${Date.now()}`, // Admin booking identifier
       staffPin: staffInfo.pin,
       staffName: staffInfo.staffName,
       isManualBooking: true,
@@ -575,15 +610,14 @@ router.get("/karaoke/availability", async (req, res) => {
     }
 
     // Find all bookings for the specified date and room
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    // TIMEZONE FIX: Use UTC date comparison to match database storage
+    const startOfDay = new Date(`${date}T00:00:00.000Z`);
+    const endOfDay = new Date(`${date}T23:59:59.999Z`);
 
     const bookings = await KaraokeBooking.find({
       roomId,
       status: { $in: ["pending", "confirmed"] },
-      startDateTime: { $gte: startOfDay, $lte: endOfDay },
+      date: date,
     });
 
     res.json({
@@ -623,15 +657,14 @@ router.get("/n64/availability", async (req, res) => {
     }
 
     // Find all bookings for the specified date and room
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    // TIMEZONE FIX: Use UTC date comparison to match database storage
+    const startOfDay = new Date(`${date}T00:00:00.000Z`);
+    const endOfDay = new Date(`${date}T23:59:59.999Z`);
 
     const bookings = await N64Booking.find({
       roomId,
       status: { $in: ["pending", "confirmed"] },
-      startDateTime: { $gte: startOfDay, $lte: endOfDay },
+      date: date,
     });
 
     res.json({

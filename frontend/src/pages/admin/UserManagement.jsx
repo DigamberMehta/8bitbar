@@ -56,9 +56,9 @@ const UserManagement = () => {
   };
 
   const toggleDropdown = (userId) => {
-    setDropdownOpen(prev => ({
+    setDropdownOpen((prev) => ({
       ...prev,
-      [userId]: !prev[userId]
+      [userId]: !prev[userId],
     }));
   };
 
@@ -73,7 +73,7 @@ const UserManagement = () => {
       await api.patch(`/admin/users/users/${userId}/promote`);
       alert("User promoted to admin successfully!");
       fetchData();
-      setDropdownOpen(prev => ({ ...prev, [userId]: false }));
+      setDropdownOpen((prev) => ({ ...prev, [userId]: false }));
     } catch (error) {
       console.error("Error promoting user:", error);
       alert(error.response?.data?.message || "Failed to promote user");
@@ -91,7 +91,7 @@ const UserManagement = () => {
       await api.patch(`/admin/users/admins/${adminId}/demote`);
       alert("Admin demoted to user successfully!");
       fetchData();
-      setDropdownOpen(prev => ({ ...prev, [adminId]: false }));
+      setDropdownOpen((prev) => ({ ...prev, [adminId]: false }));
     } catch (error) {
       console.error("Error demoting admin:", error);
       alert(error.response?.data?.message || "Failed to demote admin");
@@ -116,7 +116,7 @@ const UserManagement = () => {
         } deleted successfully!`
       );
       fetchData();
-      setDropdownOpen(prev => ({ ...prev, [userId]: false }));
+      setDropdownOpen((prev) => ({ ...prev, [userId]: false }));
     } catch (error) {
       console.error(`Error deleting ${userType}:`, error);
       alert(error.response?.data?.message || `Failed to delete ${userType}`);
@@ -125,8 +125,12 @@ const UserManagement = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    
-    if (!createUserForm.name || !createUserForm.email || !createUserForm.password) {
+
+    if (
+      !createUserForm.name ||
+      !createUserForm.email ||
+      !createUserForm.password
+    ) {
       alert("Please fill in all required fields");
       return;
     }
@@ -141,7 +145,12 @@ const UserManagement = () => {
       await api.post("/admin/users/users", createUserForm);
       alert("User created successfully!");
       setShowCreateModal(false);
-      setCreateUserForm({ name: "", email: "", password: "", role: "customer" });
+      setCreateUserForm({
+        name: "",
+        email: "",
+        password: "",
+        role: "customer",
+      });
       fetchData();
     } catch (error) {
       console.error("Error creating user:", error);
@@ -156,12 +165,15 @@ const UserManagement = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    // Display exact date without timezone conversion
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "UTC",
     });
   };
 
@@ -181,7 +193,7 @@ const UserManagement = () => {
               <p className="text-sm text-gray-500 truncate">{user.email}</p>
             </div>
           </div>
-          
+
           {/* Mobile dropdown menu */}
           <div className="relative sm:hidden">
             <button
@@ -191,7 +203,7 @@ const UserManagement = () => {
             >
               <MdMoreVert size={20} />
             </button>
-            
+
             {dropdownOpen[user._id] && (
               <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border z-10">
                 <div className="py-1">
@@ -213,7 +225,9 @@ const UserManagement = () => {
                     </button>
                   )}
                   <button
-                    onClick={() => handleDeleteUser(user._id, user.role === "admin")}
+                    onClick={() =>
+                      handleDeleteUser(user._id, user.role === "admin")
+                    }
                     className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors"
                   >
                     <MdDelete size={16} />
@@ -268,13 +282,13 @@ const UserManagement = () => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!event.target.closest('.relative')) {
+      if (!event.target.closest(".relative")) {
         setDropdownOpen({});
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   if (loading) {
@@ -299,7 +313,9 @@ const UserManagement = () => {
             <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-blue-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-600 text-sm font-medium">Total Users</p>
+                  <p className="text-gray-600 text-sm font-medium">
+                    Total Users
+                  </p>
                   <p className="text-xl sm:text-2xl font-bold text-gray-900">
                     {stats.totalUsers}
                   </p>
@@ -476,9 +492,9 @@ const UserManagement = () => {
                     name="name"
                     value={createUserForm.name}
                     onChange={(e) =>
-                      setCreateUserForm(prev => ({
+                      setCreateUserForm((prev) => ({
                         ...prev,
-                        name: e.target.value
+                        name: e.target.value,
                       }))
                     }
                     required
@@ -497,9 +513,9 @@ const UserManagement = () => {
                     name="email"
                     value={createUserForm.email}
                     onChange={(e) =>
-                      setCreateUserForm(prev => ({
+                      setCreateUserForm((prev) => ({
                         ...prev,
-                        email: e.target.value
+                        email: e.target.value,
                       }))
                     }
                     required
@@ -518,9 +534,9 @@ const UserManagement = () => {
                     name="password"
                     value={createUserForm.password}
                     onChange={(e) =>
-                      setCreateUserForm(prev => ({
+                      setCreateUserForm((prev) => ({
                         ...prev,
-                        password: e.target.value
+                        password: e.target.value,
                       }))
                     }
                     required
@@ -539,9 +555,9 @@ const UserManagement = () => {
                     name="role"
                     value={createUserForm.role}
                     onChange={(e) =>
-                      setCreateUserForm(prev => ({
+                      setCreateUserForm((prev) => ({
                         ...prev,
-                        role: e.target.value
+                        role: e.target.value,
                       }))
                     }
                     required

@@ -226,8 +226,6 @@ const PurchasedGiftCardsManagement = () => {
           </div>
         )}
 
- 
-
         {/* Filters */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
@@ -347,7 +345,15 @@ const PurchasedGiftCardsManagement = () => {
                         {getStatusBadge(card.status)}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {new Date(card.purchasedAt).toLocaleDateString()}
+                        {new Date(card.purchasedAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            timeZone: "UTC",
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">

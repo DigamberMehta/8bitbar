@@ -15,14 +15,14 @@ router.get("/karaoke-bookings/count", async (req, res) => {
 
     // Add date filtering if provided
     if (startDate || endDate) {
-      filter.startDateTime = {};
+      filter.date = {};
       if (startDate) {
-        filter.startDateTime.$gte = new Date(startDate);
+        // FIX: Use simple date string comparison - no timezone issues
+        filter.date.$gte = startDate;
       }
       if (endDate) {
-        const endDateObj = new Date(endDate);
-        endDateObj.setHours(23, 59, 59, 999); // Include the entire end date
-        filter.startDateTime.$lte = endDateObj;
+        // FIX: Use simple date string comparison - no timezone issues
+        filter.date.$lte = endDate;
       }
     }
 
@@ -40,14 +40,14 @@ router.get("/karaoke-bookings/revenue", async (req, res) => {
 
     // Add date filtering if provided
     if (startDate || endDate) {
-      matchFilter.startDateTime = {};
+      matchFilter.date = {};
       if (startDate) {
-        matchFilter.startDateTime.$gte = new Date(startDate);
+        // FIX: Use simple date string comparison - no timezone issues
+        matchFilter.date.$gte = startDate;
       }
       if (endDate) {
-        const endDateObj = new Date(endDate);
-        endDateObj.setHours(23, 59, 59, 999); // Include the entire end date
-        matchFilter.startDateTime.$lte = endDateObj;
+        // FIX: Use simple date string comparison - no timezone issues
+        matchFilter.date.$lte = endDate;
       }
     }
 
