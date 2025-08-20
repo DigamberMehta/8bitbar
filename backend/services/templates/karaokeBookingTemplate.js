@@ -353,14 +353,11 @@ export const getKaraokeBookingTemplate = (booking, roomName) => {
                 
                 <div class="detail-item">
                   <span class="detail-label">📅 Date</span>
-                  <span class="detail-value">${new Date(
-                    booking.startDateTime
-                  ).toLocaleDateString("en-AU", {
+                  <span class="detail-value">${new Date(booking.date).toLocaleDateString("en-AU", {
                     weekday: "long",
                     year: "numeric",
                     month: "long",
                     day: "numeric",
-                    timeZone: "UTC",
                   })}</span>
                 </div>
                 
