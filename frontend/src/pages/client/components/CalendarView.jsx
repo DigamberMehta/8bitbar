@@ -37,6 +37,22 @@ const CalendarView = () => {
         },
       });
       console.log("Calendar data received:", response.data.calendarData);
+      console.log(
+        "Sample event extendedProps:",
+        response.data.calendarData?.[0]?.extendedProps
+      );
+      console.log(
+        "Sample event time field:",
+        response.data.calendarData?.[0]?.extendedProps?.time
+      );
+      console.log(
+        "Sample event durationHours:",
+        response.data.calendarData?.[0]?.extendedProps?.durationHours
+      );
+      console.log(
+        "Sample event duration:",
+        response.data.calendarData?.[0]?.extendedProps?.duration
+      );
       setCalendarData(response.data.calendarData || []);
     } catch (error) {
       console.error("Error fetching calendar data:", error);
@@ -49,6 +65,18 @@ const CalendarView = () => {
     // Debug: Log the full event object to see what's available
     console.log("Client Calendar - Event clicked:", event);
     console.log("Client Calendar - Event extendedProps:", event.extendedProps);
+    console.log(
+      "Client Calendar - Event time field:",
+      event.extendedProps?.time
+    );
+    console.log(
+      "Client Calendar - Event durationHours:",
+      event.extendedProps?.durationHours
+    );
+    console.log(
+      "Client Calendar - Event duration:",
+      event.extendedProps?.duration
+    );
 
     // Extract booking data from calendar event
     const bookingData = {
@@ -60,6 +88,10 @@ const CalendarView = () => {
       roomName: event.extendedProps.roomName,
       customerName: event.extendedProps.customerName,
       customerEmail: event.extendedProps.customerEmail,
+      time: event.extendedProps.time, // Include the time field
+      durationHours: event.extendedProps.durationHours, // Include duration for karaoke/N64
+      duration: event.extendedProps.duration, // Include duration for cafe
+
       start: event.start,
       end: event.end,
       title: event.title,
