@@ -127,6 +127,30 @@ router.patch("/cafe-bookings/:id/status", async (req, res) => {
   }
 });
 
+// Update payment status independently
+router.patch("/cafe-bookings/:id/payment-status", async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+
+    if (
+      !paymentStatus ||
+      !["pending", "completed", "failed", "refunded"].includes(paymentStatus)
+    ) {
+      return res.status(400).json({ message: "Invalid payment status" });
+    }
+
+    const booking = await CafeBooking.findByIdAndUpdate(
+      req.params.id,
+      { paymentStatus },
+      { new: true }
+    ).populate("userId", "name email");
+
+    res.json({ booking });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating payment status" });
+  }
+});
+
 // Delete cafe booking
 router.delete("/cafe-bookings/:id", async (req, res) => {
   try {

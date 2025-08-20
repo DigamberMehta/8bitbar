@@ -125,6 +125,32 @@ router.patch("/n64-bookings/:id/status", async (req, res) => {
   }
 });
 
+// Update payment status independently
+router.patch("/n64-bookings/:id/payment-status", async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+
+    if (
+      !paymentStatus ||
+      !["pending", "completed", "failed", "refunded"].includes(paymentStatus)
+    ) {
+      return res.status(400).json({ message: "Invalid payment status" });
+    }
+
+    const booking = await N64Booking.findByIdAndUpdate(
+      req.params.id,
+      { paymentStatus },
+      { new: true }
+    )
+      .populate("userId", "name email")
+      .populate("roomId", "name");
+
+    res.json({ booking });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating payment status" });
+  }
+});
+
 // Delete N64 booking
 router.delete("/n64-bookings/:id", async (req, res) => {
   try {
