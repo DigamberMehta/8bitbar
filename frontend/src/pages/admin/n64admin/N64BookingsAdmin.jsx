@@ -52,6 +52,18 @@ const N64BookingsAdmin = () => {
     }
   };
 
+  const updatePaymentStatus = async (bookingId, newPaymentStatus) => {
+    try {
+      await api.patch(`/admin/n64/n64-bookings/${bookingId}/payment-status`, {
+        paymentStatus: newPaymentStatus,
+      });
+      fetchBookings(); // Refresh the list
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      alert("Failed to update payment status");
+    }
+  };
+
   const deleteBooking = async (bookingId) => {
     if (
       window.confirm(
@@ -214,6 +226,27 @@ const N64BookingsAdmin = () => {
   // A reusable component for action buttons
   const ActionButtons = ({ booking }) => (
     <div className="flex items-center gap-2 lg:gap-4 mt-4 lg:mt-0">
+      {/* Payment Status Update Buttons */}
+      {booking.paymentStatus === "pending" && (
+        <button
+          onClick={() => updatePaymentStatus(booking._id, "completed")}
+          className="text-xs lg:text-sm font-medium text-green-600 hover:text-green-800 px-2 py-1 rounded border border-green-600 hover:bg-green-50"
+          title="Mark as Paid"
+        >
+          Mark Paid
+        </button>
+      )}
+      {booking.paymentStatus === "completed" && (
+        <button
+          onClick={() => updatePaymentStatus(booking._id, "pending")}
+          className="text-xs lg:text-sm font-medium text-yellow-600 hover:text-yellow-800 px-2 py-1 rounded border border-yellow-600 hover:bg-yellow-50"
+          title="Mark as Not Paid"
+        >
+          Mark Unpaid
+        </button>
+      )}
+
+      {/* Booking Status Update Buttons */}
       {booking.status === "pending" && (
         <>
           <button

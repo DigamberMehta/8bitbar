@@ -41,7 +41,7 @@ const ManualBooking = () => {
       time: "",
       numberOfPeople: 1,
       durationHours: 1,
-      paymentStatus: "pending", // Default to "Not Paid"
+      paymentStatus: "", // Admin will select
     },
     n64: {
       roomId: "",
@@ -50,7 +50,7 @@ const ManualBooking = () => {
       time: "",
       numberOfPeople: 1,
       durationHours: 1,
-      paymentStatus: "pending", // Default to "Not Paid"
+      paymentStatus: "", // Admin will select
     },
     cafe: {
       chairIds: [],
@@ -59,7 +59,7 @@ const ManualBooking = () => {
       duration: 1,
       specialRequests: "",
       deviceType: "desktop",
-      paymentStatus: "pending", // Default to "Not Paid"
+      paymentStatus: "", // Admin will select
     },
   });
   const [result, setResult] = useState(null);
@@ -650,59 +650,10 @@ const ManualBooking = () => {
         </div>
       </div>
 
-      {/* Status Selection */}
-      <div className="mb-4 sm:mb-6 md:mb-8">
-        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">
-          Payment Status
-        </h2>
-        <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="radio"
-              name="paymentStatus"
-              value="pending"
-              checked={bookingData[activeService].paymentStatus === "pending"}
-              onChange={(e) =>
-                handleBookingDataChange(
-                  activeService,
-                  "paymentStatus",
-                  e.target.value
-                )
-              }
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
-            />
-            <span className="text-sm sm:text-base text-gray-700">Not Paid</span>
-          </label>
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="radio"
-              name="paymentStatus"
-              value="completed"
-              checked={bookingData[activeService].paymentStatus === "completed"}
-              onChange={(e) =>
-                handleBookingDataChange(
-                  activeService,
-                  "paymentStatus",
-                  e.target.value
-                )
-              }
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
-            />
-            <span className="text-sm sm:text-base text-gray-700">Paid</span>
-          </label>
-        </div>
-      </div>
-
       <form
         onSubmit={handleSubmit}
         className="space-y-4 sm:space-y-6 md:space-y-8"
       >
-        {/* Customer Information */}
-        <CustomerInfoForm
-          formData={formData}
-          handleInputChange={handleInputChange}
-        />
-
         {/* Booking Details */}
         <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
           <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
@@ -759,17 +710,79 @@ const ManualBooking = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end">
+        {/* Customer Information */}
+        <CustomerInfoForm
+          formData={formData}
+          handleInputChange={handleInputChange}
+        />
+
+        {/* Payment Status and Submit Button */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
+          {/* Payment Status Selection */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <h3 className="text-sm sm:text-base font-semibold text-gray-800">
+              Payment Status:
+            </h3>
+            <div className="flex flex-wrap gap-3 sm:gap-4">
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="paymentStatus"
+                  value="pending"
+                  checked={
+                    bookingData[activeService].paymentStatus === "pending"
+                  }
+                  onChange={(e) =>
+                    handleBookingDataChange(
+                      activeService,
+                      "paymentStatus",
+                      e.target.value
+                    )
+                  }
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
+                />
+                <span className="text-sm sm:text-base text-gray-700">
+                  Not Paid
+                </span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="paymentStatus"
+                  value="completed"
+                  checked={
+                    bookingData[activeService].paymentStatus === "completed"
+                  }
+                  onChange={(e) =>
+                    handleBookingDataChange(
+                      activeService,
+                      "paymentStatus",
+                      e.target.value
+                    )
+                  }
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
+                />
+                <span className="text-sm sm:text-base text-gray-700">Paid</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading || showPinModal}
+            disabled={
+              loading ||
+              showPinModal ||
+              !bookingData[activeService].paymentStatus
+            }
             className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 bg-blue-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading
               ? "Creating Booking..."
               : showPinModal
               ? "Enter PIN Required"
+              : !bookingData[activeService].paymentStatus
+              ? "Select Payment Status"
               : staffInfo
               ? "Create Booking"
               : "Enter PIN & Create Booking"}
