@@ -71,12 +71,12 @@ const ManualBooking = () => {
 
   // Debug staff info changes
   useEffect(() => {
-    console.log("🔄 staffInfo state changed:", staffInfo);
+    // console.log("🔄 staffInfo state changed:", staffInfo);
   }, [staffInfo]);
 
   // Debug activeService changes
   useEffect(() => {
-    console.log("🔄 activeService changed:", activeService);
+    // console.log("🔄 activeService changed:", activeService);
   }, [activeService]);
 
   useEffect(() => {
@@ -343,11 +343,11 @@ const ManualBooking = () => {
 
   // Function to create booking (extracted from handleSubmit)
   const createBooking = async (staffInfo) => {
-    console.log("🔍 createBooking called");
-    console.log("📋 Form Data:", formData);
-    console.log("📅 Booking Data:", bookingData[activeService]);
-    console.log("👤 Staff:", staffInfo?.staffName || "None");
-    console.log("🎯 Active Service:", activeService);
+    // console.log("🔍 createBooking called");
+    // console.log("📋 Form Data:", formData);
+    // console.log("📅 Booking Data:", bookingData[activeService]);
+    // console.log("👤 Staff:", staffInfo?.staffName || "None");
+    // console.log("🎯 Active Service:", activeService);
 
     // Set loading state
     setLoading(true);
@@ -380,16 +380,16 @@ const ManualBooking = () => {
       }),
     };
 
-    console.log("🔍 Required fields check:", requiredFields);
-    console.log("🔍 Current bookingData state:", bookingData[activeService]);
-    console.log(
-      "🔍 numberOfPeople value:",
-      bookingData[activeService]?.numberOfPeople
-    );
-    console.log(
-      "🔍 durationHours value:",
-      bookingData[activeService]?.durationHours
-    );
+    // console.log("🔍 Required fields check:", requiredFields);
+    // console.log("🔍 Current bookingData state:", bookingData[activeService]);
+    // console.log(
+    //   "🔍 numberOfPeople value:",
+    //   bookingData[activeService]?.numberOfPeople
+    // );
+    // console.log(
+    //   "🔍 durationHours value:",
+    //   bookingData[activeService]?.durationHours
+    // );
 
     // Check for missing required fields
     const missingFields = Object.entries(requiredFields).filter(
@@ -410,7 +410,7 @@ const ManualBooking = () => {
     );
 
     if (missingFields.length > 0) {
-      console.log("❌ Missing required fields:", missingFields);
+      // console.log("❌ Missing required fields:", missingFields);
       setResult({
         success: false,
         message: `Missing required fields: ${missingFields
@@ -420,7 +420,7 @@ const ManualBooking = () => {
       return;
     }
 
-    console.log("✅ All required fields are filled");
+    // console.log("✅ All required fields are filled");
 
     try {
       const payload = {
@@ -430,15 +430,15 @@ const ManualBooking = () => {
         staffPin: staffInfo.pin, // Include staff PIN
       };
 
-      console.log("📤 Sending payload:", payload);
-      console.log("🌐 API endpoint:", `/admin/bookings/${activeService}`);
+      // console.log("📤 Sending payload:", payload);
+      // console.log("🌐 API endpoint:", `/admin/bookings/${activeService}`);
 
       const response = await api.post(
         `/admin/bookings/${activeService}`,
         payload
       );
 
-      console.log("✅ API response:", response.data);
+      // console.log("✅ API response:", response.data);
 
       setResult({
         success: true,
@@ -503,30 +503,30 @@ const ManualBooking = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("🔍 handleSubmit called");
-    console.log("📋 Form Data:", formData);
-    console.log("📅 Booking Data:", bookingData[activeService]);
-    console.log("👤 Staff:", staffInfo?.staffName || "None");
+    // console.log("🔍 handleSubmit called");
+    // console.log("📋 Form Data:", formData);
+    // console.log("📅 Booking Data:", bookingData[activeService]);
+    // console.log("👤 Staff:", staffInfo?.staffName || "None");
 
     // PIN is required for manual bookings
     if (!staffInfo) {
-      console.log("❌ No staff info, showing PIN modal");
+      // console.log("❌ No staff info, showing PIN modal");
       setShowPinModal(true);
       return;
     }
 
-    console.log("✅ Staff info found, proceeding with booking creation");
+    // console.log("✅ Staff info found, proceeding with booking creation");
     await createBooking(staffInfo);
   };
 
   const handlePinVerified = async (verifiedStaffInfo) => {
-    console.log(
-      "🎯 handlePinVerified called with staff:",
-      verifiedStaffInfo.staffName
-    );
+    // console.log(
+    //   "🎯 handlePinVerified called with staff:",
+    //   verifiedStaffInfo.staffName
+    // );
     setStaffInfo(verifiedStaffInfo);
     setBookingInProgress(true);
-    console.log("✅ Staff info set, booking in progress");
+    // console.log("✅ Staff info set, booking in progress");
 
     // Automatically create the booking after PIN verification
     console.log("� Aurto-creating booking...");

@@ -21,9 +21,15 @@ const N64BookingForm = ({
           icon={<Gamepad2 size={16} />}
           value={bookingData.n64.roomId}
           onChange={(e) => {
+            const selectedRoom = resources.n64.find(
+              (r) => r._id === e.target.value
+            );
             handleBookingDataChange("n64", "roomId", e.target.value);
             handleBookingDataChange("n64", "date", "");
             handleBookingDataChange("n64", "time", "");
+            if (selectedRoom) {
+              handleBookingDataChange("n64", "roomType", selectedRoom.roomType);
+            }
           }}
           required
         >
