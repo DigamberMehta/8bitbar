@@ -45,7 +45,6 @@ const FinancePage = () => {
   }, [filters, dateRange.startDate, dateRange.endDate]);
 
   const fetchData = async () => {
-    console.log("fetchData called with dateRange:", dateRange);
     setLoading(true);
     try {
       // Fetch consolidated bookings
@@ -89,7 +88,6 @@ const FinancePage = () => {
   };
 
   const handleDateRangeChange = (key, value) => {
-    console.log(`Date changed: ${key} = ${value}`);
     setDateRange((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -241,7 +239,6 @@ const FinancePage = () => {
                 type="date"
                 value={dateRange.startDate}
                 onChange={(e) => {
-                  console.log("Start date input changed:", e.target.value);
                   handleDateRangeChange("startDate", e.target.value);
                 }}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -255,7 +252,6 @@ const FinancePage = () => {
                 type="date"
                 value={dateRange.endDate}
                 onChange={(e) => {
-                  console.log("End date input changed:", e.target.value);
                   handleDateRangeChange("endDate", e.target.value);
                 }}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -508,7 +504,7 @@ const FinancePage = () => {
                               {formatDate(booking.bookingDate)}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {formatTime(booking.bookingDate)}
+                              {booking.time || "N/A"}
                             </div>
                             <div className="text-sm text-gray-500">
                               {booking.roomName}
@@ -580,7 +576,7 @@ const FinancePage = () => {
                               {formatDate(booking.bookingDate)}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {formatTime(booking.bookingDate)}
+                              {booking.time || "N/A"}
                             </div>
                             <div className="text-xs text-gray-500">
                               {booking.roomName}
@@ -648,7 +644,7 @@ const FinancePage = () => {
                             {formatDate(booking.bookingDate)}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {formatTime(booking.bookingDate)}
+                            {booking.time || "N/A"}
                           </p>
                           <p className="text-xs text-gray-500">
                             {booking.roomName}
@@ -675,13 +671,6 @@ const FinancePage = () => {
               <FinanceCalendar
                 events={calendarData}
                 onEventClick={(event) => {
-                  // Debug: Log the full event object to see what's available
-                  console.log("FinancePage - Calendar event clicked:", event);
-                  console.log(
-                    "FinancePage - Event extendedProps:",
-                    event.extendedProps
-                  );
-
                   // Extract booking data from calendar event
                   const bookingData = {
                     id: event.id,
@@ -692,15 +681,15 @@ const FinancePage = () => {
                     roomName: event.extendedProps.roomName,
                     customerName: event.extendedProps.customerName,
                     customerEmail: event.extendedProps.customerEmail,
+                    time: event.extendedProps.time, // Include the time field
+                    durationHours: event.extendedProps.durationHours, // Include duration for karaoke/N64
+                    duration: event.extendedProps.duration, // Include duration for cafe
                     start: event.start,
                     end: event.end,
                     title: event.title,
                   };
 
-                  console.log(
-                    "FinancePage - Extracted booking data:",
-                    bookingData
-                  );
+                  console.log("Modal receiving data:", bookingData);
                   setSelectedBooking(bookingData);
                   setIsModalOpen(true);
                 }}

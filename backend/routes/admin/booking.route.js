@@ -197,10 +197,8 @@ router.post("/karaoke", async (req, res) => {
       });
     }
 
-    // Determine payment status based on booking status
-    // If status is "pending", payment is not completed yet
-    // If status is "confirmed", payment is completed
-    const paymentStatus = status === "confirmed" ? "completed" : "pending";
+    // Use payment status from request body, default to "pending" if not provided
+    const paymentStatus = req.body.paymentStatus || "pending";
 
     // Create booking with staff information
     const booking = await KaraokeBooking.create({
@@ -352,10 +350,8 @@ router.post("/n64", async (req, res) => {
       });
     }
 
-    // Determine payment status based on booking status
-    // If status is "pending", payment is not completed yet
-    // If status is "confirmed", payment is completed
-    const paymentStatus = status === "confirmed" ? "completed" : "pending";
+    // Use payment status from request body, default to "pending" if not provided
+    const paymentStatus = req.body.paymentStatus || "pending";
 
     // Create booking with staff information
     const booking = await N64Booking.create({
@@ -496,10 +492,8 @@ router.post("/cafe", async (req, res) => {
       });
     }
 
-    // Determine payment status based on booking status
-    // If status is "pending", payment is not completed yet
-    // If status is "confirmed", payment is completed
-    const paymentStatus = status === "confirmed" ? "completed" : "pending";
+    // Use payment status from request body, default to "pending" if not provided
+    const paymentStatus = req.body.paymentStatus || "pending";
 
     // Create booking with staff information
     const booking = await CafeBooking.create({

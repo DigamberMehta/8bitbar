@@ -89,19 +89,21 @@ class FinanceController {
           ...booking.toObject(),
           serviceType: "karaoke",
           bookingDate: booking.date,
+          time: booking.time, // Simple "3:00 PM" format
           roomName: booking.roomId?.name || "Karaoke Room",
         })),
         ...n64Bookings.map((booking) => ({
           ...booking.toObject(),
           serviceType: "n64",
           bookingDate: booking.date,
+          time: booking.time, // Explicitly include time field
           roomName: booking.roomId?.name || booking.roomType || "N64 Room",
         })),
         ...cafeBookings.map((booking) => ({
           ...booking.toObject(),
           serviceType: "cafe",
-          // TIMEZONE FIX: Create date in client's local timezone instead of server timezone
-          bookingDate: new Date(booking.date + "T" + booking.time + ":00"),
+          bookingDate: booking.date, // Keep as string like other services
+          time: booking.time, // Explicitly include time field
           roomName: `${booking.chairIds.length} Chair${
             booking.chairIds.length > 1 ? "s" : ""
           }`,
@@ -478,12 +480,17 @@ class FinanceController {
           title: `Karaoke - ${booking.customerName}`,
           start: startTime,
           end: endTime,
-          serviceType: "karaoke",
-          status: booking.status,
-          revenue: booking.totalPrice,
-          roomName: booking.roomId?.name || "Karaoke Room",
-          customerName: booking.customerName,
-          customerEmail: booking.customerEmail,
+          extendedProps: {
+            time: booking.time, // Simple time format for frontend
+            durationHours: booking.durationHours, // Include duration for end time calculation
+            serviceType: "karaoke",
+            status: booking.status,
+            paymentStatus: booking.paymentStatus, // Include payment status
+            revenue: booking.totalPrice,
+            roomName: booking.roomId?.name || "Karaoke Room",
+            customerName: booking.customerName,
+            customerEmail: booking.customerEmail,
+          },
         });
       });
 
@@ -525,12 +532,17 @@ class FinanceController {
           title: `N64 - ${booking.customerName}`,
           start: startTime,
           end: endTime,
-          serviceType: "n64",
-          status: booking.status,
-          revenue: booking.totalPrice,
-          roomName: booking.roomId?.name || booking.roomType || "N64 Room",
-          customerName: booking.customerName,
-          customerEmail: booking.customerEmail,
+          extendedProps: {
+            time: booking.time, // Simple time format for frontend
+            durationHours: booking.durationHours, // Include duration for end time calculation
+            serviceType: "n64",
+            status: booking.status,
+            paymentStatus: booking.paymentStatus, // Include payment status
+            revenue: booking.totalPrice,
+            roomName: booking.roomId?.name || booking.roomType || "N64 Room",
+            customerName: booking.customerName,
+            customerEmail: booking.customerEmail,
+          },
         });
       });
 
@@ -538,25 +550,51 @@ class FinanceController {
       const cafeBookings = await CafeBooking.find({ date: dateQuery });
 
       cafeBookings.forEach((booking) => {
-        // TIMEZONE FIX: Create date in client's local timezone instead of server timezone
-        const startTime = new Date(booking.date + "T" + booking.time + ":00");
-        const endTime = new Date(
-          startTime.getTime() + booking.duration * 60 * 60 * 1000
-        );
+        // Use simple time format for consistency
+        const startTime = `${booking.date}T${booking.time}`;
+        const endTime = (() => {
+          // Convert time to minutes for safe calculation
+          const timeMatch = booking.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!timeMatch) return startTime;
+
+          let [_, hourStr, minuteStr, period] = timeMatch;
+          let hour = parseInt(hourStr, 10);
+          const minute = parseInt(minuteStr, 10);
+
+          // Convert to 24-hour format
+          if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+          if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+          // Calculate end time
+          const endHour = hour + booking.duration;
+          const endHour24 = endHour % 24;
+          const endHour12 =
+            endHour24 === 0 ? 12 : endHour24 > 12 ? endHour24 - 12 : endHour24;
+          const endPeriod = endHour24 >= 12 ? "PM" : "AM";
+
+          return `${booking.date}T${endHour12}:${minute
+            .toString()
+            .padStart(2, "0")} ${endPeriod}`;
+        })();
 
         calendarData.push({
           id: booking._id,
           title: `Cafe - ${booking.customerName}`,
           start: startTime,
           end: endTime,
-          serviceType: "cafe",
-          status: booking.status,
-          revenue: booking.totalCost,
-          roomName: `${booking.chairIds.length} Chair${
-            booking.chairIds.length > 1 ? "s" : ""
-          }`,
-          customerName: booking.customerName,
-          customerEmail: booking.customerEmail,
+          extendedProps: {
+            time: booking.time, // Simple time format for frontend
+            duration: booking.duration, // Include duration for end time calculation
+            serviceType: "cafe",
+            status: booking.status,
+            paymentStatus: booking.paymentStatus, // Include payment status
+            revenue: booking.totalCost,
+            roomName: `${booking.chairIds.length} Chair${
+              booking.chairIds.length > 1 ? "s" : ""
+            }`,
+            customerName: booking.customerName,
+            customerEmail: booking.customerEmail,
+          },
         });
       });
 

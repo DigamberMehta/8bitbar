@@ -224,6 +224,21 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
               .padStart(2, "0")}:${minute.toString().padStart(2, "0")}:00`;
             date = new Date(isoString);
           } else {
+            // If regex doesn't match, try to extract time directly
+            const timeMatch = dateInput.match(/T(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+            if (timeMatch) {
+              const [_, hourStr, minuteStr, period] = timeMatch;
+              let hour = parseInt(hourStr, 10);
+              const minute = parseInt(minuteStr, 10);
+
+              if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+              if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+              // Create a simple time string
+              return `${hour}:${minute
+                .toString()
+                .padStart(2, "0")} ${period.toUpperCase()}`;
+            }
             date = new Date(dateInput);
           }
         } else {
@@ -356,7 +371,9 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
                 <span className="font-medium text-purple-900">Duration</span>
               </div>
               <span className="text-blue-700">
-                {formatDuration(booking.start, booking.end)}
+                {booking.durationHours
+                  ? `${booking.durationHours}h`
+                  : formatDuration(booking.start, booking.end)}
               </span>
             </div>
           </div>
@@ -380,7 +397,9 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
                 <span className="font-medium text-blue-900">Duration</span>
               </div>
               <span className="text-purple-700">
-                {formatDuration(booking.start, booking.end)}
+                {booking.durationHours
+                  ? `${booking.durationHours}h`
+                  : formatDuration(booking.start, booking.end)}
               </span>
             </div>
           </div>
@@ -404,7 +423,8 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
                 <span className="font-medium text-green-900">Time</span>
               </div>
               <span className="text-green-700">
-                {formatTime(booking.start)}
+                {booking.time ||
+                  (booking.start ? formatTime(booking.start) : "N/A")}
               </span>
             </div>
           </div>
@@ -533,20 +553,66 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
               <div className="flex items-center gap-2">
                 <MdEvent className="text-gray-500" />
                 <span className="text-gray-700">
-                  {formatDate(booking.start)}
+                  {booking.date
+                    ? formatDate(booking.date)
+                    : booking.start
+                    ? formatDate(booking.start)
+                    : "N/A"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <MdAccessTime className="text-gray-500" />
-                <span className="text-gray-700">
-                  {formatTime(booking.start)}
-                </span>
+                <span className="text-gray-700">{booking.time || "N/A"}</span>
               </div>
-              {booking.end && (
+              {(booking.durationHours || booking.duration) && (
                 <div className="flex items-center gap-2">
                   <MdSchedule className="text-gray-500" />
                   <span className="text-gray-700">
-                    Ends: {formatTime(booking.end)}
+                    Duration: {booking.durationHours || booking.duration}h{" "}
+                    {(booking.durationHours || booking.duration) > 1 ? "s" : ""}
+                  </span>
+                </div>
+              )}
+              {booking.time && (booking.durationHours || booking.duration) && (
+                <div className="flex items-center gap-2">
+                  <MdSchedule className="text-gray-500" />
+                  <span className="text-gray-700">
+                    Ends:{" "}
+                    {(() => {
+                      // Calculate end time based on start time and duration
+                      const timeMatch = booking.time.match(
+                        /(\d{1,2}):(\d{2})\s*(AM|PM)/i
+                      );
+                      if (timeMatch) {
+                        const [_, hourStr, minuteStr, period] = timeMatch;
+                        let hour = parseInt(hourStr, 10);
+                        const minute = parseInt(minuteStr, 10);
+
+                        // Convert to 24-hour format
+                        if (period.toUpperCase() === "PM" && hour !== 12)
+                          hour += 12;
+                        if (period.toUpperCase() === "AM" && hour === 12)
+                          hour = 0;
+
+                        // Calculate end time using either durationHours or duration
+                        const duration =
+                          booking.durationHours || booking.duration;
+                        const endHour = hour + duration;
+                        const endHour24 = endHour % 24;
+                        const endHour12 =
+                          endHour24 === 0
+                            ? 12
+                            : endHour24 > 12
+                            ? endHour24 - 12
+                            : endHour24;
+                        const endPeriod = endHour24 >= 12 ? "PM" : "AM";
+
+                        return `${endHour12}:${minute
+                          .toString()
+                          .padStart(2, "0")} ${endPeriod}`;
+                      }
+                      return "N/A";
+                    })()}
                   </span>
                 </div>
               )}
@@ -565,7 +631,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
             <div className="flex items-center justify-between">
               <span className="text-gray-700">Total Amount</span>
               <span className="text-2xl font-bold text-green-600">
-                ${(booking.revenue || 0).toFixed(2)}
+                ${(booking.revenue || booking.totalPrice || 0).toFixed(2)}
               </span>
             </div>
           </div>
