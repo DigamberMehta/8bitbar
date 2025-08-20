@@ -105,6 +105,7 @@ router.post("/karaoke", async (req, res) => {
       durationHours,
       status,
       staffPin, // New field for staff identification
+      comments, // Include comments field
     } = req.body;
 
     // Validate required fields
@@ -218,6 +219,7 @@ router.post("/karaoke", async (req, res) => {
       staffPin: staffInfo.pin,
       staffName: staffInfo.staffName,
       isManualBooking: true,
+      comments, // Include comments field
     });
 
     const populatedBooking = await KaraokeBooking.findById(booking._id)
@@ -262,6 +264,7 @@ router.post("/n64", async (req, res) => {
       durationHours,
       status,
       staffPin, // New field for staff identification
+      comments, // Include comments field
     } = req.body;
 
     // Validate required fields
@@ -372,6 +375,7 @@ router.post("/n64", async (req, res) => {
       staffPin: staffInfo.pin,
       staffName: staffInfo.staffName,
       isManualBooking: true,
+      comments, // Include comments field
     });
 
     const populatedBooking = await N64Booking.findById(booking._id)

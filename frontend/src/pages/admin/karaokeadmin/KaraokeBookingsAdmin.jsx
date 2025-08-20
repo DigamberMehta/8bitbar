@@ -389,6 +389,18 @@ const KaraokeBookingsAdmin = () => {
                           {booking.paymentStatus || "pending"}
                         </span>
                       </div>
+
+                      {/* Comments Display */}
+                      {booking.comments && (
+                        <div className="text-sm text-gray-600 mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                          <div className="font-medium text-blue-800 mb-1">
+                            💬 Special Requests:
+                          </div>
+                          <div className="text-blue-700">
+                            {booking.comments}
+                          </div>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-green-600">
@@ -562,6 +574,16 @@ const KaraokeBookingsAdmin = () => {
                   {booking.customerPhone && (
                     <div className="text-sm text-gray-500">
                       📞 {booking.customerPhone}
+                    </div>
+                  )}
+
+                  {/* Comments Display */}
+                  {booking.comments && (
+                    <div className="text-sm text-gray-600 mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <div className="font-medium text-blue-800 mb-1">
+                        💬 Special Requests:
+                      </div>
+                      <div className="text-blue-700">{booking.comments}</div>
                     </div>
                   )}
                 </div>

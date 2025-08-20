@@ -459,10 +459,15 @@ const AllBookingsList = () => {
                             </div>
                           )}
 
-                          {/* Special Requests */}
-                          {booking.specialRequests && (
-                            <div className="text-xs text-gray-600">
-                              Requests: {booking.specialRequests}
+                          {/* Comments */}
+                          {booking.comments && (
+                            <div className="text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded p-1 mt-1">
+                              <div className="font-medium text-blue-800">
+                                💬 Notes:
+                              </div>
+                              <div className="text-blue-700">
+                                {booking.comments}
+                              </div>
                             </div>
                           )}
                         </div>

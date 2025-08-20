@@ -9,7 +9,7 @@ const router = express.Router();
 // --- Registration Route ---
 // Logic from the 'register' controller is now directly inside the route handler.
 router.post("/register", async (req, res) => {
-  const { name, email, password, dob } = req.body;
+  const { name, email, password, phone, dob } = req.body;
   try {
     // 1. Validate input
     if (!name || !email || !password) {
@@ -36,6 +36,7 @@ router.post("/register", async (req, res) => {
       name,
       email: normalizedEmail,
       password: hashedPassword,
+      ...(phone && { phone }),
       ...(dob && { dob }),
     });
 
@@ -124,6 +125,43 @@ router.get("/profile", authenticateUser, async (req, res) => {
   } catch (error) {
     console.error("Error fetching user profile:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// --- Get User by Email Route (Public) ---
+// This route allows fetching user details by email for auto-population in forms
+router.get("/by-email/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    // Normalize email (convert to lowercase and trim)
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Find user by email, excluding sensitive fields
+    const user = await User.findOne({ email: normalizedEmail })
+      .select("name email phone dob")
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        data: null,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User found",
+      data: user,
+    });
+  } catch (error) {
+    console.error("Error fetching user by email:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      data: null,
+    });
   }
 });
 

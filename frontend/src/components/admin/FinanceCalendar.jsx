@@ -66,6 +66,7 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
           time: event.extendedProps?.time, // Include time field
           durationHours: event.extendedProps?.durationHours, // Include duration for karaoke/N64
           duration: event.extendedProps?.duration, // Include duration for cafe
+          comments: event.extendedProps?.comments, // Include comments field
         },
       };
     });

@@ -85,6 +85,7 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       totalPrice,
       paymentId,
       paymentStatus,
+      comments,
     } = req.body;
 
     if (
@@ -165,6 +166,7 @@ router.post("/bookings", authenticateUser, async (req, res) => {
       paymentId,
       paymentStatus: paymentStatus || "pending",
       status: bookingStatus, // Set status based on payment status
+      comments,
     });
 
     await newBooking.save();

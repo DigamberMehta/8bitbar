@@ -22,7 +22,6 @@ const CheckoutPage = () => {
   const [billingDetails, setBillingDetails] = useState({
     firstName: "",
     lastName: "",
-    apartment: "",
     suburb: "",
     state: "Queensland",
     postcode: "",
@@ -223,6 +222,7 @@ const CheckoutPage = () => {
             totalPrice: item.totalCost,
             paymentId: payment.id,
             paymentStatus: paymentStatus,
+            comments: item.comments, // Include comments field
           });
         } else if (item.type === "n64") {
           // Handle N64 booking
@@ -241,6 +241,7 @@ const CheckoutPage = () => {
             totalPrice: item.totalCost,
             paymentId: payment.id,
             paymentStatus: paymentStatus,
+            comments: item.comments, // Include comments field
           });
         }
       }
@@ -452,15 +453,6 @@ const CheckoutPage = () => {
                     <span className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></span>
                     Address Information
                   </h3>
-
-                  {/* Apartment/Suite Row */}
-                  <div className="mb-4">
-                    {renderInputField(
-                      "apartment",
-                      "Apartment, suite, etc.",
-                      "Optional"
-                    )}
-                  </div>
 
                   {/* Location Details Row - Mobile Optimized */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

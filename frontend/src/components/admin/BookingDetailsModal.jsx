@@ -30,8 +30,6 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
     if (isOpen) {
       document.addEventListener("keydown", handleEscape);
       document.body.style.overflow = "hidden";
-      // Debug: Log the booking data to see what's available
-      console.log("BookingDetailsModal - Received booking data:", booking);
     }
 
     return () => {
@@ -643,6 +641,17 @@ const BookingDetailsModal = ({ booking, isOpen, onClose }) => {
                 Additional Notes
               </h3>
               <p className="text-gray-700">{booking.notes}</p>
+            </div>
+          )}
+
+          {/* Comments/Special Requests */}
+          {booking.comments && (
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <h3 className="text-lg font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                <span className="text-blue-500">💬</span>
+                Special Requests & Notes
+              </h3>
+              <p className="text-blue-700">{booking.comments}</p>
             </div>
           )}
         </div>

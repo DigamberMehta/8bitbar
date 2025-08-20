@@ -14,6 +14,7 @@ const BookingForm = ({ booths, bookings }) => {
   const [selectedBoothId, setSelectedBoothId] = useState("");
   const [numberOfPeople, setNumberOfPeople] = useState(1);
   const [duration, setDuration] = useState(1);
+  const [comments, setComments] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -123,6 +124,7 @@ const BookingForm = ({ booths, bookings }) => {
         duration,
         people: numberOfPeople,
         totalCost,
+        comments,
       };
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
       cart.push(cartItem);
@@ -310,6 +312,25 @@ const BookingForm = ({ booths, bookings }) => {
             (5 min reserved for cleaning)
           </div>
         )}
+
+        {/* Comments Field */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+            <span className="text-pink-400">💬</span>
+            Special Requests or Notes (Optional)
+          </label>
+          <textarea
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+            placeholder="e.g., For 50th birthday, please load specific games, tournament setup, special rules, etc."
+            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors resize-none"
+            rows={3}
+            maxLength={500}
+          />
+          <div className="text-xs text-gray-500 mt-1 text-right">
+            Max 500 characters
+          </div>
+        </div>
 
         {/* Total Cost Display */}
         <div className="border-t border-gray-700 pt-6">
