@@ -36,23 +36,6 @@ const CalendarView = () => {
           endDate: endDate.toISOString().split("T")[0],
         },
       });
-      console.log("Calendar data received:", response.data.calendarData);
-      console.log(
-        "Sample event extendedProps:",
-        response.data.calendarData?.[0]?.extendedProps
-      );
-      console.log(
-        "Sample event time field:",
-        response.data.calendarData?.[0]?.extendedProps?.time
-      );
-      console.log(
-        "Sample event durationHours:",
-        response.data.calendarData?.[0]?.extendedProps?.durationHours
-      );
-      console.log(
-        "Sample event duration:",
-        response.data.calendarData?.[0]?.extendedProps?.duration
-      );
       setCalendarData(response.data.calendarData || []);
     } catch (error) {
       console.error("Error fetching calendar data:", error);
@@ -62,22 +45,6 @@ const CalendarView = () => {
   };
 
   const handleEventClick = (event) => {
-    // Debug: Log the full event object to see what's available
-    console.log("Client Calendar - Event clicked:", event);
-    console.log("Client Calendar - Event extendedProps:", event.extendedProps);
-    console.log(
-      "Client Calendar - Event time field:",
-      event.extendedProps?.time
-    );
-    console.log(
-      "Client Calendar - Event durationHours:",
-      event.extendedProps?.durationHours
-    );
-    console.log(
-      "Client Calendar - Event duration:",
-      event.extendedProps?.duration
-    );
-
     // Extract booking data from calendar event
     const bookingData = {
       id: event.id,
@@ -91,13 +58,13 @@ const CalendarView = () => {
       time: event.extendedProps.time, // Include the time field
       durationHours: event.extendedProps.durationHours, // Include duration for karaoke/N64
       duration: event.extendedProps.duration, // Include duration for cafe
+      comments: event.extendedProps.comments, // Include comments field
 
       start: event.start,
       end: event.end,
       title: event.title,
     };
 
-    console.log("Client Calendar - Extracted booking data:", bookingData);
     setSelectedBooking(bookingData);
     setIsModalOpen(true);
   };
@@ -128,7 +95,6 @@ const CalendarView = () => {
           events={calendarData}
           onEventClick={handleEventClick}
           onMonthChange={(monthInfo) => {
-            console.log("Month changed:", monthInfo);
             // Update date range if needed
           }}
         />

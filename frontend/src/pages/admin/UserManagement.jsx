@@ -165,7 +165,6 @@ const UserManagement = () => {
   };
 
   const formatDate = (dateString) => {
-    // Display exact date without timezone conversion
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
@@ -177,7 +176,7 @@ const UserManagement = () => {
     });
   };
 
-  const UserCard = ({ user, isAdmin = false }) => (
+  const UserCard = ({ user }) => (
     <div className="bg-white rounded-lg shadow-md border-l-4 border-blue-500 overflow-hidden">
       <div className="p-4 sm:p-6">
         {/* Header with user info and mobile menu */}
@@ -225,9 +224,7 @@ const UserManagement = () => {
                     </button>
                   )}
                   <button
-                    onClick={() =>
-                      handleDeleteUser(user._id, user.role === "admin")
-                    }
+                    onClick={() => handleDeleteUser(user._id, user.role === "admin")}
                     className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors"
                   >
                     <MdDelete size={16} />
@@ -282,9 +279,17 @@ const UserManagement = () => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!event.target.closest(".relative")) {
-        setDropdownOpen({});
-      }
+      setDropdownOpen((currentOpen) => {
+        const isAnyDropdownOpen = Object.values(currentOpen).some(
+          (isOpen) => isOpen
+        );
+
+        if (isAnyDropdownOpen && !event.target.closest(".relative")) {
+          return {};
+        }
+
+        return currentOpen;
+      });
     };
 
     document.addEventListener("click", handleClickOutside);
@@ -419,7 +424,7 @@ const UserManagement = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     {users.map((user) => (
-                      <UserCard key={user._id} user={user} isAdmin={false} />
+                      <UserCard key={user._id} user={user} />
                     ))}
                   </div>
                 )}
@@ -449,7 +454,7 @@ const UserManagement = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     {admins.map((admin) => (
-                      <UserCard key={admin._id} user={admin} isAdmin={true} />
+                      <UserCard key={admin._id} user={admin} />
                     ))}
                   </div>
                 )}

@@ -169,7 +169,7 @@ const AllBookingsController = {
       const karaokeBookings = await KaraokeBooking.find(karaokeFilter)
         .populate("roomId", "name")
         .select(
-          "date time customerName customerEmail roomId status paymentStatus totalPrice durationHours"
+          "date time customerName customerEmail roomId status paymentStatus totalPrice durationHours comments"
         );
 
       karaokeBookings.forEach((booking) => {
@@ -217,6 +217,7 @@ const AllBookingsController = {
             roomName: booking.roomId?.name || "Karaoke Room",
             customerName: booking.customerName,
             customerEmail: booking.customerEmail,
+            comments: booking.comments, // Include comments field
           },
         });
       });
@@ -233,7 +234,7 @@ const AllBookingsController = {
       const n64Bookings = await N64Booking.find(n64Filter)
         .populate("roomId", "name")
         .select(
-          "date time customerName customerEmail roomId status paymentStatus totalPrice durationHours"
+          "date time customerName customerEmail roomId status paymentStatus totalPrice durationHours comments"
         );
 
       n64Bookings.forEach((booking) => {
@@ -281,6 +282,7 @@ const AllBookingsController = {
             roomName: booking.roomId?.name || "N64 Booth",
             customerName: booking.customerName,
             customerEmail: booking.customerEmail,
+            comments: booking.comments, // Include comments field
           },
         });
       });

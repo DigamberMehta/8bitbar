@@ -47,28 +47,41 @@ export const SelectField = ({ label, icon, children, ...props }) => (
   </div>
 );
 
-export const CustomerInfoForm = ({ formData, handleInputChange }) => {
+export const CustomerInfoForm = ({
+  formData,
+  handleInputChange,
+  onEmailBlur,
+  isLoadingUser,
+}) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
       <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
         Customer Information
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        <div className="relative">
+          <InputField
+            label="Email"
+            icon={<Mail size={16} className="text-gray-500" />}
+            type="email"
+            name="customerEmail"
+            value={formData.customerEmail}
+            onChange={handleInputChange}
+            onBlur={onEmailBlur}
+            required
+          />
+          {isLoadingUser && (
+            <div className="absolute right-3 top-8">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            </div>
+          )}
+        </div>
         <InputField
           label="Full Name"
           icon={<User size={16} className="text-gray-500" />}
           type="text"
           name="customerName"
           value={formData.customerName}
-          onChange={handleInputChange}
-          required
-        />
-        <InputField
-          label="Email"
-          icon={<Mail size={16} className="text-gray-500" />}
-          type="email"
-          name="customerEmail"
-          value={formData.customerEmail}
           onChange={handleInputChange}
           required
         />

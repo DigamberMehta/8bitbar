@@ -97,18 +97,18 @@ const N64BookingsAdmin = () => {
     try {
       // Parse the time string (e.g., "2:00 PM" or "14:00")
       let hours, minutes;
-      
-      if (time.includes('PM') || time.includes('AM')) {
+
+      if (time.includes("PM") || time.includes("AM")) {
         // Handle 12-hour format (e.g., "2:00 PM")
         const timeMatch = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
         if (timeMatch) {
           hours = parseInt(timeMatch[1]);
           minutes = parseInt(timeMatch[2]);
           const period = timeMatch[3].toUpperCase();
-          
-          if (period === 'PM' && hours !== 12) {
+
+          if (period === "PM" && hours !== 12) {
             hours += 12;
-          } else if (period === 'AM' && hours === 12) {
+          } else if (period === "AM" && hours === 12) {
             hours = 0;
           }
         }
@@ -120,31 +120,31 @@ const N64BookingsAdmin = () => {
           minutes = parseInt(timeMatch[2]);
         }
       }
-      
+
       if (hours === undefined || minutes === undefined) {
         return `${time} - ${time}`; // Fallback if parsing fails
       }
-      
+
       // Create start time
       const start = new Date(date);
       start.setHours(hours, minutes, 0, 0);
-      
+
       // Create end time
       const end = new Date(start.getTime() + durationHours * 60 * 60 * 1000);
-      
+
       // Format times
       const startTime = start.toLocaleTimeString("en-US", {
         hour: "numeric",
         minute: "2-digit",
         hour12: true,
       });
-      
+
       const endTime = end.toLocaleTimeString("en-US", {
         hour: "numeric",
         minute: "2-digit",
         hour12: true,
       });
-      
+
       return `${startTime} - ${endTime}`;
     } catch (error) {
       console.error("Error formatting time range:", error);
@@ -409,6 +409,18 @@ const N64BookingsAdmin = () => {
                           {booking.paymentStatus || "pending"}
                         </span>
                       </div>
+
+                      {/* Comments Display */}
+                      {booking.comments && (
+                        <div className="text-sm text-gray-600 mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                          <div className="font-medium text-blue-800 mb-1">
+                            💬 Special Requests:
+                          </div>
+                          <div className="text-blue-700">
+                            {booking.comments}
+                          </div>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-green-600">

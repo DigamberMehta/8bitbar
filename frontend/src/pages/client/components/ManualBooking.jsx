@@ -43,7 +43,8 @@ const ManualBooking = () => {
       time: "",
       numberOfPeople: 1,
       durationHours: 1,
-      paymentStatus: "pending", // Default to "Not Paid"
+      paymentStatus: "", // No default selection
+      comments: "",
     },
     n64: {
       roomId: "",
@@ -52,7 +53,8 @@ const ManualBooking = () => {
       time: "",
       numberOfPeople: 1,
       durationHours: 1,
-      paymentStatus: "pending", // Default to "Not Paid"
+      paymentStatus: "", // No default selection
+      comments: "",
     },
     cafe: {
       chairIds: [],
@@ -61,7 +63,7 @@ const ManualBooking = () => {
       duration: 1,
       specialRequests: "",
       deviceType: "desktop",
-      paymentStatus: "pending", // Default to "Not Paid"
+      paymentStatus: "", // No default selection
     },
   });
   const [result, setResult] = useState(null);
@@ -73,6 +75,8 @@ const ManualBooking = () => {
 
   // Customer popup state
   const [showCustomerPopup, setShowCustomerPopup] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [showPaymentStatusError, setShowPaymentStatusError] = useState(false);
 
   useEffect(() => {
     fetchResources();
@@ -88,6 +92,43 @@ const ManualBooking = () => {
       alert("Failed to fetch resources");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to fetch user details by email
+  const fetchUserByEmail = async (email) => {
+    if (!email || email.trim() === "") return;
+
+    try {
+      setIsLoadingUser(true);
+      const response = await api.get(
+        `/user/by-email/${encodeURIComponent(email.trim())}`
+      );
+
+      if (response.data.success && response.data.data) {
+        const userData = response.data.data;
+
+        // Auto-populate form fields with user data
+        setFormData((prev) => ({
+          ...prev,
+          customerName: userData.name || prev.customerName,
+          customerPhone: userData.phone || prev.customerPhone,
+          customerDob: userData.dob
+            ? new Date(userData.dob).toISOString().split("T")[0]
+            : prev.customerDob,
+        }));
+
+        console.log("User data auto-populated:", userData);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        // User not found - this is normal, don't show error
+        console.log("No existing user found for this email");
+      } else {
+        console.error("Error fetching user by email:", error);
+      }
+    } finally {
+      setIsLoadingUser(false);
     }
   };
 
@@ -510,6 +551,24 @@ const ManualBooking = () => {
       return;
     }
 
+    // Check if payment status is selected
+    if (!bookingData[activeService].paymentStatus) {
+      setShowPaymentStatusError(true);
+      // Scroll to payment status section
+      const paymentStatusSection = document.getElementById(
+        "payment-status-section"
+      );
+      if (paymentStatusSection) {
+        paymentStatusSection.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+      return;
+    }
+
+    // Clear any previous payment status error
+    setShowPaymentStatusError(false);
     await createBooking(staffInfo);
   };
 
@@ -518,6 +577,26 @@ const ManualBooking = () => {
     setBookingInProgress(true);
 
     try {
+      // Check if payment status is selected
+      if (!bookingData[activeService].paymentStatus) {
+        setShowPaymentStatusError(true);
+        setShowPinModal(false);
+        setBookingInProgress(false);
+        // Scroll to payment status section
+        const paymentStatusSection = document.getElementById(
+          "payment-status-section"
+        );
+        if (paymentStatusSection) {
+          paymentStatusSection.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+        return;
+      }
+
+      // Clear any previous payment status error
+      setShowPaymentStatusError(false);
       await createBooking(verifiedStaffInfo);
       setShowPinModal(false);
       setBookingInProgress(false);
@@ -617,29 +696,53 @@ const ManualBooking = () => {
             icon={<MdMusicNote size={20} />}
             label="Karaoke"
             isActive={activeService === "karaoke"}
-            onClick={() => setActiveService("karaoke")}
+            onClick={() => {
+              setActiveService("karaoke");
+              setShowPaymentStatusError(false); // Clear error when switching services
+              // Reset payment status for this service
+              setBookingData((prev) => ({
+                ...prev,
+                karaoke: { ...prev.karaoke, paymentStatus: "" },
+              }));
+            }}
           />
           <ServiceTab
             service="n64"
             icon={<MdVideogameAsset size={20} />}
             label="N64"
             isActive={activeService === "n64"}
-            onClick={() => setActiveService("n64")}
+            onClick={() => {
+              setActiveService("n64");
+              setShowPaymentStatusError(false); // Clear error when switching services
+              // Reset payment status for this service
+              setBookingData((prev) => ({
+                ...prev,
+                n64: { ...prev.n64, paymentStatus: "" },
+              }));
+            }}
           />
           <ServiceTab
             service="cafe"
             icon={<MdLocalCafe size={20} />}
             label="Cafe"
             isActive={activeService === "cafe"}
-            onClick={() => setActiveService("cafe")}
+            onClick={() => {
+              setActiveService("cafe");
+              setShowPaymentStatusError(false); // Clear error when switching services
+              // Reset payment status for this service
+              setBookingData((prev) => ({
+                ...prev,
+                cafe: { ...prev.cafe, paymentStatus: "" },
+              }));
+            }}
           />
         </div>
       </div>
 
       {/* Status Selection */}
-      <div className="mb-4 sm:mb-6 md:mb-8">
+      <div id="payment-status-section" className="mb-4 sm:mb-6 md:mb-8">
         <h2 className="text-xs sm:text-sm md:text-base font-semibold text-gray-800 mb-2 sm:mb-3 md:mb-4">
-          Payment Status
+          Payment Status *
         </h2>
         <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
           <label className="flex items-center space-x-2 cursor-pointer">
@@ -648,13 +751,14 @@ const ManualBooking = () => {
               name="paymentStatus"
               value="pending"
               checked={bookingData[activeService].paymentStatus === "pending"}
-              onChange={(e) =>
+              onChange={(e) => {
                 handleBookingDataChange(
                   activeService,
                   "paymentStatus",
                   e.target.value
-                )
-              }
+                );
+                setShowPaymentStatusError(false); // Clear error when selection is made
+              }}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
             <span className="text-xs sm:text-sm text-gray-700">Not Paid</span>
@@ -665,45 +769,47 @@ const ManualBooking = () => {
               name="paymentStatus"
               value="completed"
               checked={bookingData[activeService].paymentStatus === "completed"}
-              onChange={(e) =>
+              onChange={(e) => {
                 handleBookingDataChange(
                   activeService,
                   "paymentStatus",
                   e.target.value
-                )
-              }
+                );
+                setShowPaymentStatusError(false); // Clear error when selection is made
+              }}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
             <span className="text-xs sm:text-sm text-gray-700">Paid</span>
           </label>
         </div>
+
+        {/* Payment Status Error Message */}
+        {showPaymentStatusError && (
+          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex items-center space-x-2">
+              <svg
+                className="w-5 h-5 text-red-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-red-800 text-sm font-medium">
+                Please select a payment status before creating the booking.
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <form
         onSubmit={handleSubmit}
         className="space-y-4 sm:space-y-6 md:space-y-8"
       >
-        {/* Customer Information */}
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-              Customer Information
-            </h3>
-            <button
-              type="button"
-              onClick={() => setShowCustomerPopup(true)}
-              className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-md"
-            >
-              <MdPersonAdd size={20} />
-              <span className="text-base font-medium">Customer Input</span>
-            </button>
-          </div>
-          <CustomerInfoForm
-            formData={formData}
-            handleInputChange={handleInputChange}
-          />
-        </div>
-
         {/* Booking Details */}
         <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
           <h3 className="text-xs sm:text-sm md:text-base font-semibold text-gray-800 mb-3 sm:mb-4">
@@ -760,6 +866,29 @@ const ManualBooking = () => {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Customer Information */}
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+              Customer Information
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowCustomerPopup(true)}
+              className="flex items-center space-x-1 sm:space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-md"
+            >
+              <MdPersonAdd size={20} />
+              <span className="text-base font-medium">Customer Input</span>
+            </button>
+          </div>
+          <CustomerInfoForm
+            formData={formData}
+            handleInputChange={handleInputChange}
+            onEmailBlur={(e) => fetchUserByEmail(e.target.value)}
+            isLoadingUser={isLoadingUser}
+          />
         </div>
 
         {/* Submit Button */}

@@ -83,6 +83,12 @@ const karaokeBookingSchema = new mongoose.Schema(
       type: Boolean,
       default: false, // Indicates if this was created via admin manual booking
     },
+    comments: {
+      type: String,
+      required: false, // Optional field for special requests and notes
+      maxlength: [500, "Comments cannot exceed 500 characters"],
+      trim: true,
+    },
   },
   {
     timestamps: true,

@@ -15,6 +15,7 @@ const BookingForm = ({ room }) => {
   const [selectedTime, setSelectedTime] = useState("");
   const [numberOfPeople, setNumberOfPeople] = useState(2);
   const [numberOfHours, setNumberOfHours] = useState(1);
+  const [comments, setComments] = useState("");
   const [error, setError] = useState("");
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
@@ -172,6 +173,7 @@ const BookingForm = ({ room }) => {
         duration: numberOfHours,
         people: numberOfPeople,
         totalCost,
+        comments,
       };
       // Get existing cart from localStorage (common cart)
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -201,6 +203,7 @@ const BookingForm = ({ room }) => {
         roomId: room._id,
         paymentId: "FREE_BOOKING",
         paymentStatus: "completed",
+        comments,
       };
 
       const response = await axios.post("/karaoke-rooms/bookings", bookingData);
@@ -213,6 +216,7 @@ const BookingForm = ({ room }) => {
         setSelectedTime("");
         setNumberOfPeople(2);
         setNumberOfHours(1);
+        setComments("");
         // Refresh bookings to show the new booking
         const res = await axios.get("/karaoke-rooms/bookings");
         if (res.data.success) {
@@ -429,6 +433,25 @@ const BookingForm = ({ room }) => {
             (5 min reserved for cleaning)
           </div>
         )}
+
+        {/* Comments Field */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+            <span className="text-pink-400">💬</span>
+            Special Requests or Notes (Optional)
+          </label>
+          <textarea
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+            placeholder="e.g., For 50th birthday, please decorate, special song requests, dietary requirements, etc."
+            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 focus:outline-none transition-colors resize-none"
+            rows={3}
+            maxLength={500}
+          />
+          <div className="text-xs text-gray-500 mt-1 text-right">
+            Max 500 characters
+          </div>
+        </div>
 
         {/* Total Cost */}
         <div className="border-t border-gray-700 pt-6">

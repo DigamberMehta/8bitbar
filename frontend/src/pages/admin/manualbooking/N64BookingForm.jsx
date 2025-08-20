@@ -123,6 +123,27 @@ const N64BookingForm = ({
           />
         </div>
       )}
+
+      {/* Comments Field */}
+      <div className="space-y-2 sm:space-y-3">
+        <label className="flex items-center space-x-1 sm:space-y-2 text-xs sm:text-sm font-medium text-gray-700">
+          <span className="text-blue-500">💬</span>
+          <span>Special Requests or Notes (Optional)</span>
+        </label>
+        <textarea
+          value={bookingData.n64.comments || ""}
+          onChange={(e) =>
+            handleBookingDataChange("n64", "comments", e.target.value)
+          }
+          placeholder="e.g., For 50th birthday, please load specific games, tournament setup, special rules, etc."
+          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-500 resize-none"
+          rows={3}
+          maxLength={500}
+        />
+        <div className="text-xs text-gray-500 text-right">
+          Max 500 characters
+        </div>
+      </div>
     </div>
   );
 };
