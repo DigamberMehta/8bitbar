@@ -22,7 +22,8 @@ const KaraokeBookingForm = ({
           value={bookingData.karaoke.roomId}
           onChange={(e) => {
             handleBookingDataChange("karaoke", "roomId", e.target.value);
-            handleBookingDataChange("karaoke", "startDateTime", "");
+            handleBookingDataChange("karaoke", "date", "");
+            handleBookingDataChange("karaoke", "time", "");
           }}
           required
         >
@@ -57,18 +58,10 @@ const KaraokeBookingForm = ({
           label="Date"
           icon={<Calendar size={16} />}
           type="date"
-          value={
-            bookingData.karaoke.startDateTime
-              ? bookingData.karaoke.startDateTime.split("T")[0]
-              : ""
-          }
+          value={bookingData.karaoke.date || ""}
           onChange={(e) => {
             const date = e.target.value;
-            handleBookingDataChange(
-              "karaoke",
-              "startDateTime",
-              date ? `${date}T00:00` : ""
-            );
+            handleBookingDataChange("karaoke", "date", date);
           }}
           min={new Date().toISOString().split("T")[0]}
           required
@@ -97,58 +90,37 @@ const KaraokeBookingForm = ({
       </div>
 
       {/* Time Slot Selection */}
-      {bookingData.karaoke.roomId && bookingData.karaoke.startDateTime && (
+      {bookingData.karaoke.roomId && bookingData.karaoke.date && (
         <div className="space-y-2 sm:space-y-3">
-          <h4 className="text-sm sm:text-base font-medium text-gray-700">
-            Available Time Slots
-          </h4>
+          <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
+            <Clock size={14} className="sm:w-4 sm:h-4" />
+            <span>Select Start Time</span>
+          </label>
+
           <TimeSlotSelector
-            service="karaoke"
-            date={bookingData.karaoke.startDateTime.split("T")[0]}
-            duration={bookingData.karaoke.durationHours}
-            roomAvailability={roomAvailability}
-            loading={loadingRoomAvailability}
-            getSlotDate={getSlotDate}
-            getBlockedSlots={getBlockedSlots}
-            selectedTime={
-              bookingData.karaoke.startDateTime &&
-              bookingData.karaoke.startDateTime !== "" &&
-              !bookingData.karaoke.startDateTime.endsWith("T00:00")
-                ? new Date(bookingData.karaoke.startDateTime)
-                    .toTimeString()
-                    .slice(0, 5)
-                : ""
-            }
-            onTimeSelect={(time) => {
-              const date = bookingData.karaoke.startDateTime.split("T")[0];
-              const [hour, minute] = time.split(":");
-              const dateTime = new Date(date);
-              dateTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
-              handleBookingDataChange(
+            timeSlots={roomAvailability.karaoke.timeSlots}
+            blockedSlots={(() => {
+              return getBlockedSlots(
                 "karaoke",
-                "startDateTime",
-                dateTime.toISOString()
+                bookingData.karaoke.date,
+                bookingData.karaoke.durationHours
               );
-            }}
+            })()}
+            selectedTime={bookingData.karaoke.time || ""}
+            date={bookingData.karaoke.date}
+            onTimeSelect={(time) =>
+              handleBookingDataChange("karaoke", "time", time)
+            }
+            loading={loadingRoomAvailability}
           />
         </div>
       )}
 
-      {/* Room Information */}
-      {roomAvailability.karaoke.room && (
-        <div className="p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h4 className="text-sm sm:text-base font-medium text-blue-800 mb-2">
-            Room Information
-          </h4>
-          <div className="text-sm text-blue-700">
-            <p>Room: {roomAvailability.karaoke.room.name}</p>
-            <p>Price: ${roomAvailability.karaoke.room.pricePerHour}/hour</p>
-            <p>
-              Max Capacity: {roomAvailability.karaoke.room.maxPeople} people
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Note: Form submission is handled by the parent component */}
+      <div className="text-sm text-gray-500 text-center py-2">
+        Fill in all required fields above, then use the "Create Booking" button
+        below
+      </div>
     </div>
   );
 };

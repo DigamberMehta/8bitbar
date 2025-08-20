@@ -28,14 +28,14 @@ class FinanceController {
       const query = {};
       const dateQuery = {};
 
-      // Date filtering
+      // Date filtering - Use string comparison for YYYY-MM-DD format
       if (startDate && endDate) {
-        dateQuery.$gte = new Date(startDate);
-        dateQuery.$lte = new Date(endDate);
+        dateQuery.$gte = startDate;
+        dateQuery.$lte = endDate;
       } else if (startDate) {
-        dateQuery.$gte = new Date(startDate);
+        dateQuery.$gte = startDate;
       } else if (endDate) {
-        dateQuery.$lte = new Date(endDate);
+        dateQuery.$lte = endDate;
       }
 
       // Status filtering
@@ -51,7 +51,7 @@ class FinanceController {
       if (serviceType === "all" || serviceType === "karaoke") {
         const karaokeQuery = { ...query };
         if (Object.keys(dateQuery).length > 0) {
-          karaokeQuery.startDateTime = dateQuery;
+          karaokeQuery.date = dateQuery;
         }
         karaokeBookings = await KaraokeBooking.find(karaokeQuery)
           .populate("roomId", "name")
@@ -63,7 +63,7 @@ class FinanceController {
       if (serviceType === "all" || serviceType === "n64") {
         const n64Query = { ...query };
         if (Object.keys(dateQuery).length > 0) {
-          n64Query.startDateTime = dateQuery;
+          n64Query.date = dateQuery;
         }
         n64Bookings = await N64Booking.find(n64Query)
           .populate("roomId", "name")
@@ -88,13 +88,13 @@ class FinanceController {
         ...karaokeBookings.map((booking) => ({
           ...booking.toObject(),
           serviceType: "karaoke",
-          bookingDate: booking.startDateTime,
+          bookingDate: booking.date,
           roomName: booking.roomId?.name || "Karaoke Room",
         })),
         ...n64Bookings.map((booking) => ({
           ...booking.toObject(),
           serviceType: "n64",
-          bookingDate: booking.startDateTime,
+          bookingDate: booking.date,
           roomName: booking.roomId?.name || booking.roomType || "N64 Room",
         })),
         ...cafeBookings.map((booking) => ({
@@ -140,8 +140,8 @@ class FinanceController {
 
       let dateQuery = {};
       if (startDate && endDate) {
-        dateQuery.$gte = new Date(startDate);
-        dateQuery.$lte = new Date(endDate);
+        dateQuery.$gte = startDate; // Use string comparison for YYYY-MM-DD format
+        dateQuery.$lte = endDate; // Use string comparison for YYYY-MM-DD format
       } else {
         // Default to current month if no dates provided
         const now = new Date();
@@ -151,12 +151,12 @@ class FinanceController {
 
       // Get bookings for each service type
       const karaokeBookings = await KaraokeBooking.find({
-        startDateTime: dateQuery,
+        date: dateQuery,
         status: { $ne: "cancelled" },
       });
 
       const n64Bookings = await N64Booking.find({
-        startDateTime: dateQuery,
+        date: dateQuery,
         status: { $ne: "cancelled" },
       });
 
@@ -261,8 +261,8 @@ class FinanceController {
 
       let dateQuery = {};
       if (startDate && endDate) {
-        dateQuery.$gte = new Date(startDate);
-        dateQuery.$lte = new Date(endDate);
+        dateQuery.$gte = startDate; // Use string comparison for YYYY-MM-DD format
+        dateQuery.$lte = endDate; // Use string comparison for YYYY-MM-DD format
       } else {
         const now = new Date();
         dateQuery.$gte = startOfMonth(now);
@@ -277,12 +277,12 @@ class FinanceController {
 
       // Get revenue for each service
       const karaokeBookings = await KaraokeBooking.find({
-        startDateTime: dateQuery,
+        date: dateQuery,
         status: { $ne: "cancelled" },
       });
 
       const n64Bookings = await N64Booking.find({
-        startDateTime: dateQuery,
+        date: dateQuery,
         status: { $ne: "cancelled" },
       });
 
@@ -374,9 +374,9 @@ class FinanceController {
 
       // Get all bookings in date range
       const karaokeBookings = await KaraokeBooking.find({
-        startDateTime: dateQuery,
+        date: dateQuery,
       });
-      const n64Bookings = await N64Booking.find({ startDateTime: dateQuery });
+      const n64Bookings = await N64Booking.find({ date: dateQuery });
       const cafeBookings = await CafeBooking.find({ date: dateQuery });
 
       // Aggregate statistics
@@ -430,8 +430,8 @@ class FinanceController {
 
       let dateQuery = {};
       if (startDate && endDate) {
-        dateQuery.$gte = new Date(startDate);
-        dateQuery.$lte = new Date(endDate);
+        dateQuery.$gte = startDate; // Use string comparison for YYYY-MM-DD format
+        dateQuery.$lte = endDate; // Use string comparison for YYYY-MM-DD format
       } else {
         const now = new Date();
         dateQuery.$gte = startOfMonth(now);
@@ -442,18 +442,42 @@ class FinanceController {
 
       // Get karaoke bookings
       const karaokeBookings = await KaraokeBooking.find({
-        startDateTime: dateQuery,
+        date: dateQuery,
       }).populate("roomId", "name");
 
       karaokeBookings.forEach((booking) => {
+        // FIX: Calculate end time without timezone complications
+        const startTime = `${booking.date}T${booking.time}`;
+        const endTime = (() => {
+          // Convert time to minutes for safe calculation
+          const timeMatch = booking.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!timeMatch) return startTime;
+
+          let [_, hourStr, minuteStr, period] = timeMatch;
+          let hour = parseInt(hourStr, 10);
+          const minute = parseInt(minuteStr, 10);
+
+          // Convert to 24-hour format
+          if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+          if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+          // Calculate end time
+          const endHour = hour + booking.durationHours;
+          const endHour24 = endHour % 24;
+          const endHour12 =
+            endHour24 === 0 ? 12 : endHour24 > 12 ? endHour24 - 12 : endHour24;
+          const endPeriod = endHour24 >= 12 ? "PM" : "AM";
+
+          return `${booking.date}T${endHour12}:${minute
+            .toString()
+            .padStart(2, "0")} ${endPeriod}`;
+        })();
+
         calendarData.push({
           id: booking._id,
           title: `Karaoke - ${booking.customerName}`,
-          start: booking.startDateTime,
-          end: new Date(
-            new Date(booking.startDateTime).getTime() +
-              booking.durationHours * 60 * 60 * 1000
-          ),
+          start: startTime,
+          end: endTime,
           serviceType: "karaoke",
           status: booking.status,
           revenue: booking.totalPrice,
@@ -465,18 +489,42 @@ class FinanceController {
 
       // Get N64 bookings
       const n64Bookings = await N64Booking.find({
-        startDateTime: dateQuery,
+        date: dateQuery,
       }).populate("roomId", "name");
 
       n64Bookings.forEach((booking) => {
+        // FIX: Calculate end time without timezone complications
+        const startTime = `${booking.date}T${booking.time}`;
+        const endTime = (() => {
+          // Convert time to minutes for safe calculation
+          const timeMatch = booking.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!timeMatch) return startTime;
+
+          let [_, hourStr, minuteStr, period] = timeMatch;
+          let hour = parseInt(hourStr, 10);
+          const minute = parseInt(minuteStr, 10);
+
+          // Convert to 24-hour format
+          if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+          if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+          // Calculate end time
+          const endHour = hour + booking.durationHours;
+          const endHour24 = endHour % 24;
+          const endHour12 =
+            endHour24 === 0 ? 12 : endHour24 > 12 ? endHour24 - 12 : endHour24;
+          const endPeriod = endHour24 >= 12 ? "PM" : "AM";
+
+          return `${booking.date}T${endHour12}:${minute
+            .toString()
+            .padStart(2, "0")} ${endPeriod}`;
+        })();
+
         calendarData.push({
           id: booking._id,
           title: `N64 - ${booking.customerName}`,
-          start: booking.startDateTime,
-          end: new Date(
-            new Date(booking.startDateTime).getTime() +
-              booking.durationHours * 60 * 60 * 1000
-          ),
+          start: startTime,
+          end: endTime,
           serviceType: "n64",
           status: booking.status,
           revenue: booking.totalPrice,
@@ -536,8 +584,8 @@ class FinanceController {
 
       let dateQuery = {};
       if (startDate && endDate) {
-        dateQuery.$gte = new Date(startDate);
-        dateQuery.$lte = new Date(endDate);
+        dateQuery.$gte = startDate; // Use string comparison for YYYY-MM-DD format
+        dateQuery.$lte = endDate; // Use string comparison for YYYY-MM-DD format
       } else {
         const now = new Date();
         dateQuery.$gte = startOfMonth(now);
@@ -546,9 +594,9 @@ class FinanceController {
 
       // Get all bookings
       const karaokeBookings = await KaraokeBooking.find({
-        startDateTime: dateQuery,
+        date: dateQuery,
       });
-      const n64Bookings = await N64Booking.find({ startDateTime: dateQuery });
+      const n64Bookings = await N64Booking.find({ date: dateQuery });
       const cafeBookings = await CafeBooking.find({ date: dateQuery });
 
       const exportData = {
@@ -576,7 +624,7 @@ class FinanceController {
           customerName: booking.customerName,
           customerEmail: booking.customerEmail,
           customerPhone: booking.customerPhone,
-          bookingDate: booking.startDateTime,
+          bookingDate: booking.date,
           duration: booking.durationHours,
           totalPrice: booking.totalPrice,
           status: booking.status,
@@ -594,7 +642,7 @@ class FinanceController {
           customerName: booking.customerName,
           customerEmail: booking.customerEmail,
           customerPhone: booking.customerPhone,
-          bookingDate: booking.startDateTime,
+          bookingDate: booking.date,
           duration: booking.durationHours,
           totalPrice: booking.totalPrice,
           status: booking.status,

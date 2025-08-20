@@ -35,14 +35,8 @@ const calculateActualEndTime = (startTime, duration) => {
 
 // Email template for N64 booking confirmation
 export const getN64BookingTemplate = (booking, roomName) => {
-  const startTime = new Date(booking.startDateTime).toLocaleTimeString(
-    "en-AU",
-    {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }
-  );
+  // FIX: Use the new date and time fields directly - no timezone conversion needed
+  const startTime = booking.time;
   const actualEndTime = calculateActualEndTime(
     startTime,
     booking.durationHours
@@ -363,6 +357,7 @@ export const getN64BookingTemplate = (booking, roomName) => {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
+                    timeZone: "UTC",
                   })}</span>
                 </div>
                 

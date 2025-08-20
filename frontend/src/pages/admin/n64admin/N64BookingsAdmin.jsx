@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import api from "../../../utils/axios";
 
 const N64BookingsAdmin = () => {
@@ -71,38 +71,85 @@ const N64BookingsAdmin = () => {
 
   // Helper function to format dates
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    // Display exact date without timezone conversion
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
+      timeZone: "UTC",
     });
   };
 
   const formatTime = (dateString) => {
-    return new Date(dateString).toLocaleTimeString("en-US", {
+    // Display exact time without timezone conversion
+    const date = new Date(dateString);
+    return date.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
+      timeZone: "UTC",
     });
   };
 
-  const formatTimeRange = (startDateTime, durationHours) => {
-    const start = new Date(startDateTime);
-    const end = new Date(start);
-    end.setHours(end.getHours() + durationHours);
-
-    const startTime = start.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-    const endTime = end.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-
-    return `${startTime} - ${endTime}`;
+  // Helper function to format time range
+  const formatTimeRange = (date, time, durationHours) => {
+    try {
+      // Parse the time string (e.g., "2:00 PM" or "14:00")
+      let hours, minutes;
+      
+      if (time.includes('PM') || time.includes('AM')) {
+        // Handle 12-hour format (e.g., "2:00 PM")
+        const timeMatch = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (timeMatch) {
+          hours = parseInt(timeMatch[1]);
+          minutes = parseInt(timeMatch[2]);
+          const period = timeMatch[3].toUpperCase();
+          
+          if (period === 'PM' && hours !== 12) {
+            hours += 12;
+          } else if (period === 'AM' && hours === 12) {
+            hours = 0;
+          }
+        }
+      } else {
+        // Handle 24-hour format (e.g., "14:00")
+        const timeMatch = time.match(/(\d+):(\d+)/);
+        if (timeMatch) {
+          hours = parseInt(timeMatch[1]);
+          minutes = parseInt(timeMatch[2]);
+        }
+      }
+      
+      if (hours === undefined || minutes === undefined) {
+        return `${time} - ${time}`; // Fallback if parsing fails
+      }
+      
+      // Create start time
+      const start = new Date(date);
+      start.setHours(hours, minutes, 0, 0);
+      
+      // Create end time
+      const end = new Date(start.getTime() + durationHours * 60 * 60 * 1000);
+      
+      // Format times
+      const startTime = start.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+      
+      const endTime = end.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+      
+      return `${startTime} - ${endTime}`;
+    } catch (error) {
+      console.error("Error formatting time range:", error);
+      return `${time} - ${time}`; // Fallback
+    }
   };
 
   // Helper function to get status badge colors and display text
@@ -126,25 +173,43 @@ const N64BookingsAdmin = () => {
     return bookings
       .filter((booking) => {
         if (!dateFilter) return true;
-        const bookingDate = new Date(booking.startDateTime)
-          .toISOString()
-          .slice(0, 10);
-        return bookingDate === dateFilter;
+        // FIX: Simple date string comparison - no timezone conversion needed
+        return booking.date === dateFilter;
       })
       .sort((a, b) => {
         switch (sortBy) {
           case "oldest":
-            return new Date(a.startDateTime) - new Date(b.startDateTime);
+            return new Date(a.date) - new Date(b.date);
           case "durationHigh":
             return b.durationHours - a.durationHours;
           case "durationLow":
             return a.durationHours - b.durationHours;
           case "newest":
           default:
-            return new Date(b.startDateTime) - new Date(a.startDateTime);
+            return new Date(b.date) - new Date(a.date);
         }
       });
   }, [bookings, dateFilter, sortBy]);
+
+  // Sort bookings by date and time
+  const sortedBookings = useMemo(() => {
+    if (!bookings) return [];
+
+    return [...bookings].sort((a, b) => {
+      // FIX: Sort by date first, then by time
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+
+      if (dateA.getTime() !== dateB.getTime()) {
+        return dateA - dateB;
+      }
+
+      // If same date, sort by time
+      const timeA = a.time;
+      const timeB = b.time;
+      return timeA.localeCompare(timeB);
+    });
+  }, [bookings]);
 
   // A reusable component for action buttons
   const ActionButtons = ({ booking }) => (
@@ -311,9 +376,10 @@ const N64BookingsAdmin = () => {
                         {booking.roomId?.name || booking.roomType || "N/A"}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {formatDate(booking.startDateTime)} (
+                        {formatDate(booking.date)} (
                         {formatTimeRange(
-                          booking.startDateTime,
+                          booking.date,
+                          booking.time,
                           booking.durationHours
                         )}
                         )
@@ -422,11 +488,12 @@ const N64BookingsAdmin = () => {
                         {booking.roomId?.name || booking.roomType || "N/A"}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {formatDate(booking.startDateTime)}
+                        {formatDate(booking.date)}
                       </div>
                       <div className="text-xs text-gray-500">
                         {formatTimeRange(
-                          booking.startDateTime,
+                          booking.date,
+                          booking.time,
                           booking.durationHours
                         )}
                       </div>
@@ -523,7 +590,7 @@ const N64BookingsAdmin = () => {
 
                   <dt className="text-sm font-medium text-gray-500">Date</dt>
                   <dd className="text-sm text-gray-900">
-                    {formatDate(booking.startDateTime)}
+                    {formatDate(booking.date)}
                   </dd>
 
                   <dt className="text-sm font-medium text-gray-500">
@@ -531,7 +598,8 @@ const N64BookingsAdmin = () => {
                   </dt>
                   <dd className="text-sm text-gray-900">
                     {formatTimeRange(
-                      booking.startDateTime,
+                      booking.date,
+                      booking.time,
                       booking.durationHours
                     )}
                   </dd>

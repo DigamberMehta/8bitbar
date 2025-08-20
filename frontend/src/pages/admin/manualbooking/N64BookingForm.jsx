@@ -25,7 +25,8 @@ const N64BookingForm = ({
               (r) => r._id === e.target.value
             );
             handleBookingDataChange("n64", "roomId", e.target.value);
-            handleBookingDataChange("n64", "startDateTime", "");
+            handleBookingDataChange("n64", "date", "");
+            handleBookingDataChange("n64", "time", "");
             if (selectedRoom) {
               handleBookingDataChange("n64", "roomType", selectedRoom.roomType);
             }
@@ -64,18 +65,10 @@ const N64BookingForm = ({
           label="Date"
           icon={<Calendar size={16} />}
           type="date"
-          value={
-            bookingData.n64.startDateTime
-              ? bookingData.n64.startDateTime.split("T")[0]
-              : ""
-          }
+          value={bookingData.n64.date || ""}
           onChange={(e) => {
             const date = e.target.value;
-            handleBookingDataChange(
-              "n64",
-              "startDateTime",
-              date ? `${date}T00:00` : ""
-            );
+            handleBookingDataChange("n64", "date", date);
           }}
           min={new Date().toISOString().split("T")[0]}
           required
@@ -104,31 +97,26 @@ const N64BookingForm = ({
       </div>
 
       {/* Time Slot Selection */}
-      {bookingData.n64.roomId && bookingData.n64.startDateTime && (
+      {bookingData.n64.roomId && bookingData.n64.date && (
         <div className="space-y-2 sm:space-y-3">
           <label className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-medium text-gray-700">
-            <Clock size={14} className="sm:w-4 sm:h-4" />
+            <Clock size={14} className="sm:w-4 sm:w-4" />
             <span>Select Start Time</span>
           </label>
 
           <TimeSlotSelector
             timeSlots={roomAvailability.n64.timeSlots}
             blockedSlots={(() => {
-              const date = bookingData.n64.startDateTime.split("T")[0];
               return getBlockedSlots(
                 "n64",
-                date,
+                bookingData.n64.date,
                 bookingData.n64.durationHours
               );
             })()}
-            selectedTime={
-              bookingData.n64.startDateTime.includes("T")
-                ? bookingData.n64.startDateTime.split("T")[1]
-                : ""
-            }
-            date={bookingData.n64.startDateTime.split("T")[0]}
-            onTimeSelect={(dateTime) =>
-              handleBookingDataChange("n64", "startDateTime", dateTime)
+            selectedTime={bookingData.n64.time || ""}
+            date={bookingData.n64.date}
+            onTimeSelect={(time) =>
+              handleBookingDataChange("n64", "time", time)
             }
             getSlotDate={getSlotDate}
             loading={loadingRoomAvailability}

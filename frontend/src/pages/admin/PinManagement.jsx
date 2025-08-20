@@ -310,7 +310,12 @@ const PinManagement = () => {
                     <div className="text-sm text-gray-500">
                       <span className="font-medium">Last Used:</span>{" "}
                       {existingPin?.lastUsed
-                        ? new Date(existingPin.lastUsed).toLocaleDateString()
+                        ? new Date(existingPin.lastUsed).toLocaleDateString("en-US", {
+                            timeZone: "UTC",
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
                         : existingPin
                         ? "Never"
                         : "-"}

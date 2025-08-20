@@ -2,23 +2,13 @@ import React from "react";
 import { MdAccessTime } from "react-icons/md";
 
 const TimeSlotSelector = ({
-  service,
-  date,
-  duration,
-  roomAvailability,
-  loading,
-  getSlotDate,
-  getBlockedSlots,
-  onTimeSelect,
+  timeSlots = [],
+  blockedSlots = [],
   selectedTime,
+  date,
+  onTimeSelect,
+  loading,
 }) => {
-  console.log(`TimeSlotSelector props:`, {
-    service,
-    date,
-    duration,
-    roomAvailability,
-    loading,
-  });
 
   if (loading) {
     return (
@@ -28,12 +18,17 @@ const TimeSlotSelector = ({
     );
   }
 
-  const { timeSlots } = roomAvailability[service] || { timeSlots: [] };
-  const blockedSlots = getBlockedSlots
-    ? getBlockedSlots(service, date, duration)
-    : [];
+  if (!timeSlots || timeSlots.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <MdAccessTime size={48} className="mx-auto mb-2 text-gray-300" />
+        <p>No time slots available for this room</p>
+      </div>
+    );
+  }
 
-  console.log(`TimeSlotSelector data:`, { timeSlots, blockedSlots });
+    // Ensure blockedSlots is an array
+  const safeBlockedSlots = Array.isArray(blockedSlots) ? blockedSlots : [];
 
   if (timeSlots.length === 0) {
     return (
@@ -47,19 +42,16 @@ const TimeSlotSelector = ({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 sm:gap-2">
       {timeSlots.map((timeSlot) => {
-        const isBlocked = blockedSlots.includes(timeSlot);
-        const slotDate = getSlotDate ? getSlotDate(date, timeSlot) : null;
-        const timeValue = slotDate ? slotDate.toTimeString().slice(0, 5) : "";
-
-        const isSelected = selectedTime === timeValue;
+        const isBlocked = safeBlockedSlots.includes(timeSlot);
+        const isSelected = selectedTime === timeSlot;
 
         return (
           <button
             key={timeSlot}
             type="button"
             onClick={() => {
-              if (!isBlocked && slotDate) {
-                onTimeSelect(timeValue);
+              if (!isBlocked) {
+                onTimeSelect(timeSlot);
               }
             }}
             disabled={isBlocked}

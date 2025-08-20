@@ -220,6 +220,7 @@ export const getGiftCardPurchaseTemplate = (giftCard, user) => {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
+                          timeZone: "UTC",
                         })}</span>
                     </div>
                     <div class="detail-row">

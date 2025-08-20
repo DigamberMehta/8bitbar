@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Clock, Users, Calendar, Music, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -53,21 +53,20 @@ const BookingForm = ({ room }) => {
   // Helper: get all booked slots for the selected date (overlapping logic)
   const getBookedTimesForDate = (dateStr) => {
     return timeSlots.filter((slot) => {
-      // Convert slot (e.g., "6:00 PM") to a Date object on the selected date
-      const match = slot.match(/(\d+):(\d+) (AM|PM)/);
-      if (!match) return false;
-      const [_, slotHour, slotMinute, slotPeriod] = match;
-      let hour = parseInt(slotHour, 10);
-      if (slotPeriod === "PM" && hour !== 12) hour += 12;
-      if (slotPeriod === "AM" && hour === 12) hour = 0;
-      const slotDate = new Date(dateStr);
-      slotDate.setHours(hour, parseInt(slotMinute, 10), 0, 0);
+      // Convert slot time to minutes
+      const slotStart = convertTimeToMinutes(slot);
 
       // Check if this slot overlaps with any booking
       return bookings.some((b) => {
-        const bookingStart = new Date(b.startDateTime);
-        const bookingEnd = new Date(b.endDateTime);
-        return slotDate >= bookingStart && slotDate < bookingEnd;
+        // Only check bookings on the same date
+        if (b.date !== dateStr) return false;
+
+        // Convert booking time to minutes
+        const bookingStart = convertTimeToMinutes(b.time);
+        const bookingEnd = bookingStart + b.durationHours * 60;
+
+        // Check if the slot time falls within the booking time range
+        return slotStart >= bookingStart && slotStart < bookingEnd;
       });
     });
   };
@@ -80,40 +79,78 @@ const BookingForm = ({ room }) => {
     let hour = parseInt(slotHour, 10);
     if (slotPeriod === "PM" && hour !== 12) hour += 12;
     if (slotPeriod === "AM" && hour === 12) hour = 0;
-    const slotDate = new Date(dateStr);
-    slotDate.setHours(hour, parseInt(slotMinute, 10), 0, 0);
+    // TIMEZONE FIX: Create date as UTC to match database storage
+    const slotDate = new Date(
+      `${dateStr}T${hour.toString().padStart(2, "0")}:${slotMinute.padStart(
+        2,
+        "0"
+      )}:00.000Z`
+    );
     return slotDate;
+  };
+
+  // Helper function to convert time string to minutes since midnight
+  const convertTimeToMinutes = (timeString) => {
+    const match = timeString.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return 0;
+
+    let [_, hourStr, minuteStr, period] = match;
+    let hour = parseInt(hourStr, 10);
+    const minute = parseInt(minuteStr, 10);
+
+    // Convert to 24-hour format
+    if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+    if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+    return hour * 60 + minute;
   };
 
   // Get all slots that would be blocked by the selected duration
   const getBlockedSlots = (dateStr) => {
-    return timeSlots.filter((slot, idx) => {
-      const slotStart = getSlotDate(dateStr, slot);
-      if (!slotStart) return false;
-      // Calculate the end time for this booking if started at this slot
-      const slotEnd = new Date(slotStart);
-      slotEnd.setHours(slotEnd.getHours() + numberOfHours);
-      // For each hour in the duration, check if any hour overlaps with a booking
-      for (let d = 0; d < numberOfHours; d++) {
-        const checkStart = new Date(slotStart);
-        checkStart.setHours(checkStart.getHours() + d);
-        const checkEnd = new Date(checkStart);
-        checkEnd.setHours(checkEnd.getHours() + 1);
-        // Check for overlap with any booking
-        const overlap = bookings.some((b) => {
-          const bookingStart = new Date(b.startDateTime);
-          const bookingEnd = new Date(b.endDateTime);
-          // Overlap if checkStart < bookingEnd && checkEnd > bookingStart
-          return checkStart < bookingEnd && checkEnd > bookingStart;
-        });
-        if (overlap) return true;
-      }
-      return false;
+    return timeSlots.filter((slot) => {
+      // Convert current slot time to minutes
+      const slotStart = convertTimeToMinutes(slot);
+      const slotEnd = slotStart + numberOfHours * 60;
+
+      // Check for overlap with any booking on the same date
+      const overlap = bookings.some((b) => {
+        // Only check bookings on the same date
+        if (b.date !== dateStr) return false;
+
+        // Convert booking time to minutes
+        const bookingStart = convertTimeToMinutes(b.time);
+        const bookingEnd = bookingStart + b.durationHours * 60;
+
+        // Check for overlap: (StartA < EndB) and (StartB < EndA)
+        return slotStart < bookingEnd && bookingStart < slotEnd;
+      });
+
+      return overlap;
     });
   };
   const blockedSlots = selectedDate ? getBlockedSlots(selectedDate) : [];
 
   const bookedTimes = selectedDate ? getBookedTimesForDate(selectedDate) : [];
+
+  // Check for conflicts
+  const hasConflict = useMemo(() => {
+    if (!selectedTime || !selectedDate || !numberOfHours) return false;
+
+    return bookings.some((b) => {
+      // Only check bookings on the same date
+      if (b.date !== selectedDate) return false;
+
+      // Convert times to minutes for comparison
+      const selectedStart = convertTimeToMinutes(selectedTime);
+      const selectedEnd = selectedStart + numberOfHours * 60;
+
+      const bookingStart = convertTimeToMinutes(b.time);
+      const bookingEnd = bookingStart + b.durationHours * 60;
+
+      // Check for overlap: (StartA < EndB) and (StartB < EndA)
+      return selectedStart < bookingEnd && bookingStart < selectedEnd;
+    });
+  }, [bookings, selectedTime, selectedDate, numberOfHours]);
 
   const handleAddToCart = () => {
     if (selectedDate && selectedTime) {
@@ -191,9 +228,7 @@ const BookingForm = ({ room }) => {
   };
 
   // Helper: get all booked dates (for disabling in date picker)
-  const bookedDatesSet = new Set(
-    bookings.map((b) => new Date(b.startDateTime).toISOString().split("T")[0])
-  );
+  const bookedDatesSet = new Set(bookings.map((b) => b.date));
 
   // Helper: check if a date falls on an available week day
   const isDateAvailable = (dateStr) => {

@@ -22,24 +22,52 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
   };
 
   const formatEvents = (events) => {
-    return events.map((event) => ({
-      id: event.id,
-      title: event.title,
-      start: event.start,
-      end: event.end,
-      backgroundColor: getEventColor(event.serviceType),
-      borderColor: getEventColor(event.serviceType),
-      textColor: "#FFFFFF",
-      extendedProps: {
-        serviceType: event.serviceType,
-        status: event.status,
-        paymentStatus: event.paymentStatus,
-        revenue: event.revenue,
-        roomName: event.roomName,
-        customerName: event.customerName,
-        customerEmail: event.customerEmail,
-      },
-    }));
+    const formattedEvents = events.map((event) => {
+      // Convert time format from "2:00 PM" to ISO format
+      const convertTimeToISO = (dateTimeStr) => {
+        // Parse "2025-08-23T2:00 PM" format
+        const match = dateTimeStr.match(
+          /(\d{4}-\d{2}-\d{2})T(\d{1,2}):(\d{2})\s*(AM|PM)/i
+        );
+        if (!match) {
+          return dateTimeStr;
+        }
+
+        const [_, date, hourStr, minuteStr, period] = match;
+        let hour = parseInt(hourStr, 10);
+        const minute = parseInt(minuteStr, 10);
+
+        // Convert to 24-hour format
+        if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+        if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+        // Format as ISO string
+        return `${date}T${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}:00`;
+      };
+
+      return {
+        id: event.id,
+        title: event.title,
+        start: convertTimeToISO(event.start),
+        end: convertTimeToISO(event.end),
+        backgroundColor: getEventColor(event.serviceType),
+        borderColor: getEventColor(event.serviceType),
+        textColor: "#FFFFFF",
+        extendedProps: {
+          serviceType: event.serviceType,
+          status: event.status,
+          paymentStatus: event.paymentStatus,
+          revenue: event.revenue,
+          roomName: event.roomName,
+          customerName: event.customerName,
+          customerEmail: event.customerEmail,
+        },
+      };
+    });
+
+    return formattedEvents;
   };
 
   const handleEventClick = (clickInfo) => {
@@ -49,7 +77,6 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
   };
 
   const handleDatesSet = (dateInfo) => {
-    console.log("Calendar dates changed:", dateInfo);
     // Update current view state
     setCurrentView(dateInfo.view.type);
 
@@ -68,7 +95,6 @@ const FinanceCalendar = ({ events, onEventClick, onMonthChange }) => {
         year: startDate.getFullYear(),
       };
 
-      console.log("Month changed to:", monthInfo);
       onMonthChange(monthInfo);
     }
   };
